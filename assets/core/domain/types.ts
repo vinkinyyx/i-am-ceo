@@ -1,0 +1,238 @@
+/**
+ * 核心领域类型（设计文档 02.2 / 02.3 字段字典）。
+ * 本文件同时是存档 JSON Schema 的 TS 事实来源，字段命名与 save.schema.json 对齐。
+ */
+
+export type IndustryId = 'TRADE' | 'SOFTWARE' | 'SERVICE';
+export type DeptType =
+  | 'BUSINESS'
+  | 'HR'
+  | 'PROCUREMENT'
+  | 'MARKETING'
+  | 'CUSTOMER_SERVICE'
+  | 'FINANCE';
+export type SupportDeptType = Exclude<DeptType, 'BUSINESS'>;
+export type Policy = 'STEADY' | 'GROWTH' | 'PROFIT';
+export type CashRisk = 'NORMAL' | 'WARNING' | 'DISTRESS';
+export type CeoTrait = 'BOLD' | 'STEADY' | 'PEOPLE';
+export type EmployeePersonality = 'BOLD' | 'STEADY' | 'COLLABORATIVE';
+export type EmployeeStatus = 'ACTIVE' | 'PENDING_DISMISSAL' | 'DISMISSED';
+export type StaffingMode = 'AUTO' | 'LOCKED';
+export type GameSpeed = 0 | 1 | 2 | 5;
+
+export type GamePhase =
+  | 'CREATING'
+  | 'HIRING_INITIAL'
+  | 'TUTORIAL_DASHBOARD'
+  | 'RUNNING'
+  | 'DISTRESS'
+  | 'RESETTING';
+
+export const INDUSTRIES: readonly IndustryId[] = ['TRADE', 'SOFTWARE', 'SERVICE'];
+export const SUPPORT_DEPARTMENTS: readonly SupportDeptType[] = [
+  'HR',
+  'PROCUREMENT',
+  'MARKETING',
+  'CUSTOMER_SERVICE',
+  'FINANCE',
+];
+export const CEO_TRAITS: readonly CeoTrait[] = ['BOLD', 'STEADY', 'PEOPLE'];
+
+export interface Company {
+  companyId: string;
+  name: string;
+  industry: IndustryId;
+  foundedYear: number;
+  cashYuan: number;
+  initialCapitalYuan: number;
+  paidInCapitalYuan: number;
+  businessAssetBookYuan: number;
+  businessCapacityInvestmentYuan: number;
+  businessCapacityBonusBps: number;
+  marketDemandIndexBps: number;
+}
+
+export interface Ceo {
+  name: string;
+  trait: CeoTrait;
+  businessSkill: number;
+  managementSkill: number;
+  financeSkill: number;
+}
+
+export interface Employee {
+  employeeId: string;
+  name: string;
+  avatarId: string;
+  departmentId: string;
+  skill: number;
+  potential: number;
+  teamwork: number;
+  personality: EmployeePersonality;
+  salaryMonthlyYuan: number;
+  hiredAtMonthIndex: number;
+  effectiveFromMonthIndex: number;
+  dismissedAtMonthIndex: number | null;
+  status: EmployeeStatus;
+  /** 录用该员工的命令 ID（幂等重放依据，不展示给玩家）。 */
+  hireCommandId?: string;
+  /** 来源候选 ID（防止同一候选被重复录用）。 */
+  candidateId?: string;
+}
+
+export interface Department {
+  deptId: string;
+  type: DeptType;
+  enabled: boolean;
+  staffingMode: StaffingMode;
+  targetCount: number;
+  createdMonthIndex: number;
+  setupPaid: boolean;
+}
+
+export interface Candidate {
+  candidateId: string;
+  name: string;
+  avatarId: string;
+  skill: number;
+  potential: number;
+  teamwork: number;
+  personality: EmployeePersonality;
+  salaryMonthlyYuan: number;
+  /** 候选倾向标签：A 即战力 / B 潜力股 / C 经济型 */
+  archetype: 'A' | 'B' | 'C';
+}
+
+export interface CandidateOffer {
+  offerId: string;
+  deptId: string;
+  generatedForIndex: number;
+  expiresAtMonthIndex: number;
+  offerSequence: number;
+  candidates: readonly Candidate[];
+}
+
+export type JournalCategory =
+  | 'REVENUE'
+  | 'DIRECT_COST'
+  | 'OTHER_OPERATING'
+  | 'AFTER_SALES'
+  | 'FIXED_COST'
+  | 'PAYROLL'
+  | 'RECRUITMENT'
+  | 'SEVERANCE'
+  | 'DEPT_SETUP'
+  | 'EVENT'
+  | 'DEPRECIATION'
+  | 'CAPEX'
+  | 'CAPITAL_INJECTION';
+
+export interface JournalEntry {
+  entryId: string;
+  monthKey: string;
+  category: JournalCategory;
+  amountYuan: number;
+  isCash: boolean;
+  /** 该笔现金是否已在命令确认时实际扣付（月结不可再次扣现金）。 */
+  alreadyPaid: boolean;
+  refId?: string;
+}
+
+export interface MonthlyLedger {
+  runId: string;
+  year: number;
+  month: number;
+  revenueYuan: number;
+  directCostYuan: number;
+  otherOperatingCostYuan: number;
+  afterSalesCostYuan: number;
+  fixedCostYuan: number;
+  payrollYuan: number;
+  recruitmentCostYuan: number;
+  severanceCostYuan: number;
+  deptSetupCostYuan: number;
+  eventCostYuan: number;
+  depreciationYuan: number;
+  profitYuan: number;
+  /** 归属该月的全部现金变化（含已在命令时支付的款项），用于年报勾稽。 */
+  cashDeltaYuan: number;
+}
+
+export interface AnnualReport {
+  year: number;
+  revenueYuan: number;
+  directCostYuan: number;
+  otherOperatingCostYuan: number;
+  afterSalesCostYuan: number;
+  fixedCostYuan: number;
+  payrollYuan: number;
+  recruitmentCostYuan: number;
+  severanceCostYuan: number;
+  deptSetupCostYuan: number;
+  eventCostYuan: number;
+  depreciationYuan: number;
+  profitYuan: number;
+  cashOpenYuan: number;
+  cashCloseYuan: number;
+  assetCloseYuan: number;
+  headcountClose: number;
+  settled: boolean;
+}
+
+export interface EventRecord {
+  eventId: string;
+  type: string;
+  effectYuan: number;
+  year: number;
+  month: number;
+}
+
+export interface BotCompany {
+  botId: string;
+  name: string;
+  assetsYuan: number;
+  yearsOperated: number;
+  initialAssetsYuan: number;
+  baseGrowthBps: number;
+}
+
+export interface OnboardingState {
+  stepId: string;
+  completedSteps: string[];
+  skipped: boolean;
+  lastKnownStep: string;
+  tutorialVersion: number;
+  initialHiresCompleted: number;
+}
+
+export interface GameState {
+  phase: GamePhase;
+  runId: string;
+  seed: number;
+  rngCounter: number;
+  initializedCapital: boolean;
+  gameYear: number;
+  gameMonth: number;
+  progressMsInMonth: number;
+  speed: GameSpeed;
+  lastWallClockMs: number;
+  lastSettledMonthKey: string | null;
+  offlineRemainderMs: number;
+  onboarding: OnboardingState;
+  company: Company | null;
+  ceo: Ceo | null;
+  employees: Employee[];
+  departments: Department[];
+  offers: CandidateOffer[];
+  policy: Policy;
+  monthlyLedgersRolling: MonthlyLedger[];
+  annualReports: AnnualReport[];
+  pendingEntries: JournalEntry[];
+  eventHistory: EventRecord[];
+  botCompanies: BotCompany[];
+  consecutiveProfitableYears: number;
+  target3YearsAchieved: boolean;
+  rescueCapitalUsed: boolean;
+  cashRisk: CashRisk;
+  executedCommandIds: string[];
+}

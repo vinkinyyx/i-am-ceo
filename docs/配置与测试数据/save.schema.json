@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/im-ceo/save.schema.json",
+  "title": "IM CEO GameSave Envelope (foundation contract)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "gameVersion",
+    "configVersion",
+    "checksum",
+    "revision",
+    "runId",
+    "resetGeneration",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "gameVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "configVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checksum": {
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resetGeneration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "phase",
+        "runId",
+        "seed",
+        "gameYear",
+        "gameMonth",
+        "speed",
+        "company",
+        "ceo",
+        "employees",
+        "departments",
+        "annualReports",
+        "consecutiveProfitableYears",
+        "rescueCapitalUsed"
+      ],
+      "properties": {
+        "phase": {
+          "enum": [
+            "CREATING",
+            "HIRING_INITIAL",
+            "TUTORIAL_DASHBOARD",
+            "RUNNING",
+            "DISTRESS",
+            "RESETTING"
+          ]
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "gameYear": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "gameMonth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "speed": {
+          "enum": [
+            0,
+            1,
+            2,
+            5
+          ]
+        },
+        "company": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "name",
+                "industry",
+                "cashYuan",
+                "businessAssetBookYuan"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "industry": {
+                  "enum": [
+                    "TRADE",
+                    "SOFTWARE",
+                    "SERVICE"
+                  ]
+                },
+                "cashYuan": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "businessAssetBookYuan": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "ceo": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "name",
+                "trait",
+                "businessSkill",
+                "managementSkill",
+                "financeSkill"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "trait": {
+                  "enum": [
+                    "BOLD",
+                    "STEADY",
+                    "PEOPLE"
+                  ]
+                },
+                "businessSkill": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "managementSkill": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "financeSkill": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              },
+              "additionalProperties": true
+            }
+          ]
+        },
+        "employees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "employeeId",
+              "name",
+              "departmentId",
+              "skill",
+              "potential",
+              "teamwork",
+              "salaryMonthlyYuan",
+              "status"
+            ],
+            "properties": {
+              "employeeId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "departmentId": {
+                "type": "string"
+              },
+              "skill": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "potential": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "teamwork": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "salaryMonthlyYuan": {
+                "type": "integer",
+                "minimum": 4000,
+                "maximum": 8000
+              },
+              "status": {
+                "enum": [
+                  "ACTIVE",
+                  "PENDING_DISMISSAL",
+                  "DISMISSED"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "departments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "deptId",
+              "type",
+              "enabled",
+              "staffingMode",
+              "targetCount"
+            ],
+            "properties": {
+              "deptId": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "BUSINESS",
+                  "HR",
+                  "PROCUREMENT",
+                  "MARKETING",
+                  "CUSTOMER_SERVICE",
+                  "FINANCE"
+                ]
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "staffingMode": {
+                "enum": [
+                  "AUTO",
+                  "LOCKED"
+                ]
+              },
+              "targetCount": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "annualReports": {
+          "type": "array"
+        },
+        "consecutiveProfitableYears": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rescueCapitalUsed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

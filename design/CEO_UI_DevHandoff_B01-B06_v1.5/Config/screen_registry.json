@@ -1,0 +1,822 @@
+{
+  "schemaVersion": "1.0",
+  "designLogicalSize": {
+    "width": 375,
+    "height": 812
+  },
+  "screens": [
+    {
+      "id": "UI-01",
+      "routeId": "S00",
+      "kind": "scene",
+      "screen": "Boot",
+      "navigationPath": "/boot",
+      "parent": "NONE",
+      "vmKey": "boot/init",
+      "viewFields": [
+        "hasSave",
+        "platformStatus",
+        "loadStatus"
+      ],
+      "actions": [
+        "startNew",
+        "continue",
+        "retry",
+        "openPrivacy"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch.svg",
+      "spec": "Docs/ScreenSpecs/UI-01_Launch_Spec.md",
+      "states": "Docs/ScreenStates/UI-01_Launch_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-02",
+      "routeId": "S01",
+      "kind": "scene",
+      "screen": "CreateCompany",
+      "navigationPath": "/onboarding/company",
+      "parent": "NONE",
+      "vmKey": "company/draft",
+      "viewFields": [
+        "industryOptions",
+        "nameSuggestions",
+        "customName",
+        "validation"
+      ],
+      "actions": [
+        "selectIndustry",
+        "selectName",
+        "refreshNames",
+        "setCustomName",
+        "next"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-02_CreateCompany.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-02_CreateCompany.svg",
+      "spec": "Docs/ScreenSpecs/UI-02_CreateCompany_Spec.md",
+      "states": "Docs/ScreenStates/UI-02_CreateCompany_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-03",
+      "routeId": "S02",
+      "kind": "scene",
+      "screen": "CreateCEO",
+      "navigationPath": "/onboarding/ceo",
+      "parent": "NONE",
+      "vmKey": "ceo/draft",
+      "viewFields": [
+        "ceoName",
+        "trait",
+        "initialStats",
+        "validation"
+      ],
+      "actions": [
+        "editCEOName",
+        "chooseTrait",
+        "back",
+        "next"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-03_CreateCEO.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-03_CreateCEO.svg",
+      "spec": "Docs/ScreenSpecs/UI-03_CreateCEO_Spec.md",
+      "states": "Docs/ScreenStates/UI-03_CreateCEO_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-04",
+      "routeId": "S03",
+      "kind": "scene",
+      "screen": "FirstHire",
+      "navigationPath": "/onboarding/hire",
+      "parent": "NONE",
+      "vmKey": "recruitment/initial",
+      "viewFields": [
+        "offers",
+        "selectedCount",
+        "recruitmentFee",
+        "cash"
+      ],
+      "actions": [
+        "selectCandidate",
+        "hire",
+        "back",
+        "enterBusiness"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-04_FirstHire.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-04_FirstHire.svg",
+      "spec": "Docs/ScreenSpecs/UI-04_FirstHire_Spec.md",
+      "states": "Docs/ScreenStates/UI-04_FirstHire_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-05",
+      "routeId": "T01",
+      "kind": "tab",
+      "screen": "CompanyDashboard",
+      "navigationPath": "/tab/company",
+      "parent": "NONE",
+      "vmKey": "dashboard/read",
+      "viewFields": [
+        "companyName",
+        "ceo",
+        "year",
+        "month",
+        "cash",
+        "revenueYTD",
+        "forecastProfit",
+        "speed",
+        "risk"
+      ],
+      "actions": [
+        "setSpeed",
+        "openYearReport",
+        "openPolicy",
+        "openSettings",
+        "openRisk"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-05_CompanyDashboard.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-05_CompanyDashboard.svg",
+      "spec": "Docs/ScreenSpecs/UI-05_CompanyDashboard_Spec.md",
+      "states": "Docs/ScreenStates/UI-05_CompanyDashboard_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-06",
+      "routeId": "T02",
+      "kind": "tab",
+      "screen": "DepartmentList",
+      "navigationPath": "/tab/departments",
+      "parent": "NONE",
+      "vmKey": "departments/list",
+      "viewFields": [
+        "businessDepartment",
+        "supportDepartments",
+        "creationCosts",
+        "autoMode"
+      ],
+      "actions": [
+        "openDepartment",
+        "createDepartment",
+        "openStaffAllocation"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-06_DepartmentList.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-06_DepartmentList.svg",
+      "spec": "Docs/ScreenSpecs/UI-06_DepartmentList_Spec.md",
+      "states": "Docs/ScreenStates/UI-06_DepartmentList_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-07",
+      "routeId": "T03",
+      "kind": "tab",
+      "screen": "StaffList",
+      "navigationPath": "/tab/staff",
+      "parent": "NONE",
+      "vmKey": "employees/list",
+      "viewFields": [
+        "employeeList",
+        "staffCount",
+        "salaryCost",
+        "departmentFilter"
+      ],
+      "actions": [
+        "filterDepartment",
+        "openEmployee",
+        "openRecruitment"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-07_StaffList.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-07_StaffList.svg",
+      "spec": "Docs/ScreenSpecs/UI-07_StaffList_Spec.md",
+      "states": "Docs/ScreenStates/UI-07_StaffList_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-08",
+      "routeId": "T04",
+      "kind": "tab",
+      "screen": "Leaderboard",
+      "navigationPath": "/tab/ranking",
+      "parent": "NONE",
+      "vmKey": "ranking/read",
+      "viewFields": [
+        "rankType",
+        "companyRank",
+        "botRanks",
+        "companyYears",
+        "totalAssets"
+      ],
+      "actions": [
+        "setRankType",
+        "openRankingHelp"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-08_Leaderboard.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-08_Leaderboard.svg",
+      "spec": "Docs/ScreenSpecs/UI-08_Leaderboard_Spec.md",
+      "states": "Docs/ScreenStates/UI-08_Leaderboard_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-09",
+      "routeId": "D01",
+      "kind": "detail",
+      "screen": "AnnualReport",
+      "navigationPath": "/detail/annual-report",
+      "parent": "T01",
+      "vmKey": "reports/read",
+      "viewFields": [
+        "annualRevenue",
+        "annualCost",
+        "annualProfit",
+        "openingCash",
+        "closingCash",
+        "assets",
+        "events"
+      ],
+      "actions": [
+        "close",
+        "chooseYear",
+        "acknowledgeTutorial"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-09_AnnualReport.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-09_AnnualReport.svg",
+      "spec": "Docs/ScreenSpecs/UI-09_AnnualReport_Spec.md",
+      "states": "Docs/ScreenStates/UI-09_AnnualReport_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-10",
+      "routeId": "D02",
+      "kind": "detail",
+      "screen": "EmployeeDetail",
+      "navigationPath": "/detail/employee",
+      "parent": "T03",
+      "vmKey": "employee/read",
+      "viewFields": [
+        "employee",
+        "department",
+        "traits",
+        "tenure",
+        "salary"
+      ],
+      "actions": [
+        "openLayoffPreview",
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-10_EmployeeDetail.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-10_EmployeeDetail.svg",
+      "spec": "Docs/ScreenSpecs/UI-10_EmployeeDetail_Spec.md",
+      "states": "Docs/ScreenStates/UI-10_EmployeeDetail_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-11",
+      "routeId": "D03",
+      "kind": "detail",
+      "screen": "DepartmentDetail",
+      "navigationPath": "/detail/department",
+      "parent": "T02",
+      "vmKey": "department/read",
+      "viewFields": [
+        "department",
+        "staffCount",
+        "annualCosts",
+        "annualBenefit",
+        "staffMode"
+      ],
+      "actions": [
+        "openStaffAllocation",
+        "openRecruitment",
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-11_DepartmentDetail.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-11_DepartmentDetail.svg",
+      "spec": "Docs/ScreenSpecs/UI-11_DepartmentDetail_Spec.md",
+      "states": "Docs/ScreenStates/UI-11_DepartmentDetail_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-12",
+      "routeId": "D04",
+      "kind": "detail",
+      "screen": "Settings",
+      "navigationPath": "/detail/settings",
+      "parent": "T01",
+      "vmKey": "settings/read",
+      "viewFields": [
+        "soundEnabled",
+        "musicEnabled",
+        "guideStatus",
+        "version",
+        "platformInfo"
+      ],
+      "actions": [
+        "toggleSound",
+        "replayTutorial",
+        "openPrivacy",
+        "openCloseCompany"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-12_Settings.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-12_Settings.svg",
+      "spec": "Docs/ScreenSpecs/UI-12_Settings_Spec.md",
+      "states": "Docs/ScreenStates/UI-12_Settings_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-13",
+      "routeId": "D05",
+      "kind": "danger_dialog",
+      "screen": "CloseCompany",
+      "navigationPath": "/dialog/close-company",
+      "parent": "D04",
+      "vmKey": "company/close/preview",
+      "viewFields": [
+        "companyName",
+        "clearScope",
+        "confirmationToken"
+      ],
+      "actions": [
+        "cancel",
+        "confirmClose"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-13_CloseCompany.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-13_CloseCompany.svg",
+      "spec": "Docs/ScreenSpecs/UI-13_CloseCompany_Spec.md",
+      "states": "Docs/ScreenStates/UI-13_CloseCompany_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-14",
+      "routeId": "D06",
+      "kind": "modal",
+      "screen": "OfflineReport",
+      "navigationPath": "/modal/offline-report",
+      "parent": "S00",
+      "vmKey": "offline/summary",
+      "viewFields": [
+        "offlineYears",
+        "revenue",
+        "profit",
+        "cashDelta",
+        "events"
+      ],
+      "actions": [
+        "acknowledgeOffline"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-14_OfflineReport.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-14_OfflineReport.svg",
+      "spec": "Docs/ScreenSpecs/UI-14_OfflineReport_Spec.md",
+      "states": "Docs/ScreenStates/UI-14_OfflineReport_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-15",
+      "routeId": "D07",
+      "kind": "detail",
+      "screen": "BusinessDistress",
+      "navigationPath": "/detail/distress",
+      "parent": "T01",
+      "vmKey": "risk/read",
+      "viewFields": [
+        "cashShortfall",
+        "dueCost",
+        "riskAdvice",
+        "rescueAvailable"
+      ],
+      "actions": [
+        "openRescue",
+        "openStaff",
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-15_CashCrisis.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-15_CashCrisis.svg",
+      "spec": "Docs/ScreenSpecs/UI-15_CashCrisis_Spec.md",
+      "states": "Docs/ScreenStates/UI-15_CashCrisis_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-16",
+      "routeId": "A16",
+      "kind": "modal",
+      "screen": "Recruitment",
+      "navigationPath": "/modal/recruitment",
+      "parent": "T03",
+      "vmKey": "recruitment/offers",
+      "viewFields": [
+        "department",
+        "offers",
+        "cash",
+        "offerExpires"
+      ],
+      "actions": [
+        "selectCandidate",
+        "refreshCandidates",
+        "openHireConfirm",
+        "cancel"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-16_Recruitment.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-16_Recruitment.svg",
+      "spec": "Docs/ScreenSpecs/UI-16_Recruitment_Spec.md",
+      "states": "Docs/ScreenStates/UI-16_Recruitment_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-17",
+      "routeId": "A17",
+      "kind": "confirm_dialog",
+      "screen": "HiringConfirm",
+      "navigationPath": "/dialog/hiring-confirm",
+      "parent": "A16",
+      "vmKey": "recruitment/preview",
+      "viewFields": [
+        "employee",
+        "recruitmentFee",
+        "annualSalary",
+        "cashAfter"
+      ],
+      "actions": [
+        "cancel",
+        "confirmHire"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-17_HiringConfirm.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-17_HiringConfirm.svg",
+      "spec": "Docs/ScreenSpecs/UI-17_HiringConfirm_Spec.md",
+      "states": "Docs/ScreenStates/UI-17_HiringConfirm_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-18",
+      "routeId": "A18",
+      "kind": "danger_dialog",
+      "screen": "LayoffConfirm",
+      "navigationPath": "/dialog/layoff-confirm",
+      "parent": "D02",
+      "vmKey": "employee/severance/preview",
+      "viewFields": [
+        "employee",
+        "severanceMonths",
+        "severanceAmount",
+        "cashAfter",
+        "impact"
+      ],
+      "actions": [
+        "cancel",
+        "confirmDismiss"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-18_LayoffConfirm.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-18_LayoffConfirm.svg",
+      "spec": "Docs/ScreenSpecs/UI-18_LayoffConfirm_Spec.md",
+      "states": "Docs/ScreenStates/UI-18_LayoffConfirm_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-19",
+      "routeId": "A19",
+      "kind": "confirm_dialog",
+      "screen": "CreateDepartment",
+      "navigationPath": "/dialog/create-department",
+      "parent": "T02",
+      "vmKey": "department/create/preview",
+      "viewFields": [
+        "departmentType",
+        "setupFee",
+        "monthlySalary",
+        "noStaffNoBenefit"
+      ],
+      "actions": [
+        "cancel",
+        "confirmCreateDepartment"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-19_CreateDepartment.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-19_CreateDepartment.svg",
+      "spec": "Docs/ScreenSpecs/UI-19_CreateDepartment_Spec.md",
+      "states": "Docs/ScreenStates/UI-19_CreateDepartment_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-20",
+      "routeId": "A20",
+      "kind": "modal",
+      "screen": "BusinessExpansion",
+      "navigationPath": "/modal/business-expansion",
+      "parent": "T02",
+      "vmKey": "business/invest/preview",
+      "viewFields": [
+        "investmentAmount",
+        "capacityDelta",
+        "cashAfter",
+        "demandGap"
+      ],
+      "actions": [
+        "setAmount",
+        "cancel",
+        "confirmInvestment"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-20_BusinessExpansion.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-20_BusinessExpansion.svg",
+      "spec": "Docs/ScreenSpecs/UI-20_BusinessExpansion_Spec.md",
+      "states": "Docs/ScreenStates/UI-20_BusinessExpansion_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-21",
+      "routeId": "A21",
+      "kind": "modal",
+      "screen": "BusinessStrategy",
+      "navigationPath": "/modal/business-strategy",
+      "parent": "T01",
+      "vmKey": "policy/read",
+      "viewFields": [
+        "selectedPolicy",
+        "policyEffects"
+      ],
+      "actions": [
+        "choosePolicy",
+        "applyPolicy",
+        "cancel"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-21_BusinessStrategy.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-21_BusinessStrategy.svg",
+      "spec": "Docs/ScreenSpecs/UI-21_BusinessStrategy_Spec.md",
+      "states": "Docs/ScreenStates/UI-21_BusinessStrategy_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-22",
+      "routeId": "A22",
+      "kind": "modal",
+      "screen": "StaffAllocation",
+      "navigationPath": "/modal/staff-allocation",
+      "parent": "D03",
+      "vmKey": "department/staff/mode",
+      "viewFields": [
+        "department",
+        "mode",
+        "targetCount",
+        "currentCount"
+      ],
+      "actions": [
+        "chooseMode",
+        "setTarget",
+        "apply",
+        "cancel"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-22_StaffAllocation.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-22_StaffAllocation.svg",
+      "spec": "Docs/ScreenSpecs/UI-22_StaffAllocation_Spec.md",
+      "states": "Docs/ScreenStates/UI-22_StaffAllocation_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-23",
+      "routeId": "A23",
+      "kind": "help",
+      "screen": "FinanceHelp",
+      "navigationPath": "/help/finance",
+      "parent": "T01",
+      "vmKey": "help/finance",
+      "viewFields": [
+        "revenueDefinition",
+        "profitDefinition",
+        "cashDefinition",
+        "assetDefinition"
+      ],
+      "actions": [
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-23_FinanceHelp.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-23_FinanceHelp.svg",
+      "spec": "Docs/ScreenSpecs/UI-23_FinanceHelp_Spec.md",
+      "states": "Docs/ScreenStates/UI-23_FinanceHelp_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-24",
+      "routeId": "A24",
+      "kind": "help",
+      "screen": "RankingHelp",
+      "navigationPath": "/help/ranking",
+      "parent": "T04",
+      "vmKey": "help/ranking",
+      "viewFields": [
+        "rankMetric",
+        "botNotice",
+        "tieBreakRule"
+      ],
+      "actions": [
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-24_LeaderboardRules.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-24_LeaderboardRules.svg",
+      "spec": "Docs/ScreenSpecs/UI-24_LeaderboardRules_Spec.md",
+      "states": "Docs/ScreenStates/UI-24_LeaderboardRules_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-25",
+      "routeId": "A25",
+      "kind": "reward",
+      "screen": "ProfitGoal",
+      "navigationPath": "/modal/profit-goal",
+      "parent": "D01",
+      "vmKey": "goals/read",
+      "viewFields": [
+        "positiveYearStreak",
+        "achievement"
+      ],
+      "actions": [
+        "acknowledge",
+        "close"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-25_ProfitMilestone.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-25_ProfitMilestone.svg",
+      "spec": "Docs/ScreenSpecs/UI-25_ProfitMilestone_Spec.md",
+      "states": "Docs/ScreenStates/UI-25_ProfitMilestone_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-26",
+      "routeId": "A26",
+      "kind": "confirm_dialog",
+      "screen": "RescueConfirm",
+      "navigationPath": "/dialog/rescue-confirm",
+      "parent": "D07",
+      "vmKey": "rescue/preview",
+      "viewFields": [
+        "capitalGranted",
+        "used",
+        "cashAfter"
+      ],
+      "actions": [
+        "cancel",
+        "confirmRescue"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-26_RecoveryGrant.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-26_RecoveryGrant.svg",
+      "spec": "Docs/ScreenSpecs/UI-26_RecoveryGrant_Spec.md",
+      "states": "Docs/ScreenStates/UI-26_RecoveryGrant_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-27",
+      "routeId": "A27",
+      "kind": "error",
+      "screen": "SaveError",
+      "navigationPath": "/dialog/save-error",
+      "parent": "ANY",
+      "vmKey": "storage/health",
+      "viewFields": [
+        "errorCode",
+        "retryAvailable",
+        "safeState"
+      ],
+      "actions": [
+        "retry",
+        "returnToTitle"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-27_SaveError.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-27_SaveError.svg",
+      "spec": "Docs/ScreenSpecs/UI-27_SaveError_Spec.md",
+      "states": "Docs/ScreenStates/UI-27_SaveError_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-28",
+      "routeId": "TUT-01",
+      "kind": "overlay",
+      "screen": "GuideCreateCompany",
+      "navigationPath": "/tutorial/company",
+      "parent": "S01",
+      "vmKey": "tutorial/step01",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-28_GuideCreateCompany.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-28_GuideCreateCompany.svg",
+      "spec": "Docs/ScreenSpecs/UI-28_GuideCreateCompany_Spec.md",
+      "states": "Docs/ScreenStates/UI-28_GuideCreateCompany_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-29",
+      "routeId": "TUT-02",
+      "kind": "overlay",
+      "screen": "GuideCEO",
+      "navigationPath": "/tutorial/ceo",
+      "parent": "S02",
+      "vmKey": "tutorial/step02",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-29_GuideCEO.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-29_GuideCEO.svg",
+      "spec": "Docs/ScreenSpecs/UI-29_GuideCEO_Spec.md",
+      "states": "Docs/ScreenStates/UI-29_GuideCEO_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-30",
+      "routeId": "TUT-03",
+      "kind": "overlay",
+      "screen": "GuideHire",
+      "navigationPath": "/tutorial/hire",
+      "parent": "S03",
+      "vmKey": "tutorial/step03",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B01_Onboarding/UI-30_GuideHire.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B01_Onboarding/UI-30_GuideHire.svg",
+      "spec": "Docs/ScreenSpecs/UI-30_GuideHire_Spec.md",
+      "states": "Docs/ScreenStates/UI-30_GuideHire_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-31",
+      "routeId": "TUT-04",
+      "kind": "overlay",
+      "screen": "GuideMetrics",
+      "navigationPath": "/tutorial/metrics",
+      "parent": "T01",
+      "vmKey": "tutorial/step04",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-31_GuideMetrics.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-31_GuideMetrics.svg",
+      "spec": "Docs/ScreenSpecs/UI-31_GuideMetrics_Spec.md",
+      "states": "Docs/ScreenStates/UI-31_GuideMetrics_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-32",
+      "routeId": "TUT-05",
+      "kind": "overlay",
+      "screen": "GuideTime",
+      "navigationPath": "/tutorial/time",
+      "parent": "T01",
+      "vmKey": "tutorial/step05",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-32_GuideTime.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-32_GuideTime.svg",
+      "spec": "Docs/ScreenSpecs/UI-32_GuideTime_Spec.md",
+      "states": "Docs/ScreenStates/UI-32_GuideTime_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "UI-33",
+      "routeId": "TUT-06",
+      "kind": "overlay",
+      "screen": "GuideAnnualReport",
+      "navigationPath": "/tutorial/report",
+      "parent": "D01",
+      "vmKey": "tutorial/step06",
+      "viewFields": [
+        "targetAnchor",
+        "copy",
+        "progress"
+      ],
+      "actions": [
+        "skipTip",
+        "acknowledge"
+      ],
+      "referencePng": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-33_GuideAnnualReport.png",
+      "editableSvg": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-33_GuideAnnualReport.svg",
+      "spec": "Docs/ScreenSpecs/UI-33_GuideAnnualReport_Spec.md",
+      "states": "Docs/ScreenStates/UI-33_GuideAnnualReport_States.csv",
+      "implementationStatus": "NOT_IMPLEMENTED"
+    }
+  ]
+}

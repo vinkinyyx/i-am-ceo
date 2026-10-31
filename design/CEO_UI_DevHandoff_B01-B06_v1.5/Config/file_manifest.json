@@ -1,0 +1,1472 @@
+[
+  {
+    "path": "AGENT_UI_HANDOFF.md",
+    "bytes": 1842,
+    "sha256": "2102dd1eb268f4547cb3969e07ec43a1d58e8a91d034559a7c52155f44a15475"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color1.png",
+    "bytes": 12374,
+    "sha256": "54ffc9b53df86e21edfe76d25b15c872bb4883327df45bfa490f5e106a001d42"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color2.png",
+    "bytes": 12677,
+    "sha256": "59e46518d227a8f3e2f15e8742807986aad69a1951121f1b2fd4776013269f46"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color3.png",
+    "bytes": 12520,
+    "sha256": "9889e4e5e3a3db75b97648db2679a9e57d1c06575e936d792ce4a56ffb015866"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1.png",
+    "bytes": 13142,
+    "sha256": "6755b3c728947c226a5450f61355ecd8e280993e7ffea10b757b0235f59ebddd"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2.png",
+    "bytes": 13267,
+    "sha256": "94a8576a49dfb090502f4f03ccc88fb8acbbe8443254de277fb4144b8c8f5431"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3.png",
+    "bytes": 13049,
+    "sha256": "1547d2eee2b7ba78cc495c5b8e0281c132cbd3b4921087035716bfe389781c4e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1.png",
+    "bytes": 13201,
+    "sha256": "9be3fa6e73985ce8dcb9a26e82035db083b7df348f99f19fb75fdb552fe43c48"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2.png",
+    "bytes": 13407,
+    "sha256": "b8770c0f5038bfee9f1c32cd907dd5be1e75322dbcee1bb73cdd981b0fadff30"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3.png",
+    "bytes": 13193,
+    "sha256": "c358cc84b94fa2f6f19a8a46465cef78649ddd2e862e644d4fcb4aa5873a5be1"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color1.png",
+    "bytes": 13218,
+    "sha256": "45f63522e22ae83e5727314aa96391fbab5cc1084d51fc1649ec9b13c91de0f0"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color2.png",
+    "bytes": 13360,
+    "sha256": "ebc446ace4e03849697d0bd481bc5b76c2c0668e15a4d581c1e7f3baac9a13ea"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color3.png",
+    "bytes": 13181,
+    "sha256": "b7547d2f4728784f646a9d99b3902d86478b59647d9966380b78928a7856f708"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color1.png",
+    "bytes": 13640,
+    "sha256": "4332f1eea3810575c87eff1edf255b8aa9486675edac36b23518828e6c152492"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color2.png",
+    "bytes": 13893,
+    "sha256": "7f44a0965598c7f6995bf9b30babddb770634bead16028ea240d54821c1e5eff"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color3.png",
+    "bytes": 13688,
+    "sha256": "17119a4f686c1460353981a890f06dca0a3e14c21d261bbf8e5446f42b6e9f87"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color1.png",
+    "bytes": 14055,
+    "sha256": "628ad840b68e3094a15be8ebd9c36a47b7d798b570a1195f2e34f4cf252d63ff"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color2.png",
+    "bytes": 14238,
+    "sha256": "57709d3a9259f01fd58020edbd48a496b9db43ddc578f52288ee524cd163f2e4"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color3.png",
+    "bytes": 14035,
+    "sha256": "1a1e264af220e324c181fea308a7588955831d3a4c4f4e523b7ad05116b429b9"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1.png",
+    "bytes": 12241,
+    "sha256": "f0ac92d1432d4151bf01a5cd91f1792793c9d8a86a78d5ad278c2df07f9e7256"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2.png",
+    "bytes": 12408,
+    "sha256": "94cb84e92b0b7329e2c24f1370ec9a1b0ff95cc7fa770a38c44342a64f821ec7"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3.png",
+    "bytes": 12195,
+    "sha256": "b43a6d6ba6dd2d9e4bd1085073163990c2c5472ffb8cab72c25b9fb82d430f8b"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color1.png",
+    "bytes": 13091,
+    "sha256": "530403a46fb6d893c24aab397047410be9ba2ed3bafaa8761b3922aa253e772e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color2.png",
+    "bytes": 13252,
+    "sha256": "2f940f764c50bc07199de3076dcbf8c79756a02d1f7db46e459de35902127148"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color3.png",
+    "bytes": 13100,
+    "sha256": "7aaf801d338a8814ad5170843b1ee2d087286a95096c67f317fb09330f96ef8e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_DangerButton.png",
+    "bytes": 2558,
+    "sha256": "cbf63b64dab95574ba8c1473b26da12c63feb5b09f74c64631e83829cb882acf"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_InfoCard.png",
+    "bytes": 3758,
+    "sha256": "c2e28f01fe705197d7c62a542f67e391cb57c52931245be0f874fa9f06de8c14"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_PrimaryButton.png",
+    "bytes": 2590,
+    "sha256": "33964f0099bffa9add3ff749107a8bd6cb202e88fd76f22544572563f6110d7e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_SecondaryButton.png",
+    "bytes": 4059,
+    "sha256": "7fcd6d7f7baf1fded3f78efe457d264d35c8c3ed972de2b6367a6342efc0e142"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_SelectedCard.png",
+    "bytes": 4280,
+    "sha256": "72bb5229324057491f0807caa2883d423f066728d798c8c3ef84a5b6fc58226e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_SuccessCard.png",
+    "bytes": 3903,
+    "sha256": "8b67c2f221ca6b2411d9d7243c541d65a40021dc2ecfabb361b904e2e0973a69"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/components/Component_WarningCard.png",
+    "bytes": 3770,
+    "sha256": "ced6afe3cef76574347328416def8ef8cf4223792cb75559c600c55a16801670"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_CustomerService.png",
+    "bytes": 7027,
+    "sha256": "9bfc5a4409d666f5cc3a64283d7baf2966478c14fcb249bbc5f271d7564e879e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_Finance.png",
+    "bytes": 4448,
+    "sha256": "ac696e3134666ead93d4cb5b4c3bc867792ca6f92934aba2960a2b91b62a5348"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_HumanResources.png",
+    "bytes": 7240,
+    "sha256": "363f0a66cd6bba5e700c5c658a00ad882267d50253af0311cc65b9f96c0f5301"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_MainBusiness.png",
+    "bytes": 4013,
+    "sha256": "332ae82149c49c6c084a74694cc31c090995c3afd3b978be2bb7a4c12233e9d5"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_Marketing.png",
+    "bytes": 6920,
+    "sha256": "91cc2ffa15ed65d6e37e4e8b24b5dc2fbfdf36f899f7dfa35cf0251b555b8349"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/departments/Department_Procurement.png",
+    "bytes": 5120,
+    "sha256": "e5998afc0dfb269dc572f4229bbbfa8276cca99889b68f755a3be756dbd62c32"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/industries/Industry_BusinessServices.png",
+    "bytes": 4868,
+    "sha256": "d069297bfd5eb1816209ac90991b61f83d2eedbad4b458256a4dd3527d4af3fe"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/industries/Industry_Ecommerce.png",
+    "bytes": 3630,
+    "sha256": "78fd99b31faa957160b5942fd7437e5ee7e1c09519316215fb5caebfb32954d6"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/industries/Industry_Software.png",
+    "bytes": 5486,
+    "sha256": "d2f521a56b85412096e6b69fad21edccd6ef21329d092692d12ce404e94dde02"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Company.png",
+    "bytes": 4013,
+    "sha256": "332ae82149c49c6c084a74694cc31c090995c3afd3b978be2bb7a4c12233e9d5"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Company_Inactive.png",
+    "bytes": 3988,
+    "sha256": "7f2423bb93eeeb503970b044645e67f6d76368d314a822232892118e05901186"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Department.png",
+    "bytes": 4237,
+    "sha256": "76673348eee9e67773948cadabb489fd159d9ea0342dbb680a539810bc108d8d"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Department_Inactive.png",
+    "bytes": 4208,
+    "sha256": "8f5c5a8b5bf199581196dc9a397430beb2ef0325c1aa3e4c060035a827e398a1"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Leaderboard.png",
+    "bytes": 3383,
+    "sha256": "0d253f706a879fd50fa13e4897a4a1caa00fd621c6a79d91fad84f038d199c7f"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Leaderboard_Inactive.png",
+    "bytes": 3387,
+    "sha256": "10cdf0580be8cc2d46bcabcb2aaf74ec1407ec50bbaa9531dc101e424e72d49e"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Settings.png",
+    "bytes": 9344,
+    "sha256": "4da6e6b760350608f25554e73c7bc0161abb46c402cd77d25a9d294c842bcd42"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Settings_Inactive.png",
+    "bytes": 9229,
+    "sha256": "ec39699f873e9a1fd74735c14df0b276d8dd4e78165352e1542faa5a8e67effd"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Talent.png",
+    "bytes": 8892,
+    "sha256": "b4f4ba79bf49dd4399544afb4726ccd26e79de51b7d318b6f5c0331537fb6873"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/navigation/Nav_Talent_Inactive.png",
+    "bytes": 8760,
+    "sha256": "f888451d0e4d058e2ae53d048c548478e5ba25d0e8c646f2c7c06aaa2bc04640"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Action_Help.png",
+    "bytes": 10404,
+    "sha256": "a49d4fdaadd1bba62468927eb85665c7769c29524534e234dacec3a3e1e9e6b3"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Action_Layoff.png",
+    "bytes": 6450,
+    "sha256": "693232bcdc3f710f8f17f7e9869c951e492fc6f2330faaccef3dca87480e7b36"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Action_Recruit.png",
+    "bytes": 7515,
+    "sha256": "403120ddccd58f06c72dee53c32a166d993192337d3565657a8b3a874a3f8117"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Action_Refresh.png",
+    "bytes": 7249,
+    "sha256": "14a609a0eb1d6b373f888365840d742e759bcead8edd87027f0aa8bb9250ffce"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Action_Save.png",
+    "bytes": 3466,
+    "sha256": "072f70b7795e25ef42b32359b0bbee72da44f5b7e254205b953a65bce3c768a5"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Finance_Cash.png",
+    "bytes": 6709,
+    "sha256": "4b5989f01b02720057693453a068f762d89554d74e8eece4317103b24813a38a"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Finance_Profit.png",
+    "bytes": 5312,
+    "sha256": "c42f540f3ca89ec87079f81faefb0bfb3ec257eacca32498c4b9d6be31e255ab"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Finance_Revenue.png",
+    "bytes": 4497,
+    "sha256": "b782257d64cbc757c17638c10a9cd4fff78151b8219fcdfabbdf84086125f0bc"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Finance_TotalAssets.png",
+    "bytes": 4244,
+    "sha256": "ad1ec8c408f20ef2add48f7f7e224562a4a8a3b9168de1a0a5467ae4580fcd00"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Status_Error.png",
+    "bytes": 8961,
+    "sha256": "06986bcc0bee8aea2730a053636036ed8408961db171a6a1ad3505ee444cfab1"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Status_Success.png",
+    "bytes": 9321,
+    "sha256": "fe9487da85bd66bee2c4e3bd3f08653a610a8c5d681c045a60c39912b522bf6a"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/status/Status_Warning.png",
+    "bytes": 4405,
+    "sha256": "1361ac5a3190132169b42e37abddeb64ccc33b324f2bf208b4f3b0bb06fe9a31"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/time/Time_Offline.png",
+    "bytes": 8112,
+    "sha256": "c5dc821c38340c12047f7a01d38399ef2bfb81405bd825d5a16efc1c0a345f6b"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/time/Time_Pause.png",
+    "bytes": 3405,
+    "sha256": "fad84530d8b93e1514bf7f7d14a10bd269dcdeb6ece4fe7c2fad1363b73c34c2"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/time/Time_Play.png",
+    "bytes": 4510,
+    "sha256": "f55dcea87c5d061e3a47dea64d55eab1cff5490c4ba4342a58df31fa48749c57"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/time/Time_Resume.png",
+    "bytes": 7249,
+    "sha256": "14a609a0eb1d6b373f888365840d742e759bcead8edd87027f0aa8bb9250ffce"
+  },
+  {
+    "path": "CocosDropIn/assets/resources/ui/time/Time_SpeedUp.png",
+    "bytes": 9011,
+    "sha256": "01698c3984c11bf85fac4edff243e9381e575e9295653e7ab7343842be09dc12"
+  },
+  {
+    "path": "Config/asset_registry.csv",
+    "bytes": 16341,
+    "sha256": "e4ec8901b600f3ec55d372faebc170f4bf5f2a476fb517e4b431edfc89f995e0"
+  },
+  {
+    "path": "Config/asset_registry.json",
+    "bytes": 28801,
+    "sha256": "fc832a58083848af22bd88224691f2316c17b9724ba9f1eb8ede79936192bb4a"
+  },
+  {
+    "path": "Config/screen_registry.csv",
+    "bytes": 13110,
+    "sha256": "3d11c490d04d51aa0e1b05d268a506dff195ad82bceecf843fa1730e2f81f753"
+  },
+  {
+    "path": "Config/screen_registry.json",
+    "bytes": 26094,
+    "sha256": "c3cc80dda8a65ac7360f1e743b4e8783a0d92982d423e6eee60c007776200572"
+  },
+  {
+    "path": "Config/tutorial_steps.json",
+    "bytes": 1706,
+    "sha256": "8b62966e3df6b0c1ca656bcfce83b05a69ed418da55a415d6f323c64626dd14f"
+  },
+  {
+    "path": "Config/ui_action_map.csv",
+    "bytes": 10235,
+    "sha256": "4f8d0f118a1ba36e850c0ef316954f604f9060290876a6564b114fe88f85736f"
+  },
+  {
+    "path": "Config/ui_design_tokens.json",
+    "bytes": 876,
+    "sha256": "9597e86e03ee851aeaf61b43d367bbcf0e8a8659e75674b201491c5c27c2c8d3"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch.png",
+    "bytes": 69402,
+    "sha256": "b06bda739ffc676dde93937dad34b0554392069f4f59cfb489723444b1c0f707"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch_HasSave.png",
+    "bytes": 69386,
+    "sha256": "2cc17722e758d2fa9ae8eda5d509f02b5ae6a097c7c323f7993ce6884869d68b"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch_Loading.png",
+    "bytes": 70741,
+    "sha256": "e36307bba7fb7b47a5bcc9349aafb750306b808273e8b464422a7e8c00d2594c"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch_NoSave.png",
+    "bytes": 69402,
+    "sha256": "b06bda739ffc676dde93937dad34b0554392069f4f59cfb489723444b1c0f707"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-01_Launch_SaveRecovery.png",
+    "bytes": 69230,
+    "sha256": "96aea34048ca42bbbb7dfbf1ce03bab77d390da1c6ac429588515ca5ea4e3313"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-02_CreateCompany.png",
+    "bytes": 122548,
+    "sha256": "542a57fbaa1aa15b66b3e2659c312e1d221c2e5ea1abe53fb73e5a698bac310a"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-03_CreateCEO.png",
+    "bytes": 106111,
+    "sha256": "4f5cba4d58583c01e3460361e6106129539cdf5b491115be0e53dacf2060b10e"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-04_FirstHire.png",
+    "bytes": 145018,
+    "sha256": "716f40a6bc5e93442a6ecebb305619257fcb5faf79cc40b71fd041a5b4b291d4"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-28_GuideCreateCompany.png",
+    "bytes": 112753,
+    "sha256": "e5361715e6da3bc51dce54f58eb8dd2c7ed96d0329f04053f24e676a4f24633e"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-29_GuideCEO.png",
+    "bytes": 108928,
+    "sha256": "11e8a7941867e58d5e7e18bf9fa44d1db6a2a510da73eacf32fe0c9977bdf163"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B01_Onboarding/UI-30_GuideHire.png",
+    "bytes": 141058,
+    "sha256": "391cbf2502ec5e4fc50bf0650abbdc35c33e248ebc381bd07be93d953a034ddf"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-05_CompanyDashboard.png",
+    "bytes": 133668,
+    "sha256": "6a61d641cac12572b67d680368c36492b50eb655625ebe4636091105e83d313e"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-06_DepartmentList.png",
+    "bytes": 129084,
+    "sha256": "d281f78f737fbdba383dc5680a77d705111f118dcc1169ad0f38064bb1ba2756"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-07_StaffList.png",
+    "bytes": 122238,
+    "sha256": "d3a585053a40ed82ab480f82c929dfca364ad5e71bd64296bf777458ea8737ff"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-08_Leaderboard.png",
+    "bytes": 130883,
+    "sha256": "5857c91f000b0d25d750afdec541029aa7f5d4d73b5e1fca1b9a7ffa6ac39ef8"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-31_GuideMetrics.png",
+    "bytes": 134192,
+    "sha256": "1223cfbc0dc84d1876e7f409960dbe55a9f9845f057d116a4e0981e77a3039df"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B02_CoreBusiness/UI-32_GuideTime.png",
+    "bytes": 126949,
+    "sha256": "73f33c18c1eee089a5f8159954e480ae029160d20881b7383518f9eb85084fd6"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-10_EmployeeDetail.png",
+    "bytes": 81187,
+    "sha256": "1d8ecdc065aac7ce5e48e3b8ff1eac2772aa2d06bf2d479e8752737c8b8e6af5"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-11_DepartmentDetail.png",
+    "bytes": 105333,
+    "sha256": "726c7fbf7b9824e8effa552b6e8d1692f1a142af528dc134d1d1e370fdfe7b0b"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-16_Recruitment.png",
+    "bytes": 124840,
+    "sha256": "3d8441ea5c878d9b3e0b25b191ca539bf1bb9a994ece42890336b2488781e47b"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-17_HiringConfirm.png",
+    "bytes": 103079,
+    "sha256": "acf2950ab075c1e8ca0b46df5f37529345a5acba02d49fcc339843635f48ed66"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-18_LayoffConfirm.png",
+    "bytes": 88513,
+    "sha256": "f650530735ab3bf69a83501a849b880b69a5b6a6d3a1b5e6044a0e2467340c6f"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-19_CreateDepartment.png",
+    "bytes": 110410,
+    "sha256": "4a5dd1c664eb5ac4115883f23a4b52fc6b64d45bb8f3537f6c41e7bbd68ba517"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-20_BusinessExpansion.png",
+    "bytes": 121523,
+    "sha256": "be2e6b03eb467e55f0ebc8dd316c41586bf278eb8344c0b90651db829f8bbeb4"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-21_BusinessStrategy.png",
+    "bytes": 130647,
+    "sha256": "ced61356760e84bff4b9840eeb68a9abb4ab4df256a7d49ee42260c43ac7c256"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B03_StaffDepartments/UI-22_StaffAllocation.png",
+    "bytes": 83523,
+    "sha256": "17972e6116cf62795b4bfd306f9e33e4057bc64a8087e5a9e0bf86f359c6ccc0"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-09_AnnualReport.png",
+    "bytes": 112112,
+    "sha256": "75a2511d6a29deef0bc9badc122ee41e1cdb22fd31b8923bb2c11a7d439c37ef"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-14_OfflineReport.png",
+    "bytes": 115626,
+    "sha256": "95e53912f6bc15bb3cc9edb6640fbc9f1f34d7bae0c1d539842ab9a30c560570"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-15_CashCrisis.png",
+    "bytes": 127971,
+    "sha256": "75cd625e5aea8cf844f4952828143b0b91aa1d57fd99def173fe94f89e485858"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-23_FinanceHelp.png",
+    "bytes": 123013,
+    "sha256": "82db9286f03242981545b7252af97b2585e0d9450e1389a8c517fbffb6415c18"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-24_LeaderboardRules.png",
+    "bytes": 118263,
+    "sha256": "0af7d27026b3ce72e077310c200bcbf4eb71daab460e7bca9cd1df86ec4309e4"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-25_ProfitMilestone.png",
+    "bytes": 105911,
+    "sha256": "9785978b6c669d5a41a629f5ee24ceee3445410f08aae04c13c1ef353b6720b8"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-26_RecoveryGrant.png",
+    "bytes": 107780,
+    "sha256": "6a0aafc19dca862fb237ddb524826b3675c4296209c9496d81fd282eb3872686"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B04_FinanceRisk/UI-33_GuideAnnualReport.png",
+    "bytes": 105051,
+    "sha256": "52cbe45e01647f985b2474ac83e80c190aeca57f52e5608d86a04316be0cc91c"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-12_Settings.png",
+    "bytes": 111392,
+    "sha256": "356eaf3d9eb7f500ef7bb9cd7ac7820e721b55412bf114dbdc9f227054a8e1f3"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-13_CloseCompany.png",
+    "bytes": 120126,
+    "sha256": "051c26c4b271e0180fb60bd48f907480a3b073cfc14005bffdb28d711d46344e"
+  },
+  {
+    "path": "DesignReference/FullScreenPNG/B05_SettingsRecovery/UI-27_SaveError.png",
+    "bytes": 121266,
+    "sha256": "9907135043c2234c7d4ea84e83d0804fca9c1cdd76d90a120ae2439315c310e2"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_01_Male_ShortHair_Color1.svg",
+    "bytes": 1047,
+    "sha256": "006b4a19629b57b7a03e5684861803f8d4bd9f242acfabf39eb4d7dd23ff6c8c"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_01_Male_ShortHair_Color2.svg",
+    "bytes": 1047,
+    "sha256": "5151e8517a233b1a9e1554319824e333f7a390d7b92edec060ccf784790b7d5b"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_01_Male_ShortHair_Color3.svg",
+    "bytes": 1047,
+    "sha256": "70685fe07189db687d94a6c4c3ca5570de7d21afd0135661c792dc908e103351"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1.svg",
+    "bytes": 1112,
+    "sha256": "72472cf7d1db47379d41d1f0dcf0727f3869e03010221cd9e4da1501ddb79f08"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2.svg",
+    "bytes": 1112,
+    "sha256": "efd8105f3cea046a65be2b648f6b2a4fbb7f578d9777b8db73633947422fb2c7"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3.svg",
+    "bytes": 1112,
+    "sha256": "4be9d3b2e25cd8a66b0c9e92a2a83eb451b8ee7869d08c050ca62ebe3cd844f3"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1.svg",
+    "bytes": 1235,
+    "sha256": "81d9d7e7f932bf0b84f864f3340764facd14d2bc5cbe2fe556238ab8d2255f2e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2.svg",
+    "bytes": 1235,
+    "sha256": "1f38b7088194960f5bd62e0c794526201209b482bc6db30aaace515fb4ea2d32"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3.svg",
+    "bytes": 1235,
+    "sha256": "e319fee53296105cdd5aa890e0cc8b5cabe209464483ff0d1f7a31f0924a7953"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_04_Female_ShortHair_Color1.svg",
+    "bytes": 1112,
+    "sha256": "ccd2ec7aa88bd079adf16057717019cd60a9c55bfdcec58521834edfc9fcf95c"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_04_Female_ShortHair_Color2.svg",
+    "bytes": 1112,
+    "sha256": "721eca5bd28c7d89f9da9543d4f1051b8ebecb66e032ac5eb6781dc116e9575b"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_04_Female_ShortHair_Color3.svg",
+    "bytes": 1112,
+    "sha256": "487ae7b4cdf08488c0851a9b731ae105577c824cba551714624d96b933d0d738"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_05_Male_Glasses_Color1.svg",
+    "bytes": 1241,
+    "sha256": "1a649f45a78517710ce89673005fb9de4210265c963ae7ae174aae8785a223e9"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_05_Male_Glasses_Color2.svg",
+    "bytes": 1241,
+    "sha256": "4c1e5f91e592643c5c688a8098d8c3364948e6526d1226df5016dbcee9755610"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_05_Male_Glasses_Color3.svg",
+    "bytes": 1241,
+    "sha256": "4797c64ae2a407ed2a15484703bbde9e9db6d7f9e43f0a0deed08ac8118f73ae"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_06_Female_Ponytail_Color1.svg",
+    "bytes": 1158,
+    "sha256": "744061b9a74e8c9fa31b55f4637df9ca0102068328f94df0ddcd833d5f3cfea2"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_06_Female_Ponytail_Color2.svg",
+    "bytes": 1158,
+    "sha256": "8af39a174d97feb010ff8af058f1a5071825e1347eefbbc8a45a57723069fd8d"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_06_Female_Ponytail_Color3.svg",
+    "bytes": 1158,
+    "sha256": "213c941e01b25bc0aeae895b2db8d66597001412a4530a7de6ca2e6a0a62103b"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1.svg",
+    "bytes": 1029,
+    "sha256": "b720ca374923dadd3d21a23c81db61bdaed029094534ec08ca27e108368a4c4b"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2.svg",
+    "bytes": 1029,
+    "sha256": "d080516e4427168f73477fec0dbe887d625fb1a407baf053a646cec69307c986"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3.svg",
+    "bytes": 1029,
+    "sha256": "a42e7bfae2377854a31615b2a26972f0ec61aca60832afc4645c7be324d97df3"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_08_Female_LongHair_Color1.svg",
+    "bytes": 1112,
+    "sha256": "eae30b1b482ac06bf3410551b28643e82b9b2a3a0baee9f2fa117333b086720c"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_08_Female_LongHair_Color2.svg",
+    "bytes": 1112,
+    "sha256": "c1998cb475db0729b710e91b183586d9ed72bc02d0c9ab0265850fea20829bb3"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/avatars/EmployeeAvatar_08_Female_LongHair_Color3.svg",
+    "bytes": 1112,
+    "sha256": "7a801878dfff69416201ee1fd2e14346ad42557df0c43764acfdedc1427e0d18"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_DangerButton.svg",
+    "bytes": 158,
+    "sha256": "c8c1c8e6a4df02a0252e9ec02253d6af577f93f02c67cfc92c51075134003432"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_InfoCard.svg",
+    "bytes": 192,
+    "sha256": "ff0ec9121a4f845891c76443d48484e465bc07af0d3e62a62d589d484082349c"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_PrimaryButton.svg",
+    "bytes": 158,
+    "sha256": "ac2eb4e5937f0b233eb579c73300760a87126d9979a70d5da7ffc0bd2988696d"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_SecondaryButton.svg",
+    "bytes": 196,
+    "sha256": "4129471c0b0f2b4e419ed0b5d2aa7151660e8e303bbeca968c239e0ced68bead"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_SelectedCard.svg",
+    "bytes": 192,
+    "sha256": "92efd7817209d8a18ab394276748ed5ae2a19f0f00f3a45d722dcd1783b8bbe8"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_SuccessCard.svg",
+    "bytes": 192,
+    "sha256": "859eeca13219a0d4734ec9e849160c71ca19c659e359b5fbd49503628658c135"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/components/Component_WarningCard.svg",
+    "bytes": 192,
+    "sha256": "40c2dd271bd1df32a094e516a76b82a90339a14f65dcf0e090411f52ed4fe16e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_CustomerService.svg",
+    "bytes": 396,
+    "sha256": "62963e4b3e8fab8c8d0dff351cc285a4dbade1bcb04da47fb2a1575f2f294ccf"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_Finance.svg",
+    "bytes": 384,
+    "sha256": "c8f0caa2db9d8497c48167139ceb5b1ac1c5d518f13e5d27f05fa804cc54f129"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_HumanResources.svg",
+    "bytes": 353,
+    "sha256": "5e035f68d12aa091cf35537c5e8bbd69cb84478e84f3cf807c26dc740209d021"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_MainBusiness.svg",
+    "bytes": 384,
+    "sha256": "42d317f4d4474b1f1227d452b2d63e39ecaf2dcc919a5779a562834542758e3a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_Marketing.svg",
+    "bytes": 341,
+    "sha256": "fef10df6c696756458acb3f45002740e2867f8205a15d3f7a5f9ab4f9481768f"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/departments/Department_Procurement.svg",
+    "bytes": 382,
+    "sha256": "104b8e0bcbe3f4971d6e489d5a54c2c102cd02a13c46867a6a38e964af732853"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/industries/Industry_BusinessServices.svg",
+    "bytes": 384,
+    "sha256": "7d4696bfac8a0a5006ba22f31dab96970a330ddca45041a52762e2975a69f6a7"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/industries/Industry_Ecommerce.svg",
+    "bytes": 366,
+    "sha256": "16ca47658343ccdf8b723102c8a0dbb35c04ed6b3061f307371ebccd397e23c0"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/industries/Industry_Software.svg",
+    "bytes": 373,
+    "sha256": "a78287d0b8c9776b8da2d7fd282c18865ac048456baeee861786679a29d600b3"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Company.svg",
+    "bytes": 384,
+    "sha256": "42d317f4d4474b1f1227d452b2d63e39ecaf2dcc919a5779a562834542758e3a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Company_Inactive.svg",
+    "bytes": 384,
+    "sha256": "95bd0988312adcc73e6528483eed10441a745fd0548b1e8f102e64f087e05804"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Department.svg",
+    "bytes": 448,
+    "sha256": "e12d0feb99f873065612c9d0580e728775ded1643cec8c4dc3fc9662576a67c7"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Department_Inactive.svg",
+    "bytes": 448,
+    "sha256": "26355dca740ff502ff4c0e10ca1844c16b61de985a6738ddedbe2ff5bc552c3d"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Leaderboard.svg",
+    "bytes": 347,
+    "sha256": "0a732940082209fd7cb766cedc4b5568bdc1df8a78bb30531bcdccc7451a5e68"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Leaderboard_Inactive.svg",
+    "bytes": 347,
+    "sha256": "a77fbf2e30803948925cb82a43e670aa25fa1ccb795fd204dab05f22e874b26c"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Settings.svg",
+    "bytes": 400,
+    "sha256": "073a9c948c5f9c30f3871a2819fd30995c210ab4e9266bbed4a416dd84e78419"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Settings_Inactive.svg",
+    "bytes": 400,
+    "sha256": "69ad22c7b577f06f0158acc4e36f58e7bde5b7f320cf39a2a921274a693b8f4a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Talent.svg",
+    "bytes": 387,
+    "sha256": "5b0c4efcc1bda07752215288d0a0d75bc3d010223ab6f6f3d2b5310fe28bba01"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/navigation/Nav_Talent_Inactive.svg",
+    "bytes": 387,
+    "sha256": "a9a68ebdb408c288038d4d0ebae1ee5f89241f03279c156d2d756cec42c9f29e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Action_Help.svg",
+    "bytes": 345,
+    "sha256": "6abf539a51ebc6ad768f8328204fbcbffa71e137c04ec73a60bdf9260b1b17fd"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Action_Layoff.svg",
+    "bytes": 347,
+    "sha256": "0e3310aaaded1cda705cd37a94d71b2687d5ab6a9573ad33609930c3ad8993d8"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Action_Recruit.svg",
+    "bytes": 353,
+    "sha256": "3e87305eec40e3f56d0c5eb6e8c346415392fe419a8d7fc3d19a35b481c2f7ad"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Action_Refresh.svg",
+    "bytes": 347,
+    "sha256": "bc043a4a6e046382b8a7d949fcfacee0b0380fe8a4c3387a010fb222ebc4840e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Action_Save.svg",
+    "bytes": 322,
+    "sha256": "3a66a78c7a1166e75a713f268c9620f64bd91b025dad575173a5b913c7399f67"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Finance_Cash.svg",
+    "bytes": 411,
+    "sha256": "f2c0c87d3f26eb024f8bfbb1591e6d247c2abade7a5441632d5f83013bbb2952"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Finance_Profit.svg",
+    "bytes": 306,
+    "sha256": "c51aa3729b51ab49c2e9a4ee477723bd771033f066a3b631fe60f7ab6cdadd0a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Finance_Revenue.svg",
+    "bytes": 361,
+    "sha256": "0c53057caea8d15f7dbae44fa7790256758e636d49aa4372a8b9a7ac63ccb3e5"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Finance_TotalAssets.svg",
+    "bytes": 340,
+    "sha256": "480bbb7b8fa56b818d3f96ed4ccfec35f9dbbd90d1ea97db5a6f1bbffa0e18a4"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Status_Error.svg",
+    "bytes": 328,
+    "sha256": "a5affdd3b23db445758174ea3baf69658b4b3937245a8f4109a3425a22a3284a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Status_Success.svg",
+    "bytes": 320,
+    "sha256": "4311e620028b15d3fbfb7404de18b71063a53cbbbb9a70751b0771a6e29379f0"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/status/Status_Warning.svg",
+    "bytes": 303,
+    "sha256": "2b07f43c5f153d3094a913507a96796b61be8ad6971b4719a9963d42471c946a"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/time/Time_Offline.svg",
+    "bytes": 311,
+    "sha256": "6325160ecfbc34ab0ed253d4a2a2827748b6481c8538642be61f4fff3f70747e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/time/Time_Pause.svg",
+    "bytes": 360,
+    "sha256": "2b82435ef1f761baf79a15d8364ce82a5b6da2f3190606fd4a0bef00bab2b779"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/time/Time_Play.svg",
+    "bytes": 291,
+    "sha256": "9b430aa0569f90a09e43d7eba06102f6abbd1774a6080ab2eb8a686a59fe2ee3"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/time/Time_Resume.svg",
+    "bytes": 347,
+    "sha256": "bc043a4a6e046382b8a7d949fcfacee0b0380fe8a4c3387a010fb222ebc4840e"
+  },
+  {
+    "path": "DesignSource/B06_SharedSVG/time/Time_SpeedUp.svg",
+    "bytes": 325,
+    "sha256": "c12cca19cbcea49b40b44a91b123758883bf9f42608330f2855cb39a541de249"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch.svg",
+    "bytes": 3654,
+    "sha256": "99bd8fb9d7b204f7f94d52b6df6520d72ee7e4d7b02d662d99055c20c631c705"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch_HasSave.svg",
+    "bytes": 3642,
+    "sha256": "f9c5e40998b62463a5404c4fd7b2eba6bff891176afc1acbbbed35545fc53840"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch_Loading.svg",
+    "bytes": 3742,
+    "sha256": "258a5ef205a57de1afbc1c635162582e5ffc56051148039a6782aaabd6146a44"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch_NoSave.svg",
+    "bytes": 3654,
+    "sha256": "99bd8fb9d7b204f7f94d52b6df6520d72ee7e4d7b02d662d99055c20c631c705"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-01_Launch_SaveRecovery.svg",
+    "bytes": 3722,
+    "sha256": "53d21b2fd78f46ba5f59a423c969e71152e289a0e7daa7d677e7d2b329541f63"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-02_CreateCompany.svg",
+    "bytes": 9225,
+    "sha256": "ffea94665a9f805e63ff1abf97ed6fc3203327128d48a8102a6289ed5f560643"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-03_CreateCEO.svg",
+    "bytes": 6868,
+    "sha256": "be0b38e837fd0c49bab348d567ac89ff96246ec5201172d6ff2ee7c99b0925e0"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-04_FirstHire.svg",
+    "bytes": 10541,
+    "sha256": "27075f1e497d67d363ec88e14fce806f412cfcf10512701c17ae2b22415d66f7"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-28_GuideCreateCompany.svg",
+    "bytes": 10255,
+    "sha256": "547c1342f56314d6e48e4e08ef85928f9f0da3acf0814c96ffeb4d292c696bda"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-29_GuideCEO.svg",
+    "bytes": 8065,
+    "sha256": "d811b207c660b9d9ca24007f079aa9f483c9e88d330dac1f3ba7e1f2327e917b"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B01_Onboarding/UI-30_GuideHire.svg",
+    "bytes": 11663,
+    "sha256": "a7a611edee121bd6c24f11f34618398a1aaa179051aa69e7bd383771351f22bc"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-05_CompanyDashboard.svg",
+    "bytes": 9656,
+    "sha256": "f56c004187648f4b86364f9a94de8bb41408e353508ee829491767669a8025a0"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-06_DepartmentList.svg",
+    "bytes": 8912,
+    "sha256": "8e1e4b7b1d9545e9cee49f8915f3c75d2e57376defd9bf151729f94e35ac1822"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-07_StaffList.svg",
+    "bytes": 10635,
+    "sha256": "cf066e976bd5e3b17f68eee1b5bd1c6c60b9517972a97864687a7cf28e20b8ab"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-08_Leaderboard.svg",
+    "bytes": 8898,
+    "sha256": "9a3c19f8a15cdfd9293135ff1b6f9eedfce0cb5974cd7665235c7742e44b713d"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-31_GuideMetrics.svg",
+    "bytes": 11880,
+    "sha256": "1044b56d27343966c90f9b6e1f842b568bbab82a5b0ec481e8aea545dbb2e3fd"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B02_CoreBusiness/UI-32_GuideTime.svg",
+    "bytes": 11604,
+    "sha256": "dbf76e718d5c2766af0424d98dff9c36f98e7c875caa4ee69ade3c18837f4f72"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-10_EmployeeDetail.svg",
+    "bytes": 5552,
+    "sha256": "49a59665335737084308601ce4e21afb5a392f6a7979c0bef71fc0dc678be018"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-11_DepartmentDetail.svg",
+    "bytes": 5317,
+    "sha256": "d6140e436eec54436de0e1e7b19d5a46d4489fc67606b568f165c6b1dd2344ca"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-16_Recruitment.svg",
+    "bytes": 16947,
+    "sha256": "bcf593d0a33415c21a804b1b9d67eaa52d6c4e861684358987a1796b30afa746"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-17_HiringConfirm.svg",
+    "bytes": 12504,
+    "sha256": "166f2fbc791f184195fb2dd2b4eb74ccfe00a02e068e791c8c8819d0247cad70"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-18_LayoffConfirm.svg",
+    "bytes": 7434,
+    "sha256": "8b3cbb6fd82143b07e88d0236cd29476eabd818b084f446c062ffc441c6353ab"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-19_CreateDepartment.svg",
+    "bytes": 10767,
+    "sha256": "7949aa33760709319ee05f877e72d3ec7c09485329e402967e840ac8e494734d"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-20_BusinessExpansion.svg",
+    "bytes": 11653,
+    "sha256": "1834fe8cdd06762c550e5ab642b1b293f4b51912a75fc4ed03ead151a82193b4"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-21_BusinessStrategy.svg",
+    "bytes": 12953,
+    "sha256": "81947f4782bee8449ae5cd47a9f480e701efe4b463b7e7afcb493d5ec1128c7d"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B03_StaffDepartments/UI-22_StaffAllocation.svg",
+    "bytes": 8149,
+    "sha256": "74316ee23b5d04820ff67e926d87d077adfab9e5c6047c1539d2c45235ebcf7e"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-09_AnnualReport.svg",
+    "bytes": 6429,
+    "sha256": "433e45b7a4c4501c80b379631f52934fd236aaaa8ea67d978256b5bc8a777376"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-14_OfflineReport.svg",
+    "bytes": 5183,
+    "sha256": "1d464882bfd4fe34bc2cd82cb97061ce1cd37a65b3bd6e50c2aa90c63ce46313"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-15_CashCrisis.svg",
+    "bytes": 5333,
+    "sha256": "fced281694f96d0e85bcc1575251d713376c9c10f51b98b051ec2240b2e7f64e"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-23_FinanceHelp.svg",
+    "bytes": 12988,
+    "sha256": "4256dd675803d3d91ece528cc3db40677821e29933ddc121a30625a92964f782"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-24_LeaderboardRules.svg",
+    "bytes": 10795,
+    "sha256": "e812c2d6805f79c6a0fb3c1e972fd460a9c65b7c9908d4f93a1ae7f6ba21fd97"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-25_ProfitMilestone.svg",
+    "bytes": 7856,
+    "sha256": "cd1158bd99fd4c399d8942b306fae8428d51abae075b10b4375c5fdbd44299d8"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-26_RecoveryGrant.svg",
+    "bytes": 7215,
+    "sha256": "2c0101adae3e6cf3824180b54d47acac34d6833c229d0c95ae9c1640ac4b4f04"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B04_FinanceRisk/UI-33_GuideAnnualReport.svg",
+    "bytes": 7831,
+    "sha256": "b9c0eafcb0b5a78ae4ce7ee4a8ac9550563bd84a7d7777143f0ce9c5e47947df"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-12_Settings.svg",
+    "bytes": 4904,
+    "sha256": "0ea17236aa735ec1fd41733332747339661ecc6550a90eebaa74fc4d120ff10f"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-13_CloseCompany.svg",
+    "bytes": 6811,
+    "sha256": "4c3d3481600ccfdd336487a815bf49d9ad9236b8b62ad120e69bfdd49a90e27b"
+  },
+  {
+    "path": "DesignSource/FullScreenSVG/B05_SettingsRecovery/UI-27_SaveError.svg",
+    "bytes": 11357,
+    "sha256": "4cd17a070169cece840145a13f5b2c9f578713aae4499d659c82ca4ff644eb5d"
+  },
+  {
+    "path": "Docs/COMPONENT_MAPPING.md",
+    "bytes": 1347,
+    "sha256": "4cfd7b9cd7b56d8876f573ed40ca9eb268cebe138534954d4f2f7fadf8ec8a0f"
+  },
+  {
+    "path": "Docs/DEV_AGENT_TASKS.md",
+    "bytes": 3337,
+    "sha256": "575b26b6d63d834f61ee655a7a63e6bccd1c40b4bf8516c5ff904661112cdcf0"
+  },
+  {
+    "path": "Docs/OriginalAssetIndex_CN.md",
+    "bytes": 4434,
+    "sha256": "00abd98e0ff8859eee380db35a7e1928fed7c4f46901ce5ea0c93f654f8323ca"
+  },
+  {
+    "path": "Docs/PreviousREADME_CN.md",
+    "bytes": 1750,
+    "sha256": "c0c2f65cdf970d5657467afc89c940844dd2c66a2a4c373f99839fc4e528288d"
+  },
+  {
+    "path": "Docs/QA_PREVIOUS_REPORT.md",
+    "bytes": 3260,
+    "sha256": "aea1de72f7bf959561ae20db90e38a8d90c6941c88a0515db320ec9a28652196"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-01_Launch_Spec.md",
+    "bytes": 2994,
+    "sha256": "f1093665f4bef66f6446374e451cb2d546d999446783d69e9a9ab3ec1a087c55"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-02_CreateCompany_Spec.md",
+    "bytes": 768,
+    "sha256": "58b5af72e5e1e2226447a997552d30282fce51380bf22d5ca95f869e665406a8"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-03_CreateCEO_Spec.md",
+    "bytes": 759,
+    "sha256": "cc6077de260caa954dc58c6a4593cc56b544247f58f28efc3b1f59dde9a6fa3b"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-04_FirstHire_Spec.md",
+    "bytes": 773,
+    "sha256": "4665ec10fb5b4250118296ec56098521516c472b4879248cc84a5efdf68c8710"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-05_CompanyDashboard_Spec.md",
+    "bytes": 2036,
+    "sha256": "de169212c0c74d5f965279e3dca21fd1d9ba3710c050564c346b5f9116f827ef"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-06_DepartmentList_Spec.md",
+    "bytes": 2024,
+    "sha256": "22a67ea359ffd70bba1bcd16cddbe9f105ca1c26cfe770dfcde9c248c4523436"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-07_StaffList_Spec.md",
+    "bytes": 1987,
+    "sha256": "b7bcdba9d1cdc3c4c7e2a6e05e19b3d795c09628b33b69f00da7db9499ada48a"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-08_Leaderboard_Spec.md",
+    "bytes": 1982,
+    "sha256": "0ac39963e1a63bf1b5ef6e830fa4ea23313436e43c2b44cb1730b0b6990203d3"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-09_AnnualReport_Spec.md",
+    "bytes": 1999,
+    "sha256": "dbe43ef26b0259b6b2cd9b5aea9c5158ca4c807bd1a20238ff4580b2d2f74689"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-10_EmployeeDetail_Spec.md",
+    "bytes": 1993,
+    "sha256": "d9a84298e4ec2351236d0f4f1a83c536d11e2756e4be05783aa47525047efaaa"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-11_DepartmentDetail_Spec.md",
+    "bytes": 2016,
+    "sha256": "e836eaf96088405893cc59bc353be5ba22eba295bed2d0e6edd3ffa91adc47e9"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-12_Settings_Spec.md",
+    "bytes": 1971,
+    "sha256": "891d2c7d091c4e3ce8f5d78f9558c3593a5333a8cf9c962512cc94f83815580f"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-13_CloseCompany_Spec.md",
+    "bytes": 2024,
+    "sha256": "61f559442d1609ab1851da9177cc8989434d798f09510cfd3522ab2129a79c1b"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-14_OfflineReport_Spec.md",
+    "bytes": 2014,
+    "sha256": "31808ad55bd50f5af632380cbb3c151d33862a968c6287de3a9996e972837ae8"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-15_CashCrisis_Spec.md",
+    "bytes": 1999,
+    "sha256": "13f3f95b7425f85b1dc8b39d79dcfcdbd358cb5d612a94bf216a593b4da6e992"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-16_Recruitment_Spec.md",
+    "bytes": 2030,
+    "sha256": "0d30cb657ce75a17304378a869edfd70526149de189bd4fca5389d79af5532b8"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-17_HiringConfirm_Spec.md",
+    "bytes": 2029,
+    "sha256": "016fc09f695ec9b269c0c6f4ea979dd82f31c00eba68ea77143f7fd92f09d0fc"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-18_LayoffConfirm_Spec.md",
+    "bytes": 2036,
+    "sha256": "4742b2176ec383dc8cf70c5a18cddc6c7aa632298010af898fd4f9e25eb5aae1"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-19_CreateDepartment_Spec.md",
+    "bytes": 2024,
+    "sha256": "01c88799914c8b75b95454f840ab9db8e0191bd52488a6febfc1df0481ec3ce6"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-20_BusinessExpansion_Spec.md",
+    "bytes": 2034,
+    "sha256": "4e3ca4a6bc1667b2e98190a2820cea77d9b494bfcc992b3d1324579130abee4a"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-21_BusinessStrategy_Spec.md",
+    "bytes": 2032,
+    "sha256": "9efde37121c6ffb74eb1e6afbde36a8fae5425dbcc64fac80caa273fbb16cebd"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-22_StaffAllocation_Spec.md",
+    "bytes": 2021,
+    "sha256": "7905e0dfb96bdb00d4e5d3806da984d103039280901326fe2ec74971b9f15a83"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-23_FinanceHelp_Spec.md",
+    "bytes": 1989,
+    "sha256": "72f6fee8fe4d82ce1000bb7604a78c4c999d84ab474c21240b62903d655cabab"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-24_LeaderboardRules_Spec.md",
+    "bytes": 1998,
+    "sha256": "12907d35550000ab8219080ca54458329fb8d22a5feaf77d2faed7b1dfd9ad78"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-25_ProfitMilestone_Spec.md",
+    "bytes": 2012,
+    "sha256": "fbff77a5f82f24cdfc2e3266f1d770d41b164d79926035f84b0557ec4d9e569a"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-26_RecoveryGrant_Spec.md",
+    "bytes": 2019,
+    "sha256": "ba8a99dcf070f576a0d209e612b6236ecaaedd8576c58b926602b65079fd67bf"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-27_SaveError_Spec.md",
+    "bytes": 2035,
+    "sha256": "c7c98e219e2e879ff621fe751d4b3058207689f6989333857b08066a75c18e9f"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-28_GuideCreateCompany_Spec.md",
+    "bytes": 749,
+    "sha256": "068fb5e0abbe03197443d78c85f7d389f1b7682317c73baf4801d24b99845632"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-29_GuideCEO_Spec.md",
+    "bytes": 713,
+    "sha256": "e5785e61eb7d76f31426da793b3e0401d8e999e59814c866e39e78113530ba32"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-30_GuideHire_Spec.md",
+    "bytes": 732,
+    "sha256": "d82ae19c7dc5457b09d5f702a83f813c7fb99343f6fd00c5413dd26c49cbc3f5"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-31_GuideMetrics_Spec.md",
+    "bytes": 2008,
+    "sha256": "34bec0c6b6d48fa761450aadbabdf75ef4db0760db2dc2c2226b6d8c5e91a58c"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-32_GuideTime_Spec.md",
+    "bytes": 1993,
+    "sha256": "d87450b4bfa41bfbc98d36ef2ef5b36694f26ca4af721d92a3ca8278a61f64bf"
+  },
+  {
+    "path": "Docs/ScreenSpecs/UI-33_GuideAnnualReport_Spec.md",
+    "bytes": 2003,
+    "sha256": "aa08242cc95b331851f1b1b65b5266a69cead3a1e79d36dc682496f85b785046"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-01_Launch_States.csv",
+    "bytes": 593,
+    "sha256": "2e428750beab11b161dd3f2c3f5cadf12fffd89974697d598fb27c698fccde55"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-02_CreateCompany_States.csv",
+    "bytes": 645,
+    "sha256": "e3a5689ae2c84ef77122eb31d2540293e2148537989bfaa54bf249bdc73f1257"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-03_CreateCEO_States.csv",
+    "bytes": 543,
+    "sha256": "1609d7d92b9b6d0884857bd2b2d25a97f092b0456bdedb7753464cfb4c93ecd5"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-04_FirstHire_States.csv",
+    "bytes": 615,
+    "sha256": "457023211b22177721d2b7d6bf046a34a3b011faf1ca45d7f68b3f64acca01f1"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-05_CompanyDashboard_States.csv",
+    "bytes": 484,
+    "sha256": "c7106b0784e87bbfccbf155075051b9e54238092888d740d53b27ab09584f18c"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-06_DepartmentList_States.csv",
+    "bytes": 416,
+    "sha256": "6e2652189391d92de23df7e93e1b187ee1fb20656c006be7e4fea4817622bb10"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-07_StaffList_States.csv",
+    "bytes": 344,
+    "sha256": "c4a31548360ad308bc34a49020bd53e2da7ba6853bb414c082ed7520b77cdf16"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-08_Leaderboard_States.csv",
+    "bytes": 276,
+    "sha256": "dbfdb1b4246e18cd181da624019bcebab4baa5817f8d88daad9d2b3f32712f3e"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-09_AnnualReport_States.csv",
+    "bytes": 415,
+    "sha256": "4172cd867f2f44cb8b4ceddda8bf09b6ae9f979a8cba0160f6ffeb8baab9bf77"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-10_EmployeeDetail_States.csv",
+    "bytes": 344,
+    "sha256": "f2efda02d84243fb25e68c4fdd7ed0c8191485fdff486bf6691724c1bb1736ab"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-11_DepartmentDetail_States.csv",
+    "bytes": 353,
+    "sha256": "d47f1bd900fdfacd386e10e7e8953eacebae58469140b584f447396b91af444b"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-12_Settings_States.csv",
+    "bytes": 267,
+    "sha256": "473b964c8206cbe8192d746a4d38c30df6dccbca38642f24d9c8865dc2224a7d"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-13_CloseCompany_States.csv",
+    "bytes": 350,
+    "sha256": "4e2b5fc079048725bd2012e1d0ec7dc225b13442c32957780d4824e73852dbfb"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-14_OfflineReport_States.csv",
+    "bytes": 350,
+    "sha256": "46fa952a30218c8a3d5c993c1441c8ac7094b1ea43d8ed5a9522fdb20d0616e1"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-15_CashCrisis_States.csv",
+    "bytes": 347,
+    "sha256": "2522842a1427e3c22275f7096e8b8ce99bcc4b675613f235238163c47bd911fd"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-16_Recruitment_States.csv",
+    "bytes": 341,
+    "sha256": "8551516d35000783a75150001eb9963ddf60df1ee959be012a3b6dbf45879e55"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-17_HiringConfirm_States.csv",
+    "bytes": 350,
+    "sha256": "d9e5b03bf50daf8f296258b3fa1fe9187171444ae20f81679779f9a74551f88a"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-18_LayoffConfirm_States.csv",
+    "bytes": 353,
+    "sha256": "3771d6e53f55d51d71de58dcbf6fc3fde4057ca8c570fa3ba6ce292c6da4d52e"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-19_CreateDepartment_States.csv",
+    "bytes": 347,
+    "sha256": "6ef9f5f04f1ea6c4b842b44de521a8e666fefea25bbed013a44813d6a77a3bdc"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-20_BusinessExpansion_States.csv",
+    "bytes": 345,
+    "sha256": "f0cc75ec0ccb226d7745d63e4371cd53cacf3f97a81511861cd89f51060c899c"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-21_BusinessStrategy_States.csv",
+    "bytes": 353,
+    "sha256": "40c7b2d75c89c55e78cb89f1234772638e9300c43353ca67d29012631454c50f"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-22_StaffAllocation_States.csv",
+    "bytes": 341,
+    "sha256": "2b01b09bc5a97dd7f854381b758ae6e00ae7989788bde0ec079d26cefad963d3"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-23_FinanceHelp_States.csv",
+    "bytes": 193,
+    "sha256": "1a4939e013d61884aeff74776f638b305b3c06ee7314ac82c65783c9b3442b06"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-24_LeaderboardRules_States.csv",
+    "bytes": 190,
+    "sha256": "e36a9ffd06d366359d4741d08893c5a972ceb4894a64cfc1cc56235de7cb11c7"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-25_ProfitMilestone_States.csv",
+    "bytes": 273,
+    "sha256": "a905870f1bdcafb434ebb5c1dd90ad1fb931facb4a44fc7a00996569b46e0f26"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-26_RecoveryGrant_States.csv",
+    "bytes": 282,
+    "sha256": "daa93616a9f93b56a3bdaa79857142567e55c39c0d32f27299881961b5597085"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-27_SaveError_States.csv",
+    "bytes": 353,
+    "sha256": "038f943c280840b71230e24a39239579be7251a69b7ceeb7638abe0afdd2bf72"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-28_GuideCreateCompany_States.csv",
+    "bytes": 447,
+    "sha256": "6126f88919fca095f3600f58fe59f373296cdca9e71ef3437bd05a242b4473df"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-29_GuideCEO_States.csv",
+    "bytes": 447,
+    "sha256": "c85a57aee0bbadc64964f1a131fd1518876f7b76882f6f49f6f68fe43632d022"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-30_GuideHire_States.csv",
+    "bytes": 531,
+    "sha256": "617ae7f77b46b38c7b63ddc705c1e3f2dae2621a98aa4ed82f4e2701792eb3f6"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-31_GuideMetrics_States.csv",
+    "bytes": 335,
+    "sha256": "8f0a83928c12295f72d0d30fcdf5cf52e7b3b90f38cf3523597d12c55950eef4"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-32_GuideTime_States.csv",
+    "bytes": 335,
+    "sha256": "5b84f55cd7f2be184f892a6c29c68280d5fbad2853feb6ae8550cb47cc683b8d"
+  },
+  {
+    "path": "Docs/ScreenStates/UI-33_GuideAnnualReport_States.csv",
+    "bytes": 335,
+    "sha256": "c8405a06f9e277e903839300b746a2accd43ff2e4168119a5f5419e98484f67b"
+  },
+  {
+    "path": "Docs/SourceRequirements/07_UI_Routes_Tutorial.md",
+    "bytes": 10981,
+    "sha256": "60396b80836093a26635e79f5fe23ee1fe1898b6e9dd3d37bb69673378d99577"
+  },
+  {
+    "path": "Docs/SourceRequirements/12_Commands_StateMachine.md",
+    "bytes": 9885,
+    "sha256": "1edd23a5bd444d9424243f192d6d66a17cf05702ba082a9c786b11f94a5e0208"
+  },
+  {
+    "path": "Docs/SourceRequirements/13_Art_Components.md",
+    "bytes": 5713,
+    "sha256": "6a5e1a21f76ee0fd18c50cd825a3714b9c6c585efbdee4624f7bdba29102025c"
+  },
+  {
+    "path": "IntegrationContracts/ui_contracts.ts",
+    "bytes": 1651,
+    "sha256": "4b39ff926fae38182adb2f423bb026804a0ed03ff2179c63a5a7605fe38c9f70"
+  },
+  {
+    "path": "QA/STATIC_QA.md",
+    "bytes": 1034,
+    "sha256": "172b49b424baa722eb8cdf00f7615312c8eef282cfd92106460ea0ab4f519d6d"
+  },
+  {
+    "path": "README_CN.md",
+    "bytes": 4531,
+    "sha256": "17afb833aeb3bcc4d61496dc8f1d5cd1f72952c89fcf99ee51b6398349be7300"
+  },
+  {
+    "path": "Tools/install_cocos_assets.py",
+    "bytes": 1915,
+    "sha256": "5cc6ff1a2eed8bfdce45051b297b75e3fd1223dfb0bb4ea975998ebf6fac3ab4"
+  }
+]

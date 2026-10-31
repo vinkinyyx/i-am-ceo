@@ -1,0 +1,39 @@
+{
+  "designWidth": 375,
+  "designHeight": 812,
+  "rasterExportWidth": 750,
+  "rasterExportHeight": 1624,
+  "safeArea": {
+    "top": "fromDevice",
+    "bottom": "fromDevice"
+  },
+  "layout": {
+    "fit": "width",
+    "minimumTapSize": 44,
+    "minimumTapGap": 8,
+    "bottomTabs": 4,
+    "primaryNav": [
+      "T01",
+      "T02",
+      "T03",
+      "T04"
+    ]
+  },
+  "colors": {
+    "primary": "#3668B2",
+    "support": "#5D9F8C",
+    "canvas": "#F5F7FB",
+    "text": "#273244",
+    "muted": "#697386",
+    "danger": "#C75353"
+  },
+  "fontSizeSp": {
+    "title": 24,
+    "section": 18,
+    "body": 15,
+    "caption": 12,
+    "metric": 26
+  },
+  "renderRule": "All dynamic company/employee names, values, labels and interaction controls are Cocos nodes; no full-screen raster sprite in runtime.",
+  "note": "Visual baseline tokens, tune after device contrast and layout QA."
+}

@@ -1,0 +1,58 @@
+{
+  "tutorialVersion": "1.0",
+  "steps": [
+    {
+      "tutorialId": "TUT-01",
+      "screenId": "UI-28",
+      "anchor": "companyNameOption",
+      "mustCompleteBusinessAction": true,
+      "canSkipExplanation": true,
+      "copy": "欢迎成为CEO，先给公司起个名字。"
+    },
+    {
+      "tutorialId": "TUT-02",
+      "screenId": "UI-29",
+      "anchor": "ceoTraitOption",
+      "mustCompleteBusinessAction": true,
+      "canSkipExplanation": true,
+      "copy": "CEO的性格会影响未来的成长方向。"
+    },
+    {
+      "tutorialId": "TUT-03",
+      "screenId": "UI-30",
+      "anchor": "firstCandidateCard",
+      "mustCompleteBusinessAction": true,
+      "canSkipExplanation": true,
+      "copy": "能力强不一定最划算，也要比较潜力和工资。"
+    },
+    {
+      "tutorialId": "TUT-04",
+      "screenId": "UI-31",
+      "anchor": "dashboardMetricsHelp",
+      "mustCompleteBusinessAction": false,
+      "canSkipExplanation": true,
+      "copy": "营收是卖出去多少；利润才是扣掉成本后赚的钱。"
+    },
+    {
+      "tutorialId": "TUT-05",
+      "screenId": "UI-32",
+      "anchor": "timeControl",
+      "mustCompleteBusinessAction": false,
+      "canSkipExplanation": true,
+      "copy": "公司会自动经营，你可以暂停或加速时间。"
+    },
+    {
+      "tutorialId": "TUT-06",
+      "screenId": "UI-33",
+      "anchor": "annualReportProfit",
+      "mustCompleteBusinessAction": false,
+      "canSkipExplanation": true,
+      "copy": "查看今年利润与现金变化，决定明年是否扩张。"
+    }
+  ],
+  "rules": {
+    "resetOnCloseCompany": true,
+    "replayDoesNotRepeatMutations": true,
+    "skipOnlyHidesCopy": true
+  }
+}

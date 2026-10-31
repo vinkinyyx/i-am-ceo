@@ -1,0 +1,12 @@
+{
+  /* 编辑器首次打开后可能改写为 extends ./temp/tsconfig.cocos.json；
+     当前提供可独立工作的配置，保证命令行类型检查与测试可用。 */
+  "extends": "./tsconfig.core.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["assets/**/*.ts", "tests/**/*.ts", "tools/**/*.ts"],
+  "exclude": ["node_modules", "library", "temp", "build", "NewProject"]
+}

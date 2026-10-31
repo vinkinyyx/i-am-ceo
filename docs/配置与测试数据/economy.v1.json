@@ -1,0 +1,183 @@
+{
+  "configVersion": "economy-v1.0.0",
+  "currency": "CNY",
+  "moneyStorage": "integerYuan",
+  "ratioUnit": "bps",
+  "player": {
+    "initialCapitalYuan": 300000,
+    "initialEmployeeCount": 2,
+    "initialSkills": {
+      "business": 50,
+      "management": 50,
+      "finance": 50
+    },
+    "initialPolicy": "STEADY",
+    "continuousProfitYearsForGoal": 3,
+    "maxMoneyYuan": 100000000000
+  },
+  "time": {
+    "onlineYearDurationMsAt1x": 300000,
+    "onlineSpeedMultipliers": [
+      1,
+      2,
+      5
+    ],
+    "monthsPerYear": 12,
+    "offlineRealMsPerGameMonth": 2400000,
+    "maxOfflineMonthsPerSession": 36,
+    "maxEligibleOfflineMsPerSession": 86400000
+  },
+  "recruitment": {
+    "candidateCount": 3,
+    "salaryMonthlyYuanMin": 4000,
+    "salaryMonthlyYuanMax": 8000,
+    "recruitmentFeeMonthlySalaryMultiplierBps": 10000,
+    "maxAutoHiresPerMonth": 1,
+    "maxAutoHiresPerYear": 3,
+    "tenurePayMonthCeil": 3,
+    "annualSkillGrowthDenominator": 30
+  },
+  "departments": {
+    "setupFeeYuan": 10000,
+    "staffMultiplierBps": [
+      0,
+      10000,
+      14000,
+      16000,
+      17000,
+      17500
+    ],
+    "maxSkillFactorBps": 15000,
+    "minSkillFactorBps": 5000,
+    "effects": {
+      "HR": {
+        "effectOn": "recruitmentFee_and_businessCapacity",
+        "recruitmentDiscountOneStaffBps": 2500,
+        "recruitmentDiscountCapBps": 4000,
+        "businessCapacityOneStaffBps": 600,
+        "businessCapacityCapBps": 1200
+      },
+      "PROCUREMENT": {
+        "effectOn": "eligibleDirectCost",
+        "oneQualifiedStaffBps": 1000,
+        "capBps": 1800
+      },
+      "MARKETING": {
+        "effectOn": "potentialDemand",
+        "oneQualifiedStaffBps": 1200,
+        "capBps": 2500
+      },
+      "CUSTOMER_SERVICE": {
+        "effectOn": "afterSalesCost",
+        "oneQualifiedStaffBps": 3500,
+        "capBps": 6500
+      },
+      "FINANCE": {
+        "effectOn": "fixedPlusOtherOperatingCost",
+        "oneQualifiedStaffBps": 2000,
+        "capBps": 4000
+      }
+    }
+  },
+  "industry": {
+    "TRADE": {
+      "label": "电商贸易",
+      "firstYearDemandYuan": 720000,
+      "baseAnnualCapacityPerSkill60EmployeeYuan": 400000,
+      "directCostBps": 6000,
+      "otherOperatingCostBps": 800,
+      "afterSalesCostBps": 200,
+      "fixedManagementAnnualYuan": 48000,
+      "exampleEmployeeSalaryMonthlyYuan": 5000,
+      "procurementEligibleDirectCostBps": 9500
+    },
+    "SOFTWARE": {
+      "label": "软件科技",
+      "firstYearDemandYuan": 400000,
+      "baseAnnualCapacityPerSkill60EmployeeYuan": 250000,
+      "directCostBps": 2500,
+      "otherOperatingCostBps": 1100,
+      "afterSalesCostBps": 100,
+      "fixedManagementAnnualYuan": 48000,
+      "exampleEmployeeSalaryMonthlyYuan": 6500,
+      "procurementEligibleDirectCostBps": 1000
+    },
+    "SERVICE": {
+      "label": "企业服务",
+      "firstYearDemandYuan": 450000,
+      "baseAnnualCapacityPerSkill60EmployeeYuan": 280000,
+      "directCostBps": 3500,
+      "otherOperatingCostBps": 850,
+      "afterSalesCostBps": 150,
+      "fixedManagementAnnualYuan": 48000,
+      "exampleEmployeeSalaryMonthlyYuan": 6000,
+      "procurementEligibleDirectCostBps": 1500
+    }
+  },
+  "demand": {
+    "naturalAnnualGrowthBps": 1000,
+    "acquisitionMultiplierMinBps": 8500,
+    "acquisitionMultiplierMaxBps": 13500,
+    "ceoBusinessPerPointBps": 15,
+    "defaultCompletionRateBps": 10000
+  },
+  "productivity": {
+    "skillBaseBps": 7000,
+    "skillPerPointBps": 50,
+    "ceoManagementPerPointFrom50Bps": 20,
+    "teamworkPerPointFrom50Bps": 20,
+    "minGroupModifierBps": 9000,
+    "maxGroupModifierBps": 11000,
+    "businessAssetCapBps": 3000,
+    "businessAssetPer10000YuanBps": 150,
+    "businessAssetInvestStepYuan": 10000,
+    "annualDepreciationBpsFromNextYear": 1000
+  },
+  "policies": {
+    "STEADY": {
+      "autoHireMarginThresholdBps": 10000,
+      "cashReserveMonths": 6
+    },
+    "GROWTH": {
+      "autoHireMarginThresholdBps": 8000,
+      "cashReserveMonths": 6
+    },
+    "PROFIT": {
+      "autoHireMarginThresholdBps": 12000,
+      "cashReserveMonths": 9
+    }
+  },
+  "risk": {
+    "eventAnnualChanceBps": 2500,
+    "eventMaxPerYear": 1,
+    "eventEffectMinBps": 500,
+    "eventEffectMaxBps": 1200,
+    "cashWarningRequiredMonths": 6,
+    "oneTimeRescueCapitalYuan": 100000
+  },
+  "save": {
+    "schemaVersion": 1,
+    "targetMaxBytesPerSlot": 500000,
+    "rollingMonthlyLedgers": 24,
+    "keepAnnualReports": 100,
+    "keepRecentEventDetails": 24
+  },
+  "ui": {
+    "minTouchTargetLogicalPx": 44,
+    "minTouchGapLogicalPx": 8,
+    "designWidthLogicalPx": 375,
+    "designHeightLogicalPx": 812
+  },
+  "localBots": {
+    "count": 12,
+    "initialAssetYuanMin": 100000,
+    "initialAssetYuanMax": 1500000,
+    "initialCompletedYearsMin": 0,
+    "initialCompletedYearsMax": 8,
+    "baseAnnualAssetGrowthBpsMin": 300,
+    "baseAnnualAssetGrowthBpsMax": 1200,
+    "yearJitterBpsMin": -500,
+    "yearJitterBpsMax": 500,
+    "sharedSeed": "im-ceo-v1-local-bots"
+  }
+}

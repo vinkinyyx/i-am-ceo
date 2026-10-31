@@ -1,0 +1,89 @@
+﻿Screen_ID,UI_Action,Recommended_Handling,Domain_Command_If_Applicable,Note
+UI-01,startNew,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-01,continue,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-01,retry,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-01,openPrivacy,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-02,selectIndustry,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-02,selectName,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-02,refreshNames,DomainCommand,rollCompanyNames,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-02,setCustomName,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-02,next,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-03,editCEOName,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-03,chooseTrait,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-03,back,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-03,next,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-04,selectCandidate,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-04,hire,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-04,back,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-04,enterBusiness,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-05,setSpeed,DomainCommand,setSpeed,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-05,openYearReport,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-05,openPolicy,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-05,openSettings,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-05,openRisk,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-06,openDepartment,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-06,createDepartment,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-06,openStaffAllocation,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-07,filterDepartment,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-07,openEmployee,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-07,openRecruitment,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-08,setRankType,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-08,openRankingHelp,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-09,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-09,chooseYear,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-09,acknowledgeTutorial,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-10,openLayoffPreview,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-10,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-11,openStaffAllocation,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-11,openRecruitment,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-11,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-12,toggleSound,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-12,replayTutorial,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-12,openPrivacy,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-12,openCloseCompany,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-13,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-13,confirmClose,DomainCommand,confirmCloseCompany,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-14,acknowledgeOffline,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-15,openRescue,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-15,openStaff,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-15,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-16,selectCandidate,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-16,refreshCandidates,DomainCommand,refreshOffer,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-16,openHireConfirm,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-16,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-17,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-17,confirmHire,DomainCommand,hireEmployee,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-18,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-18,confirmDismiss,DomainCommand,dismissEmployee,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-19,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-19,confirmCreateDepartment,DomainCommand,createDepartment,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-20,setAmount,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-20,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-20,confirmInvestment,DomainCommand,investInBusiness,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-21,choosePolicy,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-21,applyPolicy,DomainCommand,setPolicy,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-21,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-22,chooseMode,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-22,setTarget,DomainCommand,setDepartmentMode,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-22,apply,DomainCommand,setDepartmentMode,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-22,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-23,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-24,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-25,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-25,close,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-26,cancel,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-26,confirmRescue,DomainCommand,grantRescueCapital,UI intent only; follow 12_Commands_StateMachine.md for validated command shape
+UI-27,retry,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-27,returnToTitle,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-28,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-28,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-29,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-29,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-30,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-30,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-31,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-31,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-32,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-32,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
+UI-33,skipTip,NavigationOrStateOnly,,Implement locally or through read/query; do not assume a server endpoint
+UI-33,acknowledge,TutorialState,,Implement locally or through read/query; do not assume a server endpoint
