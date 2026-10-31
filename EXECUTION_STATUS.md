@@ -7,7 +7,7 @@
 
 | 里程碑 | 状态 | 最后commit | 通过用例 | 未解决问题 |
 |---|---|---|---|---|
-| M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 待提交 | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
+| M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 128c0ad | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
 | M1 | TODO | - | - | - |
 | M2 | TODO | - | - | - |
 | M3 | TODO | - | - | TapTap 开发者认证/AppID/备案为外部门禁，尚无凭证 |
