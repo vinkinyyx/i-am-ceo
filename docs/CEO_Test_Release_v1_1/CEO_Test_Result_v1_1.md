@@ -208,7 +208,7 @@ powershell -ExecutionPolicy Bypass -File tools/build-tap.ps1
 | 工程类型 | 小游戏 | `project.config.json.compileType = "game"`；`convertScriptVersion 2.0.4-ts` | 符合 |
 | 分包 | 非必需（首包远小于上限） | 无 `subpackages` | 符合 |
 | 敏感文件 | 不得含密钥 / 服务端配置 / source map | 包内仅 5 个 config json，**无** `runtime.config.json`、`.env`、`.map`；`clientId/clientToken` 检索 0 次 | 符合 |
-| 登录接入 | 小游戏需接入 TapTap 登录 | 代码层已接入（`TapPlatform.login()` + `AuthService` 服务端 code2Session 交换，不改写存档）；但 `authEndpoint` 来自不入库的 `runtime.config.json`，**包内未包含**，故真机首次登录需在发布时注入该配置 | **代码已就绪、配置待补** |
+| 登录接入 | 小游戏需接入 TapTap 登录 | 包体内已接入：`AuthService` 在 TAPTAP 环境强制调用 `tap.login()` 完成平台授权；未配置 `authEndpoint` 时使用平台登录态（不采集 openid、不发起网络请求），配置了才走服务端换取 | **符合** |
 | 隐私合规 | 首启显著告知 | 首启隐私弹窗（`同意并继续`）+ 设置页隐私政策入口；本机单机不联网、不采集经营数据 | 符合 |
 | 启动画面 | 不得残留引擎默认标识 | 自有图 + `#0B1526` 底色，无 Cocos logo | 符合 |
 

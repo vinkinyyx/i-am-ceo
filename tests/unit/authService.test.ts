@@ -92,10 +92,16 @@ describe('AuthService 真机 TAPTAP 登录交换（08.4）', () => {
     expect(stored?.sessionToken).toBe('tok-123');
   });
 
-  it('未配置 endpoint 时真机拒绝登录（PLATFORM_UNAVAILABLE），不伪造成功', async () => {
-    const auth = new AuthService(p, { endpoint: '' });
-    await expect(auth.ensureAuthenticated()).rejects.toMatchObject({ code: GameErrorCode.PLATFORM_UNAVAILABLE });
-    expect(p.logins).toBe(0);
+  it('未配置 endpoint 时走平台登录态：仍调用 tap.login()，不伪造 openid、不抛错', async () => {
+    const auth = new AuthService(p, { endpoint: '', now: () => 2_000_000 });
+    const s = await auth.ensureAuthenticated();
+    expect(s.kind).toBe('taptap');
+    expect(s.sessionToken).toBe('tap-platform-session');
+    expect(s.expiresAtMs).toBe(2_000_000 + 30 * 24 * 3600 * 1000);
+    // 平台登录必须真实发生（审核要求包体内已接入 TapTap 登录）
+    expect(p.logins).toBe(1);
+    // 未配置 endpoint 时不发任何网络请求
+    expect(p.requests).toHaveLength(0);
   });
 
   it('login 返回空 code → AUTH_REQUIRED', async () => {

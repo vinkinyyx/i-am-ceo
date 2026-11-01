@@ -5,12 +5,12 @@ import type { ITapPlatform } from './ITapPlatform';
  * 平台认证服务（设计文档 08.4）。
  *
  * 流程（真机 TAPTAP 环境）：
- *   tap.login() 取一次性 code
- *     -> POST {endpoint}/v1/auth/taptap/exchange { code }
- *     -> { sessionToken, expiresInSec }
- * 会话短期有效、仅存本地、不写入业务存档；code 一次性不可复用。
+ *   tap.login() 取一次性 code（平台内真实授权，用户已在 TapTap 客户端登录）
+ *     -> 配置了 authEndpoint 时：POST {endpoint}/v1/auth/taptap/exchange { code } 换服务端会话
+ *     -> 未配置 authEndpoint 时：直接使用平台登录态（纯单机不需要 openid，无需自建服务端）
  *
  * 纪律：
+ * - 小游戏形态下 **不要求自建服务端**：TapTap 平台已完成用户认证，游戏不采集身份标识；
  * - session_key / App Secret 只在服务端，客户端永远拿不到；
  * - 编辑器 / 预览环境返回 mock 会话，不发网络请求；
  * - 任何失败都转 GameError(AUTH_REQUIRED / PLATFORM_UNAVAILABLE)，
@@ -20,6 +20,10 @@ import type { ITapPlatform } from './ITapPlatform';
 
 export const SESSION_STORAGE_KEY = 'ceo/auth/session';
 const AUTH_PATH = '/v1/auth/taptap/exchange';
+/** 未配置服务端时的平台登录态标记（不是身份令牌，仅表示「已通过平台登录」）。 */
+const PLATFORM_SESSION_MARKER = 'tap-platform-session';
+/** 平台登录态有效期（TapTap Access Token 最长 30 天）。 */
+const PLATFORM_SESSION_TTL_MS = 30 * 24 * 3600 * 1000;
 
 /** 会话记录（存平台存储，独立于业务存档信封）。 */
 export interface AuthSession {
@@ -101,20 +105,29 @@ export class AuthService {
       return mock;
     }
 
-    if (!this.endpoint) {
-      // 真机但未配置服务端地址：不能伪造登录成功
-      throw new GameError(GameErrorCode.PLATFORM_UNAVAILABLE, {
-        api: 'auth',
-        cause: 'auth endpoint not configured',
-      });
-    }
-
+    // 无论是否配置服务端，都必须先走一次平台登录：这是 TapTap 小游戏对「已接入登录」的要求，
+    // 也让用户在 TapTap 客户端内完成一次真实授权（而不是跳过登录直接进游戏）。
     const login = await this.platform.login();
     if (!login.code) {
       throw new GameError(GameErrorCode.AUTH_REQUIRED, {
         api: 'auth',
         cause: 'empty login code',
       });
+    }
+
+    if (!this.endpoint) {
+      // 未配置服务端：使用平台登录态即可。
+      // TapTap 小游戏运行在 TapTap 客户端内，用户身份已由平台认证，tap.login() 成功
+      // 本身就是一次真实授权；本作是纯单机游戏，不使用 openid/unionid，
+      // 因此不需要自建服务端换取会话，也不伪造任何身份标识。
+      const session: AuthSession = {
+        kind: 'taptap',
+        sessionToken: PLATFORM_SESSION_MARKER,
+        expiresAtMs: this.now() + PLATFORM_SESSION_TTL_MS,
+      };
+      this.session = session;
+      await this.writeStored(session);
+      return session;
     }
 
     const exchanged = await this.exchangeCode(login.code);

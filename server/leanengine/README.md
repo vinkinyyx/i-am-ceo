@@ -1,6 +1,10 @@
-# 《我是CEO》登录云函数（LeanCloud 云引擎部署指南）
+# 《我是CEO》登录云函数（可选组件，正式发布不需要）
 
-零服务器方案：把 TapTap code2Session 换取接口部署到 TapTap TDS 的云引擎，免去买服务器。
+> **重要**：本组件是**可选**的。TapTap 小游戏形态下，登录由 TapTap 平台在客户端内完成
+> （`tap.login()`），纯单机游戏不需要自建服务端、不需要域名、不需要 ICP 备案。
+> 只有当你后续要做「跨设备云存档 / 跨账号排行 / 服务端校验 openid」等能力时，才需要部署本服务。
+
+零服务器方案（可选）：把 TapTap code2Session 换取接口部署到 TapTap TDS 的云引擎，免去买服务器。
 
 与 `server/auth-server.mjs` 行为完全等价：相同路由 `POST /v1/auth/taptap/exchange`、相同请求 `{code}`、相同响应 `{sessionToken, expiresInSec}`、相同错误码。**游戏客户端无需改动。**
 
