@@ -938,19 +938,19 @@ export class AppView extends Component {
     }
   }
 
-  /** TUT-04 三指标 + TUT-05 开始经营合并引导：确认即启动时钟。 */
+  /** TUT-04 三指标 + TUT-05 开始经营合并引导：确认即启动时钟；可跳过教学（TC-055）。 */
   private renderStartOperatingBubble(): void {
     const overlay = this.modalOverlay(true);
     createRect({
       width: 308,
-      height: 236,
+      height: 292,
       color: new Color(39, 50, 68, 245),
       radius: 12,
       parent: overlay,
     }).setPosition(0, 0);
     createLabel({ text: '新手提示', fontSize: 15, bold: true, color: Color.WHITE, parent: overlay }).setPosition(
       0,
-      86,
+      112,
     );
     createLabel({
       text: '营收是卖出去多少；利润才是扣掉成本后赚的钱。\n\n公司会自动经营，你可以暂停或加速时间。',
@@ -959,7 +959,7 @@ export class AppView extends Component {
       width: 264,
       lineHeight: 22,
       parent: overlay,
-    }).setPosition(0, 16);
+    }).setPosition(0, 38);
     createButton({
       text: '开始经营',
       width: 168,
@@ -970,7 +970,36 @@ export class AppView extends Component {
         overlay.destroy();
         void this.startClock();
       },
-    }).setPosition(0, -78);
+    }).setPosition(0, -64);
+    // TC-055：可跳过教学浮层，但首聘 2 人的约束由领域层强制（不跳过必要业务）
+    createButton({
+      text: '跳过教学',
+      width: 168,
+      height: 42,
+      fontSize: 13,
+      color: new Color(238, 241, 247),
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        void this.skipTutorial();
+      },
+    }).setPosition(0, -118);
+  }
+
+  /** 跳过教学浮层：进入经营但保持暂停，由玩家自行按开始（TC-055）。 */
+  private async skipTutorial(): Promise<void> {
+    const s = this.state();
+    const result = await this.facade.skipTutorial({
+      commandId: nextCommandId('skip-tut'),
+      expectedRunId: s.runId,
+    });
+    if (!result.ok) {
+      this.toast(result.displayMessage);
+      return;
+    }
+    this.toast('已跳过教学，可在「时间」栏手动开始经营');
+    this.render();
   }
 
   private renderTimeControl(parent: Node, centerY: number): void {

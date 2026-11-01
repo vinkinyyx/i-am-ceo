@@ -5,7 +5,7 @@ import type { IStorageBackend, ITapPlatform } from '../platform/ITapPlatform';
 import { GameStore } from './GameStore';
 import { createCompany, type CreateCompanyInput } from './CompanyService';
 import { getOffer, refreshOffer } from './OfferService';
-import { hireEmployee, startOperating } from './RecruitmentService';
+import { hireEmployee, startOperating, skipTutorial } from './RecruitmentService';
 import { closeCompanyPreview, confirmCloseCompany } from './ResetService';
 import { createInitialState } from '../domain/gameStateFactory';
 import type { AnnualReport, CandidateOffer, Employee, GameSpeed, GameState, IndustryId, MonthlyLedger } from '../domain/types';
@@ -169,6 +169,19 @@ export class GameFacade {
     try {
       const { revision } = await this.store.mutate(
         (draft) => startOperating(draft, ctx),
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, revision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 跳过教学浮层（TC-055）：进入 RUNNING 但保持暂停，仍强制 2 名首聘已完成。 */
+  async skipTutorial(ctx: { commandId: string; expectedRunId: string }): Promise<CommandResult<true>> {
+    try {
+      const { revision } = await this.store.mutate(
+        (draft) => skipTutorial(draft, ctx),
         ctx.expectedRunId,
       );
       return ok(this.store.current.runId, revision, true);

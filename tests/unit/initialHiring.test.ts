@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createInitialState } from '@core/domain/gameStateFactory';
 import { createCompany } from '@core/application/CompanyService';
 import { getOffer, refreshOffer } from '@core/application/OfferService';
-import { hireEmployee, startOperating } from '@core/application/RecruitmentService';
+import { hireEmployee, startOperating, skipTutorial } from '@core/application/RecruitmentService';
 import { generateCandidates } from '@core/domain/CandidateGenerator';
 import type { GameState } from '@core/domain/types';
 import rawEconomy from '../../assets/resources/config/economy.v1.json';
@@ -190,6 +190,49 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
         { commandId: 'h2-new', expectedRunId: state.runId },
       ),
     ).toThrow(/OFFER_EXPIRED/);
+  });
+
+  it('TC-055: 跳过教学进入 RUNNING 但保持暂停，不跳过 2 名首聘约束', () => {
+    const state = seededCompany(42);
+    const deptId = state.departments[0]!.deptId;
+    // 未到看板引导态不可跳过（NOT_READY）；跳过入口只在 TUTORIAL_DASHBOARD 出现
+    expect(() =>
+      skipTutorial(state, { commandId: 'skip-early', expectedRunId: state.runId }),
+    ).toThrow(/NOT_READY/);
+    expect(state.phase).toBe('HIRING_INITIAL');
+
+    const offer = getOffer(state, deptId);
+    hireEmployee(
+      state,
+      cfg,
+      { offerId: offer.offerId, candidateId: offer.candidates[0]!.candidateId, departmentId: deptId },
+      { commandId: 'k1', expectedRunId: state.runId },
+    );
+    hireEmployee(
+      state,
+      cfg,
+      { offerId: offer.offerId, candidateId: offer.candidates[1]!.candidateId, departmentId: deptId },
+      { commandId: 'k2', expectedRunId: state.runId },
+    );
+    expect(state.phase).toBe('TUTORIAL_DASHBOARD');
+
+    // 跳过教学浮层：进入 RUNNING，speed=0（暂停），引导步骤记为完成
+    skipTutorial(state, { commandId: 'skip-1', expectedRunId: state.runId });
+    expect(state.phase).toBe('RUNNING');
+    expect(state.speed).toBe(0);
+    expect(state.onboarding.completedSteps).toContain('TUT-04');
+    expect(state.onboarding.completedSteps).toContain('TUT-05');
+
+    // 幂等：同 commandId 重放不产生二次效果；已 RUNNING 再跳过也幂等
+    skipTutorial(state, { commandId: 'skip-1', expectedRunId: state.runId });
+    skipTutorial(state, { commandId: 'skip-2', expectedRunId: state.runId });
+    expect(state.phase).toBe('RUNNING');
+    expect(state.speed).toBe(0);
+
+    // 跳过后玩家经「时间」控制条调速开始经营；startOperating 对已 RUNNING 幂等不误启时钟
+    startOperating(state, { commandId: 'start-after-skip', expectedRunId: state.runId });
+    expect(state.phase).toBe('RUNNING');
+    expect(state.speed).toBe(0);
   });
 
   it('现金不足支付招聘费时拒绝（极端薪资下保护）', () => {

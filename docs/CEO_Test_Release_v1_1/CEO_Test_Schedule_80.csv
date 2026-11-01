@@ -1,4 +1,4 @@
-轮次,日期,时段,顺序,案例ID,场景ID,模块,案例标题,优先级,执行方式,预估分钟,自动化入口,前置依赖,固定数据/种子,证据要求,执行人,状态,实际结果,证据路径,备注/缺陷
+﻿轮次,日期,时段,顺序,案例ID,场景ID,模块,案例标题,优先级,执行方式,预估分钟,自动化入口,前置依赖,固定数据/种子,证据要求,执行人,状态,实际结果,证据路径,备注/缺陷
 R1,2026-11-02,09:30-12:00,1,CEO-TC-001,SC-01,创建公司,无存档进入创建公司,P0,自动+人工,10,companyCreate.test.ts,R0完成,空档;seed=1,vitest日志+首屏截图,Agent,PASS,空档进入创建公司页，默认公司名可编辑/随机,evidence/test-v1.1/R1/s01-company-name.png；companyCreate.test.ts,
 R1,2026-11-02,09:30-12:00,2,CEO-TC-002,SC-01,创建公司,随机推荐与自定义名称,P0,自动+人工,10,companyCreate.test.ts,TC-001,晨星咨询;刷新1次,截图+存档JSON,Agent,PASS,名称可随机重掷与自定义，刷新1次后仍可编辑,evidence/test-v1.1/R1/s01-company-name.png；companyCreate.test.ts,
 R1,2026-11-02,09:30-12:00,3,CEO-TC-003,SC-01,创建公司,公司名称基本必填校验,P1,自动,5,companyCreate.test.ts,TC-002,空/全角空格/\u0000,vitest日志,Agent,PASS,空/空白/非法字符被拒（域级校验）,evidence/test-v1.1/R0/automation-tests.json；companyCreate.test.ts,
@@ -56,7 +56,7 @@ R4,2026-11-04,09:00-18:00,54,CEO-TC-051,SC-14,排行榜,虚拟企业排行榜的
 R4,2026-11-04,09:00-18:00,55,CEO-TC-052,SC-14,排行榜,资产与经营年限排名规则,P1,自动,5,eventRiskM3.test.ts,TC-051,assets tie,排序断言日志,Agent,PASS,资产榜与年限榜排序规则正确,evidence/test-v1.1/R0/automation-tests.json；eventRiskM3.test.ts,
 R4,2026-11-04,09:00-18:00,56,CEO-TC-053,SC-14,排行榜,虚拟排行榜正确说明,P1,人工,5,无,TC-052,UI-24,文案截图,Agent,PASS,标题「本地模拟排行」并标注「你的排名 x/13」,evidence/test-v1.1/R4/m3-rank-assets.png,
 R4,2026-11-04,09:00-18:00,57,CEO-TC-054,SC-15,引导与导航,六步引导正常触发,P1,人工,10,无,D1新档,TUT01-06,六步录屏,Agent,PASS,向导3页+看板合并引导+操作指引重播均触发，不阻塞业务操作,evidence/test-v1.1/R1/s01-s03；evidence/test-v1.1/R2/m1-company-month1.png；evidence/test-v1.1/R4/m3-tutorial-replay.png,观察：无独立「时间控制」「首年报告」教学浮层，以合并引导+空态文案呈现
-R4,2026-11-04,09:00-18:00,58,CEO-TC-055,SC-15,引导与导航,跳过引导不跳过必要业务,P0,人工,5,无,D1新档,TUT03,跳过前后截图,Agent,FAIL,产品无「跳过引导」入口，无法执行「跳过教学浮层」步骤,evidence/test-v1.1/R1/s01-s03；全局检索无跳过文案/按钮,需求缺口 DEF-03；仅「未满2人禁止开始经营」约束成立
+R4,2026-11-04,09:00-18:00,58,CEO-TC-055,SC-15,引导与导航,跳过引导不跳过必要业务,P0,人工,5,无,D1新档,TUT03,跳过前后截图,Agent,PASS,新手提示浮层新增「跳过教学」按钮；跳过后进入 RUNNING 且 speed=0（暂停），首聘2人约束由领域层强制；跳过后经时间控制条开始经营,tests/unit/initialHiring.test.ts TC-055 用例（205 全绿）,BUG-003 已修复（2026-11-01 补入口）；跳过教学不跳过必要业务；UI 截图证据随下次构建补
 R4,2026-11-04,09:00-18:00,59,CEO-TC-057,SC-16,存档与迁移,正常保存与重启恢复,P0,自动+人工,15,saveRepository.test.ts,TC-058前,a/b/active,重启前后JSON+截图,Agent,PASS,双槽+活动指针写入；页面刷新后存档与经营状态恢复,evidence/test-v1.1/R2/save-dump.json；evidence/test-v1.1/R5/audio/audio-settings-before.png,
 R4,2026-11-04,09:00-18:00,60,CEO-TC-058,SC-16,存档与迁移,单份存档异常仍可恢复,P0,自动+人工,10,saveRepository.test.ts,D4坏档,crc tamper,恢复截图+日志,Agent,PASS,CRC 篡改/坏档时回退另一槽位,evidence/test-v1.1/R0/automation-tests.json；saveRepository.test.ts,
 R4,2026-11-04,09:00-18:00,61,CEO-TC-059,SC-16,存档与迁移,版本更新保留关键经营数据,P1,人工,15,无(需D5),D5旧档,schema v1→v2,迁移前后JSON,Agent,PASS,schema v1→v2 迁移保留 runId/payload；未注册迁移器时明确拒绝,evidence/test-v1.1/R0/automation-tests.json；releaseGaps.test.ts,框架级验证；正式 D5 旧版存档未提供，未做真机升级

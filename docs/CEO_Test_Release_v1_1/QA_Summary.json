@@ -11,8 +11,8 @@
   "golden_reference_count": 17,
   "execution_date": "2026-11-01",
   "result": {
-    "PASS": 74,
-    "FAIL": 1,
+    "PASS": 75,
+    "FAIL": 0,
     "BLOCKED": 5,
     "不适用": 0
   },
@@ -90,11 +90,10 @@
     "CEO-TC-071",
     "CEO-TC-072",
     "CEO-TC-067",
-    "CEO-TC-068"
-  ],
-  "failed_cases": [
+    "CEO-TC-068",
     "CEO-TC-055"
   ],
+  "failed_cases": [],
   "blocked_cases": [
     "CEO-TC-069",
     "CEO-TC-073",
@@ -104,8 +103,8 @@
   ],
   "automation": {
     "files": 23,
-    "tests": 204,
-    "passed": 204,
+    "tests": 205,
+    "passed": 205,
     "failed": 0,
     "typecheck_errors": 0,
     "lint_errors": 0
@@ -132,10 +131,10 @@
   "defects": {
     "BUG-001": "P3 设置弹窗切换声音开关后被整体关闭（已修复：rebuildSettings 就地重建）",
     "BUG-002": "P1 360x640 小屏顶部/底部被裁、四 Tab 不可见（已修复：按可视高兜底缩放）",
-    "BUG-003": "P0(需求缺口) 无跳过引导入口（未修复，待产品决策）",
+    "BUG-003": "P0(需求缺口) 无跳过引导入口（已修复：看板教学浮层新增「跳过教学」按钮，skipTutorial 走命令层、幂等、强制首聘2人约束）",
     "BUG-004": "P2 主壳 +30 位移导致顶部公司名被裁切（已修复：Body 归零对齐）",
     "RISK-001": "包内 EditorMockPlatform/MemoryStorage 为死代码残留（已复核非阻断：生产入口 PlatformFactory 未引用，运行期不实例化；建议构建期剔除）"
   },
-  "release_verdict": "开发可提测；包体可提审但不可直接对外发布（真机 TC-073/074/076、听感 TC-069、商店素材 TC-075 未执行，TC-055 需求缺口待决策）",
+  "release_verdict": "开发可提测；包体可提审但不可直接对外发布（真机 TC-073/074/076、听感 TC-069、商店素材 TC-075 未执行；登录服务端配置 runtime.config.json 待发布后补）",
   "status": "已执行（真机/听感/商店素材待补）"
 }

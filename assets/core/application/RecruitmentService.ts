@@ -173,3 +173,29 @@ export function startOperating(
   pushStep(state, 'TUT-05');
   recordCommand(state, ctx.commandId);
 }
+
+/**
+ * 跳过教学浮层（TC-055 / BUG-003）：仅在看板引导态可用，
+ * 跳过浮层进入 RUNNING 但保持暂停（speed=0），由玩家自行开始经营；
+ * 与 startOperating 一样强制 2 名首聘已完成，跳过教学不跳过必要业务。
+ */
+export function skipTutorial(
+  state: GameState,
+  ctx: { commandId: string; expectedRunId: string },
+): void {
+  ensureRunId(state, ctx.expectedRunId);
+  if (state.phase === 'RUNNING') return; // 幂等
+  if (state.phase !== 'TUTORIAL_DASHBOARD') {
+    throw new Error(GameErrorCode.NOT_READY);
+  }
+  if (state.onboarding.initialHiresCompleted < 2) {
+    throw new Error(GameErrorCode.ONBOARDING_INCOMPLETE);
+  }
+  if (hasCommand(state, ctx.commandId)) return;
+  state.phase = 'RUNNING';
+  state.speed = 0;
+  // 教学浮层被跳过即视为引导环节结束
+  pushStep(state, 'TUT-04');
+  pushStep(state, 'TUT-05');
+  recordCommand(state, ctx.commandId);
+}
