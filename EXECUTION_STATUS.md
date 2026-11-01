@@ -10,7 +10,7 @@
 | M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 128c0ad | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
 | M1 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | c4a8807 | 78 单测/黄金/集成全过；G001-G003 黄金账分毫不差；web-mobile 无头构建+Chromium 走通在线时钟/跨年/扩产/年报 | TapTap 真机、音频真机听感为外部项（ISSUE-ENV-02） |
 | M2 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | d0a6a9e | 99 单测/黄金/集成全过；G004/G005/G013/G014/G015 部门与裁员黄金用例；web-mobile 无头构建+Chromium 走通建部/招聘/裁员/调岗/方针 | TapTap 真机为外部项（ISSUE-ENV-02） |
-| M3 | READY_FOR_QA（核心/UI/文档全绿；真机与提审 BLOCKED） | 待提交 | 156 测试全过（含离线/事件/危机/榜单/35项Tap平台/E2E）；900 run 百种子5年模拟零负现金/零守恒失败；web-mobile 构建+Chromium 零错误（排行榜/声音设置/帮助重播） | M3-07 真机、M3-09 TapTap提审/AppID/版号需凭证（ISSUE-ENV-02） |
+| M3 | READY_FOR_QA（核心/UI/文档全绿；真机与提审 BLOCKED） | 5b00000 | 156 测试全过（含离线/事件/危机/榜单/35项Tap平台/E2E）；900 run 百种子5年模拟零负现金/零守恒失败；web-mobile 构建+Chromium 零错误（排行榜/声音设置/帮助重播） | M3-07 真机、M3-09 TapTap提审/AppID/版号需凭证（ISSUE-ENV-02） |
 
 ## 环境核查（2026-11-01）
 
