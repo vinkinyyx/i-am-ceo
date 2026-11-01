@@ -65,6 +65,15 @@ export function annualSettlement(
   ceo.managementSkill = Math.min(100, ceo.managementSkill + g.management);
   ceo.financeSkill = Math.min(100, ceo.financeSkill + g.finance);
 
+  // 员工年度成长（设计 5.5）：delta=max(1,round(potential/30))，专业能力封顶 100；
+  // 仅在年结执行一次；潜力不增长、薪资不自动上涨。
+  const denom = cfg.recruitment.annualSkillGrowthDenominator;
+  for (const emp of state.employees) {
+    if (emp.status !== 'ACTIVE') continue;
+    const delta = Math.max(1, Math.round(emp.potential / denom));
+    emp.skill = Math.min(100, emp.skill + delta);
+  }
+
   const headcountClose = state.employees.filter((e) => e.status === 'ACTIVE').length;
 
   const report: AnnualReport = {

@@ -29,6 +29,12 @@ export interface ClockTickResult {
 
 export class GameClock {
   /**
+   * 月结前钩子（应用层注入自动招聘等自动化决策）。
+   * 在每个月 advanceMonth 之前、同一变更锁内调用；不参与黄金确定性时可留空。
+   */
+  beforeMonthSettle: ((state: GameState, cfg: EconomyConfig) => void) | null = null;
+
+  /**
    * 推进真实毫秒数。阈值按当前倍速对应的"真实毫秒/月"（G008）：
    * 1× 25000ms/月、2× 12500ms/月、5× 5000ms/月。
    */
@@ -50,6 +56,8 @@ export class GameClock {
 
     while (state.progressMsInMonth >= monthMs && state.phase === 'RUNNING') {
       state.progressMsInMonth -= monthMs;
+      // 自动化决策（自动招聘）在月结前同一锁内执行，员工次月生效故不污染本月
+      this.beforeMonthSettle?.(state, cfg);
       const closed = advanceMonth(state, cfg);
       result.monthsAdvanced += 1;
       if (closed.yearClosed) {

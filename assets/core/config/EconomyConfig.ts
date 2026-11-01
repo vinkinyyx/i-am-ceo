@@ -18,33 +18,47 @@ export interface IndustryConfig {
   procurementEligibleDirectCostBps: number;
 }
 
-export interface StaffMultiplierBps {
-  staffCount: number;
-  multiplierBps: number;
+/** 员工人数→边际效益乘数表（按人数索引，第 n 人为 table[n]，见 06.3）。 */
+export type StaffMultiplierTable = readonly number[];
+
+export interface HrEffect {
+  effectOn: 'recruitmentFee_and_businessCapacity';
+  recruitmentDiscountOneStaffBps: number;
+  recruitmentDiscountCapBps: number;
+  businessCapacityOneStaffBps: number;
+  businessCapacityCapBps: number;
+}
+
+export interface ProcurementEffect {
+  effectOn: 'eligibleDirectCost';
+  oneQualifiedStaffBps: number;
+  capBps: number;
+}
+
+export interface MarketingEffect {
+  effectOn: 'potentialDemand';
+  oneQualifiedStaffBps: number;
+  capBps: number;
+}
+
+export interface CustomerServiceEffect {
+  effectOn: 'afterSalesCost';
+  oneQualifiedStaffBps: number;
+  capBps: number;
+}
+
+export interface FinanceEffect {
+  effectOn: 'fixedPlusOtherOperatingCost';
+  oneQualifiedStaffBps: number;
+  capBps: number;
 }
 
 export interface DepartmentEffects {
-  recruitmentDiscountOneStaffBps: number;
-  recruitmentDiscountCapBps: number;
-  recruitmentDiscountOneStaffHrBusinessCapacityBps: number;
-  businessCapacityCapBps: number;
-  staffMultiplierBps: readonly StaffMultiplierBps[];
-  maxSkillFactorBps: number;
-  minSkillFactorBps: number;
-  effects: {
-    HR: { oneQualifiedStaffBps: number; totalMaxBps: number };
-    PROCUREMENT: {
-      oneQualifiedStaffBps: number;
-      capBps: number;
-      eligiblePart: string;
-    };
-    MARKETING: { oneQualifiedStaffBps: number; capBps: number };
-    CUSTOMER_SERVICE: { oneQualifiedStaffBps: number; capBps: number };
-    FINANCE: {
-      fixedManagementPlusOtherControllable: string;
-      oneQualifiedStaffBps: number;
-    };
-  };
+  HR: HrEffect;
+  PROCUREMENT: ProcurementEffect;
+  MARKETING: MarketingEffect;
+  CUSTOMER_SERVICE: CustomerServiceEffect;
+  FINANCE: FinanceEffect;
 }
 
 export interface Policies {
@@ -95,6 +109,11 @@ export interface Recruitment {
 
 export interface Departments {
   setupFeeYuan: number;
+  /** 第 n 名在岗员工的边际乘数表（bps），索引 0 无人=0；超出表长按末档。 */
+  staffMultiplierBps: readonly number[];
+  /** 员工技能对部门效益的系数上限/下限（bps，skill 映射后钳制）。 */
+  maxSkillFactorBps: number;
+  minSkillFactorBps: number;
   effects: DepartmentEffects;
 }
 

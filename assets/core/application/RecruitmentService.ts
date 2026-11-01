@@ -1,14 +1,14 @@
 import { recruitmentFee } from '../domain/CandidateGenerator';
+import type { EconomyConfig } from '../config/EconomyConfig';
 import { GameErrorCode } from '../domain/errors';
-import { newId } from '../domain/ids';
 import { ensureRunId, hasCommand, recordCommand } from './MutationContext';
 import { isOfferCurrent } from './OfferService';
+import { activeStaffInDept, hrRecruitmentDiscountBps } from '../simulation/departments';
+import { monthIndexOf, addPendingEntry } from './monthEntry';
 import type {
   Candidate,
   Employee,
   GameState,
-  JournalEntry,
-  JournalCategory,
 } from '../domain/types';
 
 export interface HireInput {
@@ -24,34 +24,6 @@ export interface HireResult {
   firstHire: boolean;
 }
 
-/** 当前月份轴索引（创业第1年第1月 = 0）。 */
-export function monthIndexOf(state: GameState): number {
-  return (state.gameYear - 1) * 12 + (state.gameMonth - 1);
-}
-
-function monthKey(state: GameState): string {
-  return `${state.runId}:${state.gameYear}:${state.gameMonth}`;
-}
-
-function addPendingEntry(
-  state: GameState,
-  category: JournalCategory,
-  amountYuan: number,
-  refId: string,
-): JournalEntry {
-  const entry: JournalEntry = {
-    entryId: newId('je', `${state.runId}:${category}:${refId}`, state.pendingEntries.length + 1),
-    monthKey: monthKey(state),
-    category,
-    amountYuan,
-    isCash: true,
-    alreadyPaid: true, // 录用确认时已立即扣现金，月结不可再扣
-    refId,
-  };
-  state.pendingEntries.push(entry);
-  return entry;
-}
-
 /**
  * 录用员工（设计文档 05.4 / 12.4）。
  * - 费用确认瞬间扣现金并写 pendingEntries（RECRUITMENT，负数）。
@@ -61,6 +33,7 @@ function addPendingEntry(
  */
 export function hireEmployee(
   state: GameState,
+  cfg: EconomyConfig,
   input: HireInput,
   ctx: { commandId: string; expectedRunId: string },
 ): HireResult {
@@ -113,12 +86,17 @@ export function hireEmployee(
     throw new Error(GameErrorCode.OFFER_EXPIRED);
   }
 
-  const fee = recruitmentFee(candidate.salaryMonthlyYuan);
+  // 招聘费 = 1 个月月薪；HR 折扣只对「支付当时已生效」的 HR 部门员工生效（5.3）。
+  const mIndex = monthIndexOf(state);
+  const hrDiscount = hrRecruitmentDiscountBps(
+    cfg,
+    activeStaffInDept(state, 'HR', mIndex),
+  );
+  const fee = recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
   if (state.company.cashYuan < fee) {
     throw new Error(GameErrorCode.INSUFFICIENT_CASH);
   }
 
-  const mIndex = monthIndexOf(state);
   const employeeId = candidateToEmployeeId(state, candidate.candidateId);
   const employee: Employee = {
     employeeId,

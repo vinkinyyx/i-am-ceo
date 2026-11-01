@@ -73,6 +73,10 @@ export interface Employee {
   hiredAtMonthIndex: number;
   effectiveFromMonthIndex: number;
   dismissedAtMonthIndex: number | null;
+  /** 调岗：目标部门（下月生效前仍在原部门）。 */
+  pendingDepartmentId?: string;
+  /** 调岗生效月份轴索引。 */
+  transferFromMonthIndex?: number | null;
   status: EmployeeStatus;
   /** 录用该员工的命令 ID（幂等重放依据，不展示给玩家）。 */
   hireCommandId?: string;
@@ -187,6 +191,22 @@ export interface EventRecord {
   month: number;
 }
 
+/** 自动招聘等自动化决策的可解释日志（最近保留若干条，不参与财务勾稽）。 */
+export interface AutomationLogEntry {
+  logId: string;
+  year: number;
+  month: number;
+  kind: 'AUTO_HIRE' | 'AUTO_SKIP';
+  deptType: DeptType | null;
+  candidateId?: string;
+  /** 预计 12 个月新增贡献（元） */
+  projectedBenefitYuan?: number;
+  /** 预计 12 个月工资+招聘费（元） */
+  projectedCostYuan?: number;
+  /** 跳过/录用原因（可解释） */
+  reason: string;
+}
+
 export interface BotCompany {
   botId: string;
   name: string;
@@ -234,6 +254,10 @@ export interface GameState {
   target3YearsAchieved: boolean;
   rescueCapitalUsed: boolean;
   cashRisk: CashRisk;
+  /** 自动招聘记录：key=`${year}` → 该年已自动录用人数（每年最多 maxAutoHiresPerYear）。 */
+  autoHireCountByYear: Record<number, number>;
+  /** 最近的自动化决策日志（保留最近若干条，可解释、不参与财务）。 */
+  automationLogs: AutomationLogEntry[];
   /** 各经营年第 1 月结算前的现金快照（年报 cashOpen 口径，含初始注资）。 */
   yearOpenCashYuan: Record<number, number>;
   executedCommandIds: string[];

@@ -1,5 +1,5 @@
 import type { EconomyConfig } from '../config/EconomyConfig';
-import type { Ceo, Department, Employee, IndustryId } from '../domain/types';
+import type { Ceo, Employee, IndustryId } from '../domain/types';
 import { roundHalfUp } from '../domain/money';
 
 /**
@@ -16,9 +16,11 @@ export interface TeamComposition {
   /** 当月生效的业务交付员工 */
   businessEmployees: Employee[];
   ceo: Ceo | null;
-  departments: Department[];
+  departments: import('../domain/types').Department[];
   /** 已投入业务扩张资产（元） */
   businessCapacityInvestmentYuan: number;
+  /** HR 部门对业务产能的加成 bps（月结统一计算后注入；缺省 0）。 */
+  hrCapacityBps?: number;
 }
 
 function clampBps(value: number, min: number, max: number): number {
@@ -59,11 +61,7 @@ export function businessAssetCoeffBps(cfg: EconomyConfig, investmentYuan: number
   return 10_000 + Math.min(per, cfg.productivity.businessAssetCapBps);
 }
 
-/** HR 部门产能加成 bps（M2 接入；M1 返回 10000）。预留签名。 */
-export function hrCapacityCoeffBps(departments: Department[]): number {
-  void departments;
-  return 10_000;
-}
+/** HR 部门产能加成 bps：由月结用 computeSupportEffects 计算后注入（见 departments.ts）。 */
 
 export interface CapacityBreakdown {
   /** 当月交付产能（元） */
@@ -94,13 +92,14 @@ export function monthlyCapacity(
 ): CapacityBreakdown {
   const annualPerEmployee60 =
     cfg.industry[industry].baseAnnualCapacityPerSkill60EmployeeYuan;
+  // 调用方已按当月口径筛好（含本月确认裁员、次月才停的 PENDING）。
   const active = comp.businessEmployees.filter(
-    (e) => e.status === 'ACTIVE' && e.effectiveFromMonthIndex <= monthIndex,
+    (e) => e.effectiveFromMonthIndex <= monthIndex,
   );
 
   const collaborationBps = collaborationCoeffBps(cfg, active);
   const ceoBps = ceoManagementCoeffBps(cfg, comp.ceo);
-  const hrBps = hrCapacityCoeffBps(comp.departments);
+  const hrBps = 10_000 + (comp.hrCapacityBps ?? 0);
   const assetBps = businessAssetCoeffBps(cfg, comp.businessCapacityInvestmentYuan);
   const teamMultiplierBps = (collaborationBps * ceoBps * hrBps * assetBps) / 10_000 ** 3;
 

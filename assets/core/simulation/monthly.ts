@@ -3,6 +3,7 @@ import { roundHalfUp } from '../domain/money';
 import type { Employee, GameState, IndustryId, JournalCategory } from '../domain/types';
 import { monthlyCapacity } from './capacity';
 import { monthlyPotentialOrder } from './market';
+import { computeSupportEffects, deptIdAtMonth } from './departments';
 
 /**
  * 单月结算（设计文档 03.2 / 03.4 / 12.9）。
@@ -72,10 +73,13 @@ export function collectPendingFees(state: GameState, monthKey: string): PendingF
     }));
 }
 
-/** 当月在职且生效的员工。 */
+/** 当月在职且生效、且未到裁员工资停止月的员工（含本月确认、次月才停薪的 PENDING_DISMISSAL）。 */
 export function activeEmployeesAt(state: GameState, monthIndex: number): Employee[] {
   return state.employees.filter(
-    (e) => e.status === 'ACTIVE' && e.effectiveFromMonthIndex <= monthIndex,
+    (e) =>
+      (e.status === 'ACTIVE' || e.status === 'PENDING_DISMISSAL') &&
+      e.effectiveFromMonthIndex <= monthIndex &&
+      (e.dismissedAtMonthIndex === null || e.dismissedAtMonthIndex > monthIndex),
   );
 }
 
@@ -83,22 +87,35 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
   const { cfg, industry, year, month, monthIndex, state } = input;
   const ind = cfg.industry[industry];
 
-  // 1-3. 需求 → 获客订单 → 交付产能 → 实际收入
+  // 支持部门当月效益快照（0 员工的部门效益严格为 0，每条费用只在此处作用一次）
+  const support = computeSupportEffects(cfg, state, monthIndex);
+
+  // 全体当月生效员工（含本月确认裁员、次月才停薪者）；每人只属一个部门、只扣一次工资
+  const active = activeEmployeesAt(state, monthIndex);
+  // 业务交付员工：当月实际归属 BUSINESS 部（调岗下月生效，避免双重计产能）
+  const businessDept = state.departments.find((d) => d.type === 'BUSINESS');
+  const businessActive = businessDept
+    ? active.filter((e) => deptIdAtMonth(e, monthIndex) === businessDept.deptId)
+    : [];
+
+  // 1-3. 需求（市场部提升潜在订单）→ 交付产能（HR 提升业务产能）→ 实际收入 min
   const potentialOrder = monthlyPotentialOrder(
     cfg,
     industry,
     year,
     month,
     input.acqMultiplierBps,
+    support.marketing.effectBps,
   );
   const cap = monthlyCapacity(
     cfg,
     industry,
     {
-      businessEmployees: state.employees,
+      businessEmployees: businessActive,
       ceo: state.ceo,
       departments: state.departments,
       businessCapacityInvestmentYuan: input.businessCapacityInvestmentYuan,
+      hrCapacityBps: support.hrCapacity.effectBps,
     },
     monthIndex,
   );
@@ -116,17 +133,33 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
   const ytdFixedBefore = prior.reduce((s, l) => s + Math.abs(l.fixedCostYuan), 0);
 
   const ytdRevenue = ytdRevenueBefore + revenue;
-  const directCost =
-    roundHalfUp((ytdRevenue * ind.directCostBps) / 10_000) - ytdDirectBefore;
+
+  // 直接成本（账面）= 收入 × 行业直成率（保持 M1 口径，不被采购可适用比例改变）。
+  const grossDirect = roundHalfUp((ytdRevenue * ind.directCostBps) / 10_000);
+  // 采购部门只对「可适用直接成本」（直成 × procurementEligibleDirectCostBps）按 effectBps 节省，仅减一次。
+  const procurementSave = roundHalfUp(
+    (grossDirect * ind.procurementEligibleDirectCostBps * support.procurement.effectBps) / 10_000 ** 2,
+  );
+  const directNet = Math.max(0, grossDirect - procurementSave);
+  const directCost = directNet - ytdDirectBefore;
+
+  // 其他运营费（无部门节省，M2）
   const otherOperating =
     roundHalfUp((ytdRevenue * ind.otherOperatingCostBps) / 10_000) - ytdOtherBefore;
-  const afterSales =
-    roundHalfUp((ytdRevenue * ind.afterSalesCostBps) / 10_000) - ytdAfterBefore;
-  const fixedAnnual = ind.fixedManagementAnnualYuan;
-  const fixed = month === 12 ? fixedAnnual - ytdFixedBefore : Math.round(fixedAnnual / 12);
 
-  // 7. 工资
-  const active = activeEmployeesAt(state, monthIndex);
+  // 售后费用：客服部门按 effectBps 节省，不能扣到负数。
+  const grossAfter = roundHalfUp((ytdRevenue * ind.afterSalesCostBps) / 10_000);
+  const afterNet = roundHalfUp((grossAfter * (10_000 - support.customerService.effectBps)) / 10_000);
+  const afterSales = Math.max(0, afterNet - ytdAfterBefore);
+
+  // 固定管理费：财务部按 effectBps 节省「固定管理费 + 其他可控运营费」中的固定部分（G015）。
+  const fixedAnnualGross = ind.fixedManagementAnnualYuan;
+  const fixedAnnualNet = roundHalfUp(
+    (fixedAnnualGross * (10_000 - support.finance.effectBps)) / 10_000,
+  );
+  const fixed = month === 12 ? fixedAnnualNet - ytdFixedBefore : Math.round(fixedAnnualNet / 12);
+
+  // 7. 工资（active 已在前面计算）
   const payroll = active.reduce((s, e) => s + e.salaryMonthlyYuan, 0);
 
   // 一次性费用（来自 pendingEntries）

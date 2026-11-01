@@ -5,6 +5,11 @@ import { getOffer, refreshOffer } from '@core/application/OfferService';
 import { hireEmployee, startOperating } from '@core/application/RecruitmentService';
 import { generateCandidates } from '@core/domain/CandidateGenerator';
 import type { GameState } from '@core/domain/types';
+import rawEconomy from '../../assets/resources/config/economy.v1.json';
+import { registerConfig } from '@core/config/configLoader';
+import type { EconomyConfig } from '@core/config/EconomyConfig';
+
+const cfg = registerConfig(rawEconomy as never) as EconomyConfig;
 
 function seededCompany(seed = 7): GameState {
   const state = createInitialState(1000, seed);
@@ -49,6 +54,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     const c1 = offer.candidates[0]!;
     const r1 = hireEmployee(
       state,
+      cfg,
       { offerId: offer.offerId, candidateId: c1.candidateId, departmentId: deptId },
       { commandId: 'hire-1', expectedRunId: state.runId },
     );
@@ -61,6 +67,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     const c2 = offer2.candidates[1]!;
     const r2 = hireEmployee(
       state,
+      cfg,
       { offerId: offer2.offerId, candidateId: c2.candidateId, departmentId: deptId },
       { commandId: 'hire-2', expectedRunId: state.runId },
     );
@@ -103,11 +110,13 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
 
     hireEmployee(
       state,
+      cfg,
       { offerId: offer.offerId, candidateId: 'fixed-c1', departmentId: deptId },
       { commandId: 'g6-1', expectedRunId: state.runId },
     );
     hireEmployee(
       state,
+      cfg,
       { offerId: offer.offerId, candidateId: 'fixed-c2', departmentId: deptId },
       { commandId: 'g6-2', expectedRunId: state.runId },
     );
@@ -126,10 +135,10 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     const offer = getOffer(state, deptId);
     const c = offer.candidates[0]!;
     const input = { offerId: offer.offerId, candidateId: c.candidateId, departmentId: deptId };
-    hireEmployee(state, input, { commandId: 'dup', expectedRunId: state.runId });
+    hireEmployee(state, cfg, input, { commandId: 'dup', expectedRunId: state.runId });
     const cashAfterFirst = state.company!.cashYuan;
     for (let i = 0; i < 9; i++) {
-      hireEmployee(state, input, { commandId: 'dup', expectedRunId: state.runId });
+      hireEmployee(state, cfg, input, { commandId: 'dup', expectedRunId: state.runId });
     }
     expect(state.company!.cashYuan).toBe(cashAfterFirst);
     expect(state.employees).toHaveLength(1);
@@ -144,6 +153,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     expect(() =>
       hireEmployee(
         state,
+        cfg,
         { offerId: old.offerId, candidateId: c.candidateId, departmentId: deptId },
         { commandId: 'x', expectedRunId: state.runId },
       ),
@@ -158,6 +168,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     const c1 = offer.candidates[0]!;
     hireEmployee(
       state,
+      cfg,
       { offerId: offer.offerId, candidateId: c1.candidateId, departmentId: deptId },
       { commandId: 'h1', expectedRunId: state.runId },
     );
@@ -174,6 +185,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     expect(() =>
       hireEmployee(
         state,
+        cfg,
         { offerId: offer.offerId, candidateId: c1.candidateId, departmentId: deptId },
         { commandId: 'h2-new', expectedRunId: state.runId },
       ),
@@ -189,6 +201,7 @@ describe('首聘两人（G006 / 12.4 / 12.9）', () => {
     expect(() =>
       hireEmployee(
         state,
+        cfg,
         { offerId: offer.offerId, candidateId: c.candidateId, departmentId: deptId },
         { commandId: 'poor', expectedRunId: state.runId },
       ),

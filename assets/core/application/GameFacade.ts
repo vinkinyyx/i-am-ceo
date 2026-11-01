@@ -13,6 +13,22 @@ import { NameGenerator } from '../domain/NameGenerator';
 import { Rng, deriveSeed } from '../simulation/rng';
 import { GameClock, type ClockTickResult } from '../simulation/GameClock';
 import { investInBusiness, previewInvest, type InvestPreview } from './InvestmentService';
+import {
+  createDepartment,
+  previewCreateDepartment,
+  setStaffingMode,
+  setTargetCount,
+} from './DepartmentService';
+import {
+  previewLayoff,
+  createLayoffToken,
+  confirmLayoff,
+  type LayoffPreview,
+  type LayoffToken,
+} from './LayoffService';
+import { runMonthlyAutoHire, appendAutomationLog } from './AutoHireService';
+import { previewTransfer, transferEmployee } from './TransferService';
+import type { AutomationLogEntry, Department, Policy, StaffingMode, SupportDeptType } from '../domain/types';
 import type { EconomyConfig } from '../config/EconomyConfig';
 
 export interface BootstrapResult {
@@ -48,6 +64,11 @@ export class GameFacade {
     this.platform = platform;
     this.store = store;
     this.cfg = cfg;
+    // 自动招聘在每月月结前同一变更锁内执行（保守、可解释、禁自动裁员）
+    this.clock.beforeMonthSettle = (s) => {
+      const decision = runMonthlyAutoHire(s, this.cfg);
+      appendAutomationLog(s, decision);
+    };
   }
 
   static async bootstrap(platform: ITapPlatform, cfg: EconomyConfig): Promise<GameFacade> {
@@ -124,7 +145,7 @@ export class GameFacade {
   ): Promise<CommandResult<{ employee: Employee; feePaidYuan: number; cashAfterYuan: number }>> {
     try {
       const { result, revision } = await this.store.mutate(
-        (draft) => hireEmployee(draft, input, ctx),
+        (draft) => hireEmployee(draft, this.cfg, input, ctx),
         ctx.expectedRunId,
       );
       return ok(this.store.current.runId, revision, {
@@ -246,5 +267,157 @@ export class GameFacade {
     const runId = this.store.current.runId;
     return this.store
       .read((s) => s.monthlyLedgersRolling.filter((l) => l.runId === runId && l.year === year));
+  }
+
+  // ---------------------------------------------------------------- M2 部门 / 裁员
+
+  /** 预览设立支持部门（只读）。 */
+  previewCreateDepartment(type: SupportDeptType) {
+    return this.store.read((s) => previewCreateDepartment(s, this.cfg, type));
+  }
+
+  /** 创建支持部门（去重、扣设立费，幂等）。 */
+  async createDepartment(
+    type: SupportDeptType,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<{ department: Department; feePaidYuan: number; cashAfterYuan: number }>> {
+    try {
+      const { result } = await this.store.mutate(
+        (draft) => createDepartment(draft, this.cfg, type, ctx),
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, {
+        department: result.department,
+        feePaidYuan: result.feePaidYuan,
+        cashAfterYuan: result.cashAfterYuan,
+      });
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 切换部门编制模式 AUTO/LOCKED。 */
+  async setStaffingMode(
+    deptId: string,
+    mode: StaffingMode,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<true>> {
+    try {
+      await this.store.mutate(
+        (draft) => {
+          setStaffingMode(draft, deptId, mode, ctx);
+          return { revision: 0 };
+        },
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 手动设置目标人数（减少目标不裁员）。 */
+  async setTargetCount(
+    deptId: string,
+    target: number,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<true>> {
+    try {
+      await this.store.mutate(
+        (draft) => {
+          setTargetCount(draft, deptId, target, ctx);
+          return { revision: 0 };
+        },
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 切换经营方针（STEADY/GROWTH/PROFIT），即时影响后续自动决策，不改历史账。 */
+  async setPolicy(
+    policy: Policy,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<true>> {
+    if (policy !== 'STEADY' && policy !== 'GROWTH' && policy !== 'PROFIT') {
+      return fail(GameErrorCode.INVALID_POLICY, errorMessage(GameErrorCode.INVALID_POLICY));
+    }
+    try {
+      await this.store.mutate(
+        (draft) => {
+          draft.policy = policy;
+          return { revision: 0 };
+        },
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 最近自动化决策日志（自动招聘/跳过原因），只读、不参与财务。 */
+  getAutomationLogs(limit = 20): AutomationLogEntry[] {
+    return this.store.read((s) => s.automationLogs.slice(-limit).reverse());
+  }
+
+  /** 裁员预览（GET，返回 token 所需金额与 60s 有效期信息）。 */
+  previewLayoff(employeeId: string, nowMs = Date.now()): LayoffPreview {
+    return this.store.read((s) => previewLayoff(s, employeeId, nowMs));
+  }
+
+  /** 由预览生成确认 token（前端持有，60s 有效）。 */
+  createLayoffToken(preview: LayoffPreview, nowMs = Date.now()): LayoffToken {
+    return createLayoffToken(preview, nowMs);
+  }
+
+  /** 确认裁员（二次确认、重算补偿、现金校验、幂等）。 */
+  async confirmLayoff(
+    token: LayoffToken,
+    ctx: { commandId: string; expectedRunId: string },
+    nowMs = Date.now(),
+  ): Promise<CommandResult<{ employee: Employee; severancePaidYuan: number; cashAfterYuan: number }>> {
+    try {
+      const { result } = await this.store.mutate(
+        (draft) => confirmLayoff(draft, this.cfg, token, ctx, nowMs),
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, {
+        employee: result.employee,
+        severancePaidYuan: result.severancePaidYuan,
+        cashAfterYuan: result.cashAfterYuan,
+      });
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  // ---------------------------------------------------------------- M2-06 调岗
+
+  /** 调岗预览（只读，下月生效、无费用）。 */
+  previewTransfer(employeeId: string, toDeptId: string) {
+    return this.store.read((s) => previewTransfer(s, employeeId, toDeptId));
+  }
+
+  /** 确认调岗（主营↔支持，下月生效，幂等；无招聘费/赔偿）。 */
+  async transferEmployee(
+    employeeId: string,
+    toDeptId: string,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<true>> {
+    try {
+      await this.store.mutate(
+        (draft) => {
+          transferEmployee(draft, employeeId, toDeptId, ctx);
+          return { revision: 0 };
+        },
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
   }
 }

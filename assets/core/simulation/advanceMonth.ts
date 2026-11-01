@@ -3,6 +3,7 @@ import { GameErrorCode } from '../domain/errors';
 import type { GameState, MonthlyLedger } from '../domain/types';
 import { settleMonth } from './monthly';
 import { annualSettlement } from './annual';
+import { applyDueTransfers } from './departments';
 
 export interface AdvanceResult {
   ledger: MonthlyLedger;
@@ -90,6 +91,20 @@ export function advanceMonth(state: GameState, cfg: EconomyConfig): AdvanceResul
 
   // 结清并移除已归属本月的 pendingEntries
   state.pendingEntries = state.pendingEntries.filter((e) => e.monthKey !== key);
+
+  // 裁员次月生效：本月结完后，到生效月的待裁员工转为 DISMISSED（后续不再计工资/产能）。
+  const nextMonthIndex = monthIndex + 1;
+  for (const emp of state.employees) {
+    if (
+      emp.status === 'PENDING_DISMISSAL' &&
+      emp.dismissedAtMonthIndex !== null &&
+      emp.dismissedAtMonthIndex <= nextMonthIndex
+    ) {
+      emp.status = 'DISMISSED';
+    }
+  }
+  // 调岗下月生效：落地到期的部门归属（避免双重工资/双重产能）。
+  applyDueTransfers(state, monthIndex);
 
   let yearClosed = false;
   if (month === 12) {

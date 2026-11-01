@@ -46,6 +46,8 @@ export function createInitialState(nowEpochMs: number, seed?: number): GameState
     target3YearsAchieved: false,
     rescueCapitalUsed: false,
     cashRisk: 'NORMAL',
+    autoHireCountByYear: {},
+    automationLogs: [],
     yearOpenCashYuan: {},
     executedCommandIds: [],
   };

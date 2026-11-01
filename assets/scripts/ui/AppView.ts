@@ -9,7 +9,8 @@ import {
   Widget,
 } from 'cc';
 import { GameFacade } from '../../core/application/GameFacade';
-import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport } from '../../core/domain/types';
+import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport, SupportDeptType, Policy, Department, Employee } from '../../core/domain/types';
+import { SUPPORT_DEPARTMENTS } from '../../core/domain/types';
 import { CocosPlatform } from '../platform/CocosPlatform';
 import { loadEconomyConfig } from '../platform/loadConfig';
 import {
@@ -33,6 +34,20 @@ const TRAIT_LABELS: Record<CeoTrait, { name: string; desc: string }> = {
   BOLD: { name: '进取', desc: '每年 商业+2 管理+1 财务+1，擅长开发市场' },
   STEADY: { name: '稳健', desc: '每年 商业+1 管理+1 财务+2，擅长资金管理' },
   PEOPLE: { name: '亲和', desc: '每年 商业+1 管理+2 财务+1，擅长团队协作' },
+};
+
+const SUPPORT_DEPT_META: Record<SupportDeptType, { name: string; desc: string }> = {
+  PROCUREMENT: { name: '采购部', desc: '降低可适用的直接采购成本' },
+  CUSTOMER_SERVICE: { name: '客服部', desc: '降低售后费用' },
+  MARKETING: { name: '市场部', desc: '提升潜在订单（受产能上限）' },
+  FINANCE: { name: '财务部', desc: '降低固定管理费用' },
+  HR: { name: '人力资源部', desc: '提升业务产能、降低招聘费' },
+};
+
+const POLICY_META: Record<Policy, { name: string; desc: string }> = {
+  STEADY: { name: '稳健', desc: 'ROI≥1.0，保留6个月刚性费用' },
+  GROWTH: { name: '扩张', desc: 'ROI≥0.8，适度提前准备产能' },
+  PROFIT: { name: '利润优先', desc: 'ROI≥1.2，保留9个月刚性费用' },
 };
 
 let commandSeq = 0;
@@ -452,8 +467,8 @@ export class AppView extends Component {
     body.setPosition(0, 30);
 
     if (this.activeTab === 'COMPANY') this.renderCompanyTab(body);
-    else if (this.activeTab === 'DEPARTMENT') this.renderPlaceholderTab(body, '部门', '部门创建与人员配置将在 M2 开放');
-    else if (this.activeTab === 'TALENT') this.renderPlaceholderTab(body, '人才', '运营期招聘与裁员将在 M2 开放');
+    else if (this.activeTab === 'DEPARTMENT') this.renderDepartmentTab(body);
+    else if (this.activeTab === 'TALENT') this.renderTalentTab(body);
     else this.renderPlaceholderTab(body, '排行', '本地模拟排行榜将在 M3 开放');
 
     this.renderBottomTabs(panel);
@@ -664,6 +679,484 @@ export class AppView extends Component {
       0,
       40,
     );
+  }
+
+  private deptHeadcount(s: GameState, deptId: string): number {
+    return s.employees.filter((e) => e.status === 'ACTIVE' && e.departmentId === deptId).length;
+  }
+
+  // ---------------------------------------------------------------- 部门页
+
+  private renderDepartmentTab(parent: Node): void {
+    const s = this.state();
+    createLabel({ text: '部门', fontSize: 22, bold: true, color: THEME.text, parent: parent }).setPosition(0, 344);
+
+    // 经营方针
+    createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 282);
+    createLabel({ text: `自动经营方针：${POLICY_META[s.policy].name}（${POLICY_META[s.policy].desc}）`, fontSize: 12, color: THEME.textWeak, width: 320, parent: parent }).setPosition(0, 312);
+    (['GROWTH', 'STEADY', 'PROFIT'] as Policy[]).forEach((p, i) => {
+      createButton({
+        text: POLICY_META[p].name,
+        width: 88,
+        height: 38,
+        fontSize: 13,
+        color: s.policy === p ? THEME.primary : THEME.divider,
+        textColor: s.policy === p ? Color.WHITE : THEME.text,
+        parent: parent,
+        onClick: () => void this.onSetPolicy(p),
+      }).setPosition(-100 + i * 100, 268);
+    });
+
+    // 部门卡片列表（主营 + 已建支持部门 + 未建入口）
+    const biz = s.departments.find((d) => d.type === 'BUSINESS')!;
+    const createdTypes = new Set(s.departments.map((d) => d.type));
+    const notCreated = SUPPORT_DEPARTMENTS.filter((t) => !createdTypes.has(t));
+
+    let y = 214;
+    for (const dept of [biz, ...s.departments.filter((d) => d.type !== 'BUSINESS')]) {
+      this.renderDeptCard(parent, s, dept, y);
+      y -= 104;
+    }
+    for (const type of notCreated) {
+      this.renderUncreatedDept(parent, type, y);
+      y -= 66;
+    }
+  }
+
+  private renderDeptCard(parent: Node, s: GameState, dept: Department, y: number): void {
+    const name = dept.type === 'BUSINESS' ? '主营业务部' : SUPPORT_DEPT_META[dept.type as SupportDeptType].name;
+    const desc = dept.type === 'BUSINESS' ? '交付主营产能' : SUPPORT_DEPT_META[dept.type as SupportDeptType].desc;
+    const count = this.deptHeadcount(s, dept.deptId);
+    const wages = s.employees
+      .filter((e) => e.status === 'ACTIVE' && e.departmentId === dept.deptId)
+      .reduce((sum, e) => sum + e.salaryMonthlyYuan, 0);
+
+    createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
+    createLabel({ text: name, fontSize: 15, bold: true, width: 170, align: 'left', parent: parent }).setPosition(-77, y + 28);
+    createLabel({ text: desc, fontSize: 11, color: THEME.textWeak, width: 210, align: 'left', parent: parent }).setPosition(-57, y + 10);
+    createLabel({
+      text: count === 0 && dept.type !== 'BUSINESS' ? '尚未配置人员：无部门效益' : `在岗 ${count} 人｜月薪合计 ${moneyText(wages)}`,
+      fontSize: 11,
+      color: count === 0 ? THEME.warning : THEME.secondary,
+      width: 210,
+      align: 'left',
+      parent: parent,
+    }).setPosition(-57, y - 12);
+
+    // 编制模式切换
+    createButton({
+      text: dept.staffingMode === 'AUTO' ? '自动' : '手动',
+      width: 54,
+      height: 34,
+      fontSize: 12,
+      color: dept.staffingMode === 'AUTO' ? THEME.secondary : THEME.divider,
+      textColor: dept.staffingMode === 'AUTO' ? Color.WHITE : THEME.text,
+      parent: parent,
+      onClick: () => void this.onToggleStaffing(dept),
+    }).setPosition(106, y + 18);
+    // 招聘
+    createButton({
+      text: '招聘',
+      width: 54,
+      height: 34,
+      fontSize: 12,
+      parent: parent,
+      onClick: () => this.openHireForDept(dept.deptId),
+    }).setPosition(160, y + 18);
+  }
+
+  private renderUncreatedDept(parent: Node, type: SupportDeptType, y: number): void {
+    const meta = SUPPORT_DEPT_META[type];
+    createRect({ width: 343, height: 56, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
+    createLabel({ text: meta.name, fontSize: 14, bold: true, width: 150, align: 'left', parent: parent }).setPosition(-87, y + 12);
+    createLabel({ text: `${meta.desc}｜设立费 ${moneyText(10000)}`, fontSize: 10, color: THEME.textWeak, width: 200, align: 'left', parent: parent }).setPosition(-62, y - 10);
+    createButton({
+      text: '创建',
+      width: 54,
+      height: 34,
+      fontSize: 12,
+      parent: parent,
+      onClick: () => this.confirmCreateDept(type),
+    }).setPosition(150, y);
+  }
+
+  private async onSetPolicy(policy: Policy): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.setPolicy(policy, { commandId: nextCommandId('policy'), expectedRunId: s.runId });
+    if (!r.ok) this.toast(r.displayMessage);
+    else this.render();
+  }
+
+  private async onToggleStaffing(dept: Department): Promise<void> {
+    const s = this.state();
+    const next = dept.staffingMode === 'AUTO' ? 'LOCKED' : 'AUTO';
+    const r = await this.facade.setStaffingMode(dept.deptId, next, {
+      commandId: nextCommandId('mode'),
+      expectedRunId: s.runId,
+    });
+    if (!r.ok) this.toast(r.displayMessage);
+    else this.render();
+  }
+
+  private confirmCreateDept(type: SupportDeptType): void {
+    const s = this.state();
+    const pv = this.facade.previewCreateDepartment(type);
+    const overlay = this.modalOverlay();
+    createRect({ width: 310, height: 250, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: `创建${SUPPORT_DEPT_META[type].name}`, fontSize: 18, bold: true, parent: overlay }).setPosition(0, 86);
+    createLabel({
+      text: `${SUPPORT_DEPT_META[type].desc}\n设立费 ${moneyText(pv.feeYuan)}（确认即扣现金）。\n创建后默认手动编制，不自动招人；0 员工无效益。`,
+      fontSize: 13,
+      color: THEME.text,
+      width: 256,
+      align: 'left',
+      lineHeight: 22,
+      parent: overlay,
+    }).setPosition(0, 24);
+    createButton({
+      text: `支付 ${moneyText(pv.feeYuan)} 创建`,
+      width: 200,
+      height: 46,
+      parent: overlay,
+      onClick: () => void this.doCreateDept(type, overlay),
+    }).setPosition(0, -72);
+    createButton({
+      text: '取消',
+      width: 120,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -112);
+  }
+
+  private async doCreateDept(type: SupportDeptType, overlay: Node): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.createDepartment(type, {
+      commandId: nextCommandId('dept'),
+      expectedRunId: s.runId,
+    });
+    overlay.destroy();
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.toast(`已创建${SUPPORT_DEPT_META[type].name}，支付 ${moneyText(r.payload.feePaidYuan)}`);
+    this.render();
+  }
+
+  // ---------------------------------------------------------------- 人才页
+
+  private renderTalentTab(parent: Node): void {
+    const s = this.state();
+    createLabel({ text: '员工', fontSize: 22, bold: true, color: THEME.text, parent: parent }).setPosition(0, 344);
+    const active = s.employees.filter((e) => e.status === 'ACTIVE');
+    createLabel({
+      text: `在职 ${active.length} 人（点击详情可裁员/调岗）`,
+      fontSize: 12,
+      color: THEME.textWeak,
+      parent: parent,
+    }).setPosition(0, 316);
+
+    let y = 282;
+    for (const emp of active) {
+      this.renderEmployeeCard(parent, s, emp, y);
+      y -= 84;
+    }
+  }
+
+  private renderEmployeeCard(parent: Node, s: GameState, emp: Employee, y: number): void {
+    const dept = s.departments.find((d) => d.deptId === emp.departmentId);
+    const deptName = dept
+      ? dept.type === 'BUSINESS'
+        ? '主营'
+        : SUPPORT_DEPT_META[dept.type as SupportDeptType].name.replace('部', '')
+      : '—';
+    createRect({ width: 343, height: 72, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
+    createLabel({ text: `${emp.name}（${deptName}）`, fontSize: 15, bold: true, width: 200, align: 'left', parent: parent }).setPosition(-62, y + 18);
+    createLabel({
+      text: `能力 ${emp.skill}｜潜力 ${emp.potential}｜协作 ${emp.teamwork}`,
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: 220,
+      align: 'left',
+      parent: parent,
+    }).setPosition(-52, y - 2);
+    createLabel({
+      text: `月薪 ${moneyText(emp.salaryMonthlyYuan)}`,
+      fontSize: 12,
+      color: THEME.primary,
+      width: 140,
+      align: 'left',
+      parent: parent,
+    }).setPosition(-92, y - 22);
+    createButton({
+      text: '详情',
+      width: 56,
+      height: 36,
+      fontSize: 12,
+      parent: parent,
+      onClick: () => this.openEmployeeDetail(emp.employeeId),
+    }).setPosition(138, y);
+  }
+
+  private openEmployeeDetail(employeeId: string): void {
+    const s = this.state();
+    const emp = s.employees.find((e) => e.employeeId === employeeId);
+    if (!emp) return;
+    const dept = s.departments.find((d) => d.deptId === emp.departmentId);
+    const deptName = dept
+      ? dept.type === 'BUSINESS'
+        ? '主营业务部'
+        : SUPPORT_DEPT_META[dept.type as SupportDeptType].name
+      : '—';
+
+    const overlay = this.modalOverlay();
+    createRect({ width: 320, height: 380, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: emp.name, fontSize: 18, bold: true, parent: overlay }).setPosition(0, 156);
+    createLabel({
+      text:
+        `部门：${deptName}\n` +
+        `专业能力：${emp.skill}（年末按潜力成长）\n` +
+        `成长潜力：${emp.potential}\n团队协作：${emp.teamwork}\n` +
+        `月薪：${moneyText(emp.salaryMonthlyYuan)}\n\n` +
+        `调岗：下月生效，无招聘费/赔偿；\n裁员：主动触发，按任职年数补偿。`,
+      fontSize: 13,
+      color: THEME.text,
+      width: 270,
+      lineHeight: 22,
+      align: 'left',
+      parent: overlay,
+    }).setPosition(0, 56);
+
+    createButton({
+      text: '调岗',
+      width: 96,
+      height: 44,
+      fontSize: 14,
+      color: THEME.secondary,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        this.openTransfer(employeeId);
+      },
+    }).setPosition(-62, -110);
+    createButton({
+      text: '裁员',
+      width: 96,
+      height: 44,
+      fontSize: 14,
+      color: THEME.danger,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        this.openLayoffConfirm(employeeId);
+      },
+    }).setPosition(62, -110);
+    createButton({
+      text: '关闭',
+      width: 220,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -158);
+  }
+
+  private openTransfer(employeeId: string): void {
+    const s = this.state();
+    const emp = s.employees.find((e) => e.employeeId === employeeId);
+    if (!emp) return;
+    const targets = s.departments.filter((d) => d.deptId !== emp.departmentId);
+
+    const overlay = this.modalOverlay();
+    createRect({ width: 310, height: 80 + targets.length * 54, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: `将 ${emp.name} 调往（下月生效）`, fontSize: 16, bold: true, parent: overlay }).setPosition(0, targets.length * 27 + 14);
+    targets.forEach((d, i) => {
+      const label = d.type === 'BUSINESS' ? '主营业务部' : SUPPORT_DEPT_META[d.type as SupportDeptType].name;
+      createButton({
+        text: label,
+        width: 240,
+        height: 42,
+        fontSize: 14,
+        parent: overlay,
+        onClick: () => void this.doTransfer(employeeId, d.deptId, overlay),
+      }).setPosition(0, targets.length * 27 - 26 - i * 54);
+    });
+    createButton({
+      text: '取消',
+      width: 120,
+      height: 36,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -(targets.length * 27 + 30));
+  }
+
+  private async doTransfer(employeeId: string, toDeptId: string, overlay: Node): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.transferEmployee(employeeId, toDeptId, {
+      commandId: nextCommandId('transfer'),
+      expectedRunId: s.runId,
+    });
+    overlay.destroy();
+    if (!r.ok) this.toast(r.displayMessage);
+    else {
+      this.toast('已安排调岗，下月生效');
+      this.render();
+    }
+  }
+
+  private layoffToken: { employeeId: string; severanceYuan: number; expiresAtMs: number; previewedAtMs: number } | null = null;
+
+  private openLayoffConfirm(employeeId: string): void {
+    const pv = this.facade.previewLayoff(employeeId, Date.now());
+    this.layoffToken = this.facade.createLayoffToken(pv, Date.now());
+    const overlay = this.modalOverlay();
+    createRect({ width: 312, height: 350, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '确认裁员？', fontSize: 18, bold: true, color: THEME.danger, parent: overlay }).setPosition(0, 140);
+    createLabel({
+      text:
+        `员工：${pv.name}\n任职：${pv.tenureYears} 年（${pv.tenureMonths} 个月）\n` +
+        `月薪：${moneyText(pv.salaryMonthlyYuan)}\n补偿月数：${pv.severanceMonths} 个月\n\n` +
+        `补偿金额：${moneyText(pv.severanceYuan)}（确认即支付）\n` +
+        `次年约节约工资：${moneyText(pv.nextYearSalarySavingYuan)}\n` +
+        `裁后现金：${moneyText(pv.cashAfterYuan)}`,
+      fontSize: 13,
+      color: THEME.text,
+      width: 266,
+      lineHeight: 22,
+      align: 'left',
+      parent: overlay,
+    }).setPosition(0, 28);
+    createButton({
+      text: `确认支付补偿 ${moneyText(pv.severanceYuan)}`,
+      width: 240,
+      height: 48,
+      color: THEME.danger,
+      parent: overlay,
+      onClick: () => void this.doLayoff(overlay),
+    }).setPosition(0, -104);
+    createButton({
+      text: '再想想（取消）',
+      width: 200,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -146);
+  }
+
+  private async doLayoff(overlay: Node): Promise<void> {
+    if (!this.layoffToken) {
+      overlay.destroy();
+      return;
+    }
+    const s = this.state();
+    const token = this.layoffToken;
+    const r = await this.facade.confirmLayoff(token, {
+      commandId: nextCommandId('layoff'),
+      expectedRunId: s.runId,
+    });
+    overlay.destroy();
+    this.layoffToken = null;
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.toast(`已支付补偿 ${moneyText(r.payload.severancePaidYuan)}，次月离岗`);
+    this.render();
+  }
+
+  private openHireForDept(deptId: string): void {
+    const offer = this.facade.getOffer(deptId);
+    this.pendingOffer = offer;
+    this.renderHireDialog(offer, deptId);
+  }
+
+  private renderHireDialog(offer: CandidateOffer, deptId: string): void {
+    const s = this.state();
+    const overlay = this.modalOverlay();
+    createRect({ width: 340, height: 470, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '招聘候选人', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 206);
+    createLabel({ text: '招聘费=1个月月薪（HR已生效可折扣），次月到岗', fontSize: 10, color: THEME.textWeak, width: 300, parent: overlay }).setPosition(0, 186);
+
+    offer.candidates.forEach((c, idx) => {
+      const cardY = 150 - idx * 108;
+      createRect({ width: 308, height: 98, color: THEME.bg, radius: 8, parent: overlay }).setPosition(0, cardY);
+      const arch = c.archetype === 'A' ? '即战力' : c.archetype === 'B' ? '潜力股' : '经济型';
+      createLabel({ text: `${c.name}（${arch}）`, fontSize: 14, bold: true, width: 180, align: 'left', parent: overlay }).setPosition(-56, cardY + 32);
+      createLabel({ text: `能力 ${c.skill} 潜力 ${c.potential} 协作 ${c.teamwork}`, fontSize: 11, color: THEME.textWeak, width: 200, align: 'left', parent: overlay }).setPosition(-46, cardY + 12);
+      createLabel({ text: `月薪 ${moneyText(c.salaryMonthlyYuan)}｜招聘费 ${moneyText(c.salaryMonthlyYuan)}`, fontSize: 11, color: THEME.primary, width: 200, align: 'left', parent: overlay }).setPosition(-46, cardY - 8);
+      createButton({
+        text: '录用',
+        width: 60,
+        height: 38,
+        fontSize: 13,
+        parent: overlay,
+        disabled: s.company!.cashYuan < c.salaryMonthlyYuan,
+        onClick: () => void this.hireFromDialog(c.candidateId, deptId, overlay),
+      }).setPosition(124, cardY);
+    });
+
+    createButton({
+      text: '换一批',
+      width: 96,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.primary,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        void this.refreshHire(deptId);
+      },
+    }).setPosition(-60, -206);
+    createButton({
+      text: '关闭',
+      width: 96,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(60, -206);
+  }
+
+  private async refreshHire(deptId: string): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.refreshOffer(deptId, { commandId: nextCommandId('refresh'), expectedRunId: s.runId });
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.pendingOffer = r.payload;
+    this.renderHireDialog(r.payload, deptId);
+  }
+
+  private async hireFromDialog(candidateId: string, deptId: string, overlay: Node): Promise<void> {
+    const s = this.state();
+    const offerId = this.pendingOffer?.offerId ?? this.facade.getOffer(deptId).offerId;
+    const r = await this.facade.hireEmployee(
+      { offerId, candidateId, departmentId: deptId },
+      { commandId: nextCommandId('hire'), expectedRunId: s.runId },
+    );
+    overlay.destroy();
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.toast(`已录用，支付招聘费 ${moneyText(r.payload.feePaidYuan)}，次月到岗`);
+    this.render();
   }
 
   private renderBottomTabs(parent: Node): void {

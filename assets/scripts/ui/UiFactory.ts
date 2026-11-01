@@ -78,9 +78,11 @@ export function createLabel(opts: LabelOptions): Node {
         ? HorizontalTextAlignment.RIGHT
         : HorizontalTextAlignment.CENTER;
   label.verticalAlign = VerticalTextAlignment.CENTER;
-  label.overflow = Overflow.RESIZE_HEIGHT;
   if (opts.width) {
-    label.overflow = Overflow.SHRINK;
+    // 含换行的多行文本：保持字号、按宽度排版（SHRINK 会把整段缩成一行）
+    label.overflow = opts.text.includes('\n') ? Overflow.RESIZE_HEIGHT : Overflow.SHRINK;
+  } else {
+    label.overflow = Overflow.RESIZE_HEIGHT;
   }
   return node;
 }

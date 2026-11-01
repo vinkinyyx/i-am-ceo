@@ -56,9 +56,13 @@ export function monthlyPotentialOrder(
   year: number,
   month: number,
   acqMultiplierBps: number,
+  marketingUpliftBps = 0,
 ): number {
   const { annualDemandYuan } = annualDemand(cfg, industry, year);
-  const annualAfterAcq = roundHalfUp((annualDemandYuan * acqMultiplierBps) / 10_000);
+  // 获客系数 × (1 + 市场部需求提升)；无市场部时 uplift=0，M1 基线不变。
+  const annualAfterAcq = roundHalfUp(
+    (annualDemandYuan * acqMultiplierBps * (10_000 + marketingUpliftBps)) / 10_000 ** 2,
+  );
   const base = Math.trunc(annualAfterAcq / 12);
   if (month === 12) return annualAfterAcq - base * 11;
   return base;
