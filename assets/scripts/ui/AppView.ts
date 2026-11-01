@@ -1,7 +1,9 @@
 import {
   Color,
   Component,
+  EditBox,
   Graphics,
+  Label,
   Node,
   profiler,
   Size,
@@ -79,10 +81,15 @@ export class AppView extends Component {
   private toastNode: Node | null = null;
   private selectedIndustry: IndustryId = 'TRADE';
   private selectedTrait: CeoTrait = 'BOLD';
+  /** 创建流程子步骤：公司页 / CEO 页（避免两者都靠 phase 分发导致互相覆盖）。 */
+  private createStep: 'COMPANY' | 'CEO' = 'COMPANY';
   private customCompanyName = '';
   private customCeoName = '';
   private randomCompanyNames: string[] = [];
+  /** 选中的候选名下标；-1 表示使用自定义名称。 */
   private selectedNameIndex = 0;
+  /** 「换一批」批次序号：每次点击递增，保证换出不同名字。 */
+  private nameNonce = 0;
   private activeTab: TabId = 'COMPANY';
   private rankMode: 'assets' | 'years' = 'assets';
   private pendingOffer: CandidateOffer | null = null;
@@ -411,7 +418,9 @@ export class AppView extends Component {
         this.selectedIndustry = 'TRADE';
         this.rollNames();
       }
-      this.renderCreateCompany();
+      // 创建流程有两页（公司 / CEO），必须按子步骤分发，否则 CEO 页任何点击都会回到公司页
+      if (this.createStep === 'CEO') this.renderCreateCeo();
+      else this.renderCreateCompany();
     } else if (s.phase === 'HIRING_INITIAL') {
       this.renderInitialHiring();
     } else {
@@ -478,10 +487,22 @@ export class AppView extends Component {
 
   // ---------------------------------------------------------------- S01 创建公司
 
-  private rollNames(): void {
-    const rolled = this.facade.rollCompanyNames(this.selectedIndustry, 3);
+  /**
+   * 重新抽取候选公司名。
+   * @param advance true=用户点「换一批」，递增批次号换出新名字；
+   *                false=切换行业等场景，沿用当前批次。
+   */
+  private rollNames(advance = false): void {
+    if (advance) this.nameNonce += 1;
+    const rolled = this.facade.rollCompanyNames(this.selectedIndustry, 3, this.nameNonce);
     this.randomCompanyNames = Array.from(rolled).map((n) => String(n));
     this.selectedNameIndex = 0;
+  }
+
+  /** 当前将使用的公司名（自定义优先由 selectedNameIndex=-1 表示）。 */
+  private chosenCompanyName(): string {
+    if (this.selectedNameIndex < 0) return this.customCompanyName;
+    return this.randomCompanyNames[this.selectedNameIndex] ?? '';
   }
 
   private renderCreateCompany(): void {
@@ -537,36 +558,137 @@ export class AppView extends Component {
       }).setPosition(0, 20 - i * 54);
     });
 
+    // 自定义名称：用户自己起的名字作为第 4 个候选项（选过后保持高亮）
+    const hasCustom = this.customCompanyName.length >= 2;
+    if (hasCustom) {
+      const selectedCustom = this.selectedNameIndex < 0;
+      createButton({
+        text: `自定义：${this.customCompanyName}`,
+        width: 320,
+        height: 44,
+        fontSize: 13,
+        color: selectedCustom ? THEME.secondary : Color.WHITE,
+        textColor: selectedCustom ? Color.WHITE : THEME.text,
+        parent: panel,
+        onClick: () => {
+          this.selectedNameIndex = -1;
+          this.render();
+        },
+      }).setPosition(0, -142);
+    }
+
     createButton({
       text: '换一批',
-      width: 100,
+      width: 118,
       height: 38,
       color: Color.WHITE,
       textColor: THEME.primary,
       fontSize: 13,
       parent: panel,
       onClick: () => {
-        this.rollNames();
+        this.rollNames(true);
         this.render();
       },
-    }).setPosition(0, -178);
+    }).setPosition(-64, -198);
+    createButton({
+      text: hasCustom ? '改名' : '自定义名称',
+      width: 118,
+      height: 38,
+      color: Color.WHITE,
+      textColor: THEME.primary,
+      fontSize: 13,
+      parent: panel,
+      onClick: () => this.openCustomNameDialog(),
+    }).setPosition(64, -198);
     createLabel({
-      text: '（也可在后续版本使用自定义名称）',
+      text: '公司名创建后不可修改',
       fontSize: 11,
       color: THEME.textWeak,
       width: 320,
       parent: panel,
-    }).setPosition(0, -214);
+    }).setPosition(0, -232);
 
-    const chosenName = this.randomCompanyNames[this.selectedNameIndex] ?? '';
+    const chosenName = this.chosenCompanyName();
     createButton({
       text: '下一步：创建 CEO',
       width: 320,
       height: 50,
       parent: panel,
-      disabled: chosenName.length < 2,
-      onClick: () => this.renderCreateCeo(),
+      disabled: Array.from(chosenName).length < 2,
+      onClick: () => {
+        this.createStep = 'CEO';
+        this.render();
+      },
     }).setPosition(0, -330);
+  }
+
+  /** 自定义公司名输入弹窗（Cocos EditBox，真机会唤起系统键盘）。 */
+  private openCustomNameDialog(): void {
+    const overlay = this.modalOverlay();
+    createRect({ width: 320, height: 264, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '自定义公司名称', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 98);
+    createLabel({
+      text: '2–20 个字，创建后不可修改',
+      fontSize: 11,
+      color: THEME.textWeak,
+      parent: overlay,
+    }).setPosition(0, 74);
+
+    createRect({ width: 280, height: 46, color: THEME.bg, radius: 8, parent: overlay }).setPosition(0, 26);
+    const inputNode = new Node('CompanyNameInput');
+    inputNode.parent = overlay;
+    inputNode.setPosition(0, 26);
+    inputNode.addComponent(UITransform).setContentSize(new Size(268, 40));
+    const edit = inputNode.addComponent(EditBox);
+    edit.placeholder = '例如：向上生长科技';
+    edit.maxLength = 20;
+    edit.fontSize = 15;
+    edit.string = this.customCompanyName;
+    edit.inputMode = EditBox.InputMode.SINGLE_LINE;
+    // EditBox 默认 label 为白色，在浅色卡片上看不见；这里统一改为深色
+    const paintLabel = (): void => {
+      const pl = edit.placeholderLabel as Label | null;
+      if (pl) {
+        pl.color = THEME.textWeak;
+        pl.fontSize = 13;
+      }
+      const tl = edit.textLabel as Label | null;
+      if (tl) {
+        tl.color = THEME.text;
+        tl.fontSize = 15;
+      }
+    };
+    paintLabel();
+    this.scheduleOnce(paintLabel, 0);
+
+    createButton({
+      text: '使用这个名字',
+      width: 260,
+      height: 46,
+      parent: overlay,
+      onClick: () => {
+        const raw = (edit.string ?? '').trim();
+        const len = Array.from(raw).length;
+        if (len < 2 || len > 20) {
+          this.toast('公司名需 2–20 个字');
+          return;
+        }
+        this.customCompanyName = raw;
+        this.selectedNameIndex = -1;
+        overlay.destroy();
+        this.render();
+      },
+    }).setPosition(0, -46);
+    createButton({
+      text: '取消',
+      width: 200,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -104);
   }
 
   // ---------------------------------------------------------------- S02 CEO
@@ -649,7 +771,10 @@ export class AppView extends Component {
       color: Color.WHITE,
       textColor: THEME.text,
       parent: panel,
-      onClick: () => this.render(),
+      onClick: () => {
+        this.createStep = 'COMPANY';
+        this.render();
+      },
     }).setPosition(-85, -300);
     createButton({
       text: '下一步：招聘员工',
@@ -662,7 +787,7 @@ export class AppView extends Component {
 
   private async submitCreateCompany(): Promise<void> {
     const s = this.state();
-    const name = this.randomCompanyNames[this.selectedNameIndex] ?? '';
+    const name = this.chosenCompanyName();
     const result = await this.facade.createCompany(
       {
         companyName: name,
@@ -1958,6 +2083,9 @@ export class AppView extends Component {
     this.customCompanyName = '';
     this.customCeoName = '';
     this.randomCompanyNames = [];
+    this.selectedNameIndex = 0;
+    this.nameNonce = 0;
+    this.createStep = 'COMPANY';
     this.activeTab = 'COMPANY';
     this.toast('公司已关闭，开始新的创业');
     this.render();

@@ -41,8 +41,17 @@ $cvExit = $LASTEXITCODE
 if ($cvExit -ne 0) { throw "Tap 转换失败，详见 $cvOut" }
 if (-not (Select-String -Path $cvOut -Pattern 'CONVERT_OK' -Quiet)) { throw "转换日志缺少 CONVERT_OK，详见 $cvOut" }
 
-# 转换后再次覆盖启动图，保证 Tap 包内为自有图片
+# 转换后再次覆盖启动图与启动兼容补丁
 & node (Join-Path $root 'tools\patch-splash.cjs') | Out-Null
+
+# 关键：转换器会重新生成 game.js / check-version.js（并在 game.js 头部注回
+# throw new Error('fetch is not defined')），而 zip 在转换阶段已打包。
+# 因此补丁打完后必须重新打包，否则真机会因该 throw 永久停在加载页。
+# （用 archiver 重打包，保证 zip 内条目名为 '/' 分隔）
+Write-Host "[2.5/3] 补丁后重新打包 ..."
+& node (Join-Path $root 'tools\repack-tap.cjs') 2>&1 | Out-File -Encoding utf8 (Join-Path $logDir 'repack.log')
+if ($LASTEXITCODE -ne 0) { throw "重新打包失败，详见 $(Join-Path $logDir 'repack.log')" }
+if (-not (Select-String -Path (Join-Path $logDir 'repack.log') -Pattern 'REPACK_OK' -Quiet)) { throw "重新打包日志缺少 REPACK_OK" }
 
 Write-Host "[3/3] 产物自检 ..."
 $zip = Join-Path $root 'build\TapBuild\game.zip'

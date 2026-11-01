@@ -100,12 +100,16 @@ export class GameFacade {
     return this.store.currentRevision;
   }
 
-  /** 公司名刷新使用独立 RNG 流，不改变市场事件序列。 */
-  rollCompanyNames(industry: IndustryId, count = 3): string[] {
+  /**
+   * 公司名刷新使用独立 RNG 流，不改变市场事件序列。
+   * @param nonce 批次序号：调用方每次点击「换一批」递增，用于换出不同名字。
+   *              （同一 nonce 结果稳定，便于回放与测试）
+   */
+  rollCompanyNames(industry: IndustryId, count = 3, nonce = 0): string[] {
     const state = this.store.current;
     const rng = new Rng(deriveSeed(state.seed, 'companyName', state.rngCounter));
     // 刷新不推进市场 RNG：用 rngCounter 的临时派生子流，且不写回
-    const generator = new NameGenerator(rng.derive(`names:${state.rngCounter}`));
+    const generator = new NameGenerator(rng.derive(`names:${state.rngCounter}:${nonce}`));
     return generator.rollCompanyNames(industry, count);
   }
 

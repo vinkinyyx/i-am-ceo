@@ -50,7 +50,7 @@
 [Tap小游戏] 正在进行JavaScript兼容性转换...
 [Tap小游戏] Babel配置: D:\Workspace\TapTap\我是CEO\extensions\taptap-minigame-tools\converter\.babelrc
 [Tap小游戏] 转换目录: D:\Workspace\TapTap\我是CEO\build\TapBuild\game
-[Tap小游戏] 发现 23 个JS文件需要转换
+[Tap小游戏] 发现 31 个JS文件需要转换
 [Babel] 跳过引擎文件: cc.40b88.js
 node.exe : [BABEL] Note: The code generator has deoptimised the styling of D:\Workspace\TapTap\我是CEO\build\TapBuild\gam
 e\cocos-js\_virtual_cc-C7iGm02z.js as it exceeds the max of 500KB.
@@ -60,7 +60,7 @@ At D:\Workspace\TapTap\我是CEO\tools\build-tap.ps1:39 char:1
     + CategoryInfo          : NotSpecified: ([BABEL] Note: T...e max of 500KB.:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
-[Tap小游戏] Babel转换完成: 成功 22, 跳过 1, 失败 0
+[Tap小游戏] Babel转换完成: 成功 30, 跳过 1, 失败 0
 [Tap小游戏] ✓ Babel转换完成
 
 ========================================
@@ -91,7 +91,7 @@ At D:\Workspace\TapTap\我是CEO\tools\build-tap.ps1:39 char:1
 [Tap小游戏] 步骤11: 创建分发包
 ========================================
 [Tap小游戏] 创建ZIP包...
-[Tap小游戏] ✓ game.zip创建完成: 4.44 MB
+[Tap小游戏] ✓ game.zip创建完成: 5.24 MB
 
 ========================================
 [Tap小游戏] ✅ 转换完成！
