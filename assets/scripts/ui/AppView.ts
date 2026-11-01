@@ -9,8 +9,9 @@ import {
   Widget,
 } from 'cc';
 import { GameFacade } from '../../core/application/GameFacade';
-import type { CandidateOffer, GameState, IndustryId, CeoTrait } from '../../core/domain/types';
+import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport } from '../../core/domain/types';
 import { CocosPlatform } from '../platform/CocosPlatform';
+import { loadEconomyConfig } from '../platform/loadConfig';
 import {
   createButton,
   createLabel,
@@ -61,12 +62,30 @@ export class AppView extends Component {
     // 关闭屏幕左下角调试统计面板（发布包不应显示）
     profiler.hideStats();
     const platform = new CocosPlatform();
-    this.facade = await GameFacade.bootstrap(platform);
+    const cfg = await loadEconomyConfig();
+    this.facade = await GameFacade.bootstrap(platform, cfg);
     this.buildRoot();
     this.render();
 
-    // 前后台生命周期：回前台/进后台时由 M1/M3 接时钟与离线；M0 仅保证存档已持久化
+    // 在线经营时钟：按真实帧时间推进（仅 RUNNING 且 speed>0 时月结）
+    this.schedule(this.clockTick, 0.2);
+
+    // 前后台生命周期
     platform.onHide(() => this.toast('已自动保存'));
+  }
+
+  private clockTick(): void {
+    if (!this.facade) return;
+    const s = this.facade.getState();
+    if (s.phase !== 'RUNNING' || s.speed === 0) return;
+    void this.facade
+      .advanceRealTime(200, s.runId)
+      .then((r) => {
+        if (r.ok && (r.payload.monthsAdvanced > 0 || r.payload.yearsClosed.length > 0)) {
+          this.render();
+        }
+      })
+      .catch(() => undefined);
   }
 
   private buildRoot(): void {
@@ -452,15 +471,15 @@ export class AppView extends Component {
       fontSize: 17,
       bold: true,
       color: Color.WHITE,
-      width: 260,
+      width: 240,
       parent: parent,
-    }).setPosition(-30, 372);
+    }).setPosition(-38, 372);
     createLabel({
-      text: `${INDUSTRY_LABELS[company.industry]} · 创业第 ${s.gameYear} 年`,
+      text: `${INDUSTRY_LABELS[company.industry]} · 创业第 ${s.gameYear} 年 · 第 ${s.gameMonth} 月`,
       fontSize: 11,
       color: new Color(220, 230, 245),
       parent: parent,
-    }).setPosition(-30, 348);
+    }).setPosition(-38, 348);
     createButton({
       text: '设置',
       width: 56,
@@ -471,64 +490,172 @@ export class AppView extends Component {
       onClick: () => this.renderSettings(),
     }).setPosition(145, 360);
 
-    // 三大指标卡
-    const metrics: Array<[string, string]> = [
-      ['现金', moneyText(company.cashYuan)],
-      ['状态', s.phase === 'RUNNING' ? `经营中 ${s.speed}×` : '暂停'],
-      ['员工', `${s.employees.length} 人`],
+    // 三大指标：现金 / 本年累计收入 / 本年累计利润
+    const ledgers = this.facade.getYearLedgers(s.gameYear);
+    const yRevenue = ledgers.reduce((sum, l) => sum + l.revenueYuan, 0);
+    const yProfit = ledgers.reduce((sum, l) => sum + l.profitYuan, 0);
+    const profitColor = yProfit < 0 ? THEME.danger : THEME.profit;
+    const metrics: Array<[string, string, Color]> = [
+      ['现金', moneyText(company.cashYuan), THEME.text],
+      ['本年收入', moneyText(yRevenue), THEME.text],
+      ['本年利润', `${yProfit < 0 ? '-' : ''}${moneyText(Math.abs(yProfit))}`, profitColor],
     ];
-    metrics.forEach(([title, value], i) => {
+    metrics.forEach(([title, value, color], i) => {
       const card = createRect({ width: 112, height: 78, color: Color.WHITE, radius: 8, parent: parent });
-      card.setPosition(-120 + i * 120, 272);
+      card.setPosition(-120 + i * 120, 276);
       createLabel({ text: title, fontSize: 12, color: THEME.textWeak, parent: card }).setPosition(0, 20);
-      createLabel({ text: value, fontSize: 15, bold: true, color: THEME.text, width: 104, parent: card }).setPosition(
-        0,
-        -8,
-      );
+      createLabel({ text: value, fontSize: 14, bold: true, color, width: 104, parent: card }).setPosition(0, -8);
     });
 
+    // 时间控制
+    this.renderTimeControl(parent, 210);
+
+    // CEO 卡
+    const ceoCard = createRect({ width: 343, height: 56, color: Color.WHITE, radius: 8, parent: parent });
+    ceoCard.setPosition(0, 146);
     createLabel({
-      text: 'CEO',
+      text: `${s.ceo?.name ?? ''}（${TRAIT_LABELS[s.ceo?.trait ?? 'STEADY'].name}）`,
+      fontSize: 13,
+      bold: true,
+      align: 'left',
+      width: 160,
+      parent: ceoCard,
+    }).setPosition(-84, 8);
+    createLabel({
+      text: `商业 ${s.ceo?.businessSkill} · 管理 ${s.ceo?.managementSkill} · 财务 ${s.ceo?.financeSkill}`,
       fontSize: 12,
       color: THEME.textWeak,
       align: 'left',
-      parent: parent,
-    }).setPosition(-168, 208);
+      width: 220,
+      parent: ceoCard,
+    }).setPosition(-56, -12);
     createLabel({
-      text: `${s.ceo?.name ?? ''}（${TRAIT_LABELS[s.ceo?.trait ?? 'STEADY'].name}）商业 ${s.ceo?.businessSkill} · 管理 ${s.ceo?.managementSkill} · 财务 ${s.ceo?.financeSkill}`,
+      text: `员工 ${s.employees.length} 人`,
       fontSize: 12,
-      align: 'left',
-      width: 340,
-      parent: parent,
-    }).setPosition(0, 184);
+      color: THEME.primary,
+      width: 90,
+      parent: ceoCard,
+    }).setPosition(118, 0);
 
-    const info = createRect({ width: 343, height: 180, color: Color.WHITE, radius: 8, parent: parent });
-    info.setPosition(0, 60);
+    // 业务资产与操作
+    const actionCard = createRect({ width: 343, height: 120, color: Color.WHITE, radius: 8, parent: parent });
+    actionCard.setPosition(0, 50);
     createLabel({
-      text: 'M0 版本说明',
-      fontSize: 14,
+      text: `业务资产：${moneyText(company.businessAssetBookYuan)}（产能加成）`,
+      fontSize: 13,
       bold: true,
       align: 'left',
       width: 320,
-      parent: info,
-    }).setPosition(0, 66);
-    createLabel({
-      text: '已完成：创建公司/CEO、首聘 2 人、本地双槽存档、关闭重开。\n财务结算（M1）、部门与自动经营（M2）、离线/事件/排行（M3）将在后续里程碑开放。',
-      fontSize: 12,
-      color: THEME.textWeak,
-      align: 'left',
-      width: 310,
-      lineHeight: 18,
-      parent: info,
-    }).setPosition(0, 10);
+      parent: actionCard,
+    }).setPosition(0, 38);
+    createButton({
+      text: '扩大产能（1万起）',
+      width: 158,
+      height: 42,
+      fontSize: 13,
+      color: THEME.secondary,
+      parent: actionCard,
+      onClick: () => this.renderInvestDialog(),
+    }).setPosition(-83, -14);
+    createButton({
+      text: '年度报告',
+      width: 158,
+      height: 42,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.primary,
+      parent: actionCard,
+      onClick: () => this.renderAnnualReport(),
+    }).setPosition(83, -14);
 
-    // 引导：TUT-04/05 提示（M0-08）
-    if (!s.onboarding.completedSteps.includes('TUT-04')) {
-      this.renderTutorialBubble(parent, '营收是卖出去多少；利润才是扣掉成本后赚的钱。', () => {
-        this.render();
-      });
+    // 连续盈利目标进度
+    createLabel({
+      text: s.target3YearsAchieved
+        ? '已达成连续 3 年盈利目标，可继续自由经营'
+        : `连续盈利：${s.consecutiveProfitableYears}/3 年`,
+      fontSize: 12,
+      color: s.target3YearsAchieved ? THEME.profit : THEME.textWeak,
+      width: 320,
+      parent: parent,
+    }).setPosition(0, -36);
+
+    // 新手引导 TUT-04/05：看板预览态（暂停）讲解三指标，确认后开始经营
+    if (s.phase === 'TUTORIAL_DASHBOARD') {
+      this.renderStartOperatingBubble();
     }
   }
+
+  /** TUT-04 三指标 + TUT-05 开始经营合并引导：确认即启动时钟。 */
+  private renderStartOperatingBubble(): void {
+    const overlay = this.modalOverlay(true);
+    createRect({
+      width: 308,
+      height: 236,
+      color: new Color(39, 50, 68, 245),
+      radius: 12,
+      parent: overlay,
+    }).setPosition(0, 0);
+    createLabel({ text: '新手提示', fontSize: 15, bold: true, color: Color.WHITE, parent: overlay }).setPosition(
+      0,
+      86,
+    );
+    createLabel({
+      text: '营收是卖出去多少；利润才是扣掉成本后赚的钱。\n\n公司会自动经营，你可以暂停或加速时间。',
+      fontSize: 14,
+      color: Color.WHITE,
+      width: 264,
+      lineHeight: 22,
+      parent: overlay,
+    }).setPosition(0, 16);
+    createButton({
+      text: '开始经营',
+      width: 168,
+      height: 46,
+      color: THEME.secondary,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        void this.startClock();
+      },
+    }).setPosition(0, -78);
+  }
+
+  private renderTimeControl(parent: Node, centerY: number): void {
+    const s = this.state();
+    const wrap = createRect({ width: 343, height: 52, color: Color.WHITE, radius: 8, parent });
+    wrap.setPosition(0, centerY);
+    createLabel({ text: '时间', fontSize: 12, color: THEME.textWeak, parent: wrap }).setPosition(-140, 0);
+    const speeds: Array<[string, GameSpeed]> = [
+      ['暂停', 0],
+      ['1×', 1],
+      ['2×', 2],
+      ['5×', 5],
+    ];
+    speeds.forEach(([label, speed], i) => {
+      const active = s.speed === speed;
+      createButton({
+        text: label,
+        width: 52,
+        height: 36,
+        fontSize: 13,
+        color: active ? THEME.primary : new Color(238, 241, 247),
+        textColor: active ? Color.WHITE : THEME.textWeak,
+        parent: wrap,
+        onClick: () => void this.onSetSpeed(speed),
+      }).setPosition(-66 + i * 60, 0);
+    });
+  }
+
+  private async onSetSpeed(speed: GameSpeed): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.setSpeed(speed, { commandId: nextCommandId('speed'), expectedRunId: s.runId });
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.render();
+  }
+
 
   private renderPlaceholderTab(parent: Node, title: string, desc: string): void {
     createLabel({ text: title, fontSize: 22, bold: true, color: THEME.primary, parent: parent }).setPosition(0, 200);
@@ -564,6 +691,158 @@ export class AppView extends Component {
         },
       }).setPosition(x, -372);
     });
+  }
+
+  // ---------------------------------------------------------------- 扩产与年报
+
+  private renderInvestDialog(): void {
+    const s = this.state();
+    const overlay = this.modalOverlay();
+    createRect({ width: 320, height: 400, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, -10);
+    createLabel({ text: '扩大主营业务产能', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 150);
+    createLabel({
+      text: `可用现金 ${moneyText(s.company?.cashYuan ?? 0)}`,
+      fontSize: 13,
+      color: THEME.textWeak,
+      parent: overlay,
+    }).setPosition(0, 116);
+    createLabel({
+      text: '每投入 1 万元，交付产能 +1.5%（封顶 +30%）。\n现金即时换为业务资产，不计当月利润，次年起按 10% 折旧。',
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: 300,
+      lineHeight: 16,
+      parent: overlay,
+    }).setPosition(0, 70);
+
+    const steps = [10_000, 50_000, 100_000];
+    steps.forEach((amount, i) => {
+      const preview = this.facade.previewInvest(amount);
+      const affordable = preview.ok && preview.payload.cashAfter >= 0;
+      createButton({
+        text: `投入 ${moneyText(amount)}${affordable ? '' : '（现金不足）'}`,
+        width: 280,
+        height: 42,
+        fontSize: 13,
+        color: affordable ? THEME.secondary : THEME.disabled,
+        disabled: !affordable,
+        parent: overlay,
+        onClick: () => void this.onInvest(amount),
+      }).setPosition(0, 10 - i * 52);
+    });
+
+    createButton({
+      text: '取消',
+      width: 280,
+      height: 42,
+      color: Color.WHITE,
+      textColor: THEME.textWeak,
+      fontSize: 14,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -190);
+  }
+
+  private async onInvest(amount: number): Promise<void> {
+    const s = this.state();
+    const r = await this.facade.invest(amount, {
+      commandId: nextCommandId('invest'),
+      expectedRunId: s.runId,
+    });
+    if (!r.ok) {
+      this.toast(r.displayMessage);
+      return;
+    }
+    this.toast(`已投入 ${moneyText(amount)}，产能加成已更新`);
+    this.render();
+  }
+
+  private renderAnnualReport(): void {
+    const s = this.state();
+    const years = s.annualReports.map((r) => r.year).sort((a, b) => b - a);
+    const report: AnnualReport | null =
+      years.length > 0 ? this.facade.getAnnualReport(years[0]) : null;
+    const overlay = this.modalOverlay();
+    createRect({ width: 324, height: 572, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 54);
+    createLabel({
+      text: report ? `第 ${report.year} 年财务报告` : '年度财务报告',
+      fontSize: 18,
+      bold: true,
+      parent: overlay,
+    }).setPosition(0, 330);
+
+    if (!report) {
+      createLabel({
+        text: '首个经营年度尚未结束。\n完成 12 个月结算后可在此查看年报。',
+        fontSize: 13,
+        color: THEME.textWeak,
+        width: 280,
+        lineHeight: 20,
+        parent: overlay,
+      }).setPosition(0, 80);
+      createButton({
+        text: '知道了',
+        width: 240,
+        height: 46,
+        parent: overlay,
+        onClick: () => overlay.destroy(),
+      }).setPosition(0, -120);
+      return;
+    }
+
+    const rows: Array<[string, number, boolean]> = [
+      ['营业收入', report.revenueYuan, false],
+      ['直接成本', report.directCostYuan, true],
+      ['其他运营费', report.otherOperatingCostYuan, true],
+      ['售后费用', report.afterSalesCostYuan, true],
+      ['固定管理费', report.fixedCostYuan, true],
+      ['员工工资', report.payrollYuan, true],
+      ['招聘费', report.recruitmentCostYuan, true],
+      ['裁员赔偿', report.severanceCostYuan, true],
+      ['部门设置费', report.deptSetupCostYuan, true],
+      ['事件损益', report.eventCostYuan, true],
+      ['折旧', report.depreciationYuan, true],
+    ];
+    rows.forEach(([label, value, cost], i) => {
+      createLabel({ text: label, fontSize: 12, align: 'left', color: THEME.textWeak, width: 150, parent: overlay })
+        .setPosition(-78, 282 - i * 30);
+      createLabel({
+        text: value === 0 ? '¥0' : moneyText(value),
+        fontSize: 12,
+        align: 'right',
+        color: cost && value !== 0 ? THEME.danger : THEME.text,
+        width: 150,
+        parent: overlay,
+      }).setPosition(84, 282 - i * 30);
+    });
+
+    const profitColor = report.profitYuan < 0 ? THEME.danger : THEME.profit;
+    createRect({ width: 300, height: 76, color: new Color(238, 244, 252), radius: 8, parent: overlay }).setPosition(0, -78);
+    createLabel({ text: '本年净利润', fontSize: 12, color: THEME.textWeak, parent: overlay }).setPosition(0, -60);
+    createLabel({
+      text: `${report.profitYuan < 0 ? '-' : ''}${moneyText(Math.abs(report.profitYuan))}`,
+      fontSize: 22,
+      bold: true,
+      color: profitColor,
+      parent: overlay,
+    }).setPosition(0, -90);
+
+    createLabel({
+      text: `期初现金 ${moneyText(report.cashOpenYuan)}　期末 ${moneyText(report.cashCloseYuan)}\n总资产 ${moneyText(report.assetCloseYuan)}　期末员工 ${report.headcountClose} 人`,
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: 300,
+      lineHeight: 18,
+      parent: overlay,
+    }).setPosition(0, -138);
+
+    createButton({
+      text: '关闭',
+      width: 240,
+      height: 46,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -200);
   }
 
   // ---------------------------------------------------------------- D04/D05 设置与关闭公司
@@ -675,33 +954,6 @@ export class AppView extends Component {
   }
 
   // ---------------------------------------------------------------- 引导与通用控件
-
-  private renderTutorialBubble(parent: Node, text: string, onAck: () => void): void {
-    const overlay = this.modalOverlay(true);
-    createRect({ width: 300, height: 180, color: new Color(39, 50, 68, 245), radius: 12, parent: overlay }).setPosition(
-      0,
-      0,
-    );
-    createLabel({ text: '新手提示', fontSize: 15, bold: true, color: Color.WHITE, parent: overlay }).setPosition(
-      0,
-      56,
-    );
-    createLabel({ text, fontSize: 14, color: Color.WHITE, width: 260, lineHeight: 22, parent: overlay }).setPosition(
-      0,
-      0,
-    );
-    createButton({
-      text: '知道了',
-      width: 140,
-      height: 42,
-      color: THEME.secondary,
-      parent: overlay,
-      onClick: () => {
-        overlay.destroy();
-        onAck();
-      },
-    }).setPosition(0, -60);
-  }
 
   private fullPanel(): Node {
     const panel = createRect({

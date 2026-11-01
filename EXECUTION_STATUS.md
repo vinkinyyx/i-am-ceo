@@ -8,7 +8,7 @@
 | 里程碑 | 状态 | 最后commit | 通过用例 | 未解决问题 |
 |---|---|---|---|---|
 | M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 128c0ad | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
-| M1 | TODO | - | - | - |
+| M1 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 待提交 | 78 单测/黄金/集成全过；G001-G003 黄金账分毫不差；web-mobile 无头构建+Chromium 走通在线时钟/跨年/扩产/年报 | TapTap 真机、音频真机听感为外部项（ISSUE-ENV-02） |
 | M2 | TODO | - | - | - |
 | M3 | TODO | - | - | TapTap 开发者认证/AppID/备案为外部门禁，尚无凭证 |
 
@@ -86,6 +86,62 @@
 - 证据：build/web-mobile 可启动；evidence/m0/m0-10/{s01-company,s02-ceo,s03-hiring,s03-hired2,t01-company}.png
 - 阻塞项：ISSUE-ENV-02 官方 Tap 小游戏适配扩展、AppID、Android/iOS 真机、备案
 - QA复核：待
+
+## M1 财务引擎（2026-11-01）
+
+### TASK-M1-01
+- 状态：DONE
+- 内容：economy.v1.json 加载/TS 类型/硬校验（关键数值篡改即抛 ConfigValidationError）
+- 变更：core/config/EconomyConfig.ts、configLoader.ts；scripts/platform/loadConfig.ts（resources.load）
+- 测试：tests/unit/config.test.ts 5 项
+
+### TASK-M1-02
+- 状态：DONE
+- 内容：固定 seed mulberry32 + xmur3，独立命名空间随机流（market/event/offer/companyName 互不污染）
+- 变更：simulation/{rng,RandomStreams}.ts、domain/{rng,NameGenerator}.ts
+
+### TASK-M1-03
+- 状态：DONE
+- 内容：年需求复利、获客、月潜在订单年度残差分配（保证全年精确）；技能/协作/CEO/业务资产产能系数，个人年产能取整后前11月trunc、12月补差
+- 变更：simulation/{market,capacity}.ts
+- 测试：tests/unit/capacityMarket.test.ts 7 项
+
+### TASK-M1-04
+- 状态：DONE
+- 内容：逐月财务结算（比例费用 YTD 累计残差法、固定费12月补差、一次性 pendingEntries 区分现金口径）；**G001 贸易 利润38000/末现338000、G002 软件 35000/335000、G003 服务 43500/343500 黄金账分毫不差**
+- 变更：simulation/{monthly,advanceMonth}.ts
+- 测试：tests/golden/goldenYear1.test.ts 6 项
+
+### TASK-M1-05
+- 状态：DONE
+- 内容：在线时钟 1×(月25s/年5min)、2×、5×(月5s/年1min)、暂停(speed=0)；累积真实ms、while循环跨多月原子月结、G008
+- 变更：simulation/GameClock.ts；GameFacade.setSpeed/advanceRealTime
+- 测试：tests/unit/clock.test.ts 8 项
+
+### TASK-M1-06
+- 状态：DONE
+- 内容：年结汇总、连续盈利计数（>0累加/否则归零）、三年达标 target3YearsAchieved、CEO 按性格年度成长（封100）、年报入册
+- 变更：simulation/annual.ts；GameState.yearOpenCashYuan
+- 测试：tests/unit/annualGoal.test.ts 6 项
+
+### TASK-M1-07
+- 状态：DONE
+- 内容：扩产现金即时换业务资产（1万/步，产能+1.5%封顶+30%），CAPEX 不计当期利润；次年起年折旧10%（不追溯本年）；G007
+- 变更：application/InvestmentService.ts；GameFacade.previewInvest/invest
+- 测试：tests/unit/investment.test.ts 7 项
+
+### TASK-M1-08
+- 状态：DONE
+- 内容：公司首页实时三指标（现金/本年收入/本年利润，亏红盈绿）、时间速度控制、CEO卡、业务资产+扩产弹窗、连续盈利进度、年度报告弹窗（11项费用分类+净利润+期初期末现金/总资产/员工）；修复 TUTORIAL_DASHBOARD 看板态无「开始经营」入口导致时钟永不启动的缺陷（新增 TUT-04/05 合并引导，确认调 startOperating）；为扩产/年报弹窗补白色卡片底板
+- 变更：scripts/ui/AppView.ts；application/RecruitmentService.ts（pushStep 幂等，TUT-04/05 在 startOperating 标记）
+- 证据：evidence/m1/m1-08/{m1-company-month1,m1-speed-5x,m1-company-running,m1-after-year1,m1-invest-dialog,m1-annual-empty,m1-annual-report-y1}.png；Chromium 390×844 零 JS 错误；实测5×推进月份、收入/利润实时变化、跨年第2年CEO成长(商业52/管理51/财务51)、连盈计数随亏损归零、年报勾稽（720000−各项=−19044 该局随机高工资情形）
+- QA复核：待
+
+## 设计素材收录
+
+- UI（CEO_UI_DevHandoff_B01-B06_v1.5）：67 张 B06 PNG 已入 `assets/resources/ui/{avatars,components,departments,industries,navigation,status,time}`，编辑器已生成 meta。整屏 PNG/SVG 仅在 design/ 作参考，不入运行时。
+- 音频设计包（design/CEO_Audio_MVP_Design_v1.1）：16 项契约（2 BGM + 3 JNG + 11 SFX）+ UI-12 三开关增量规范；该包无图片。
+- 音频生产包（项目根 `audio/`，V1.0）：**16 个真实 MP3 已制作并收录入运行时** `assets/resources/audio/{bgm(2),jingles(3),sfx(11)}`，全部 `PASS_static_qa`（44.1kHz、非静音、BGM 循环接缝差 0、含 SHA256，收录后抽 4 个复核哈希一致）。作用映射：BGM_01 创业启程(60s,startup,UI-01~04)、BGM_02 日常经营(96s,operation,UI-05~15)；JNG_01 年度盈利/JNG_02 年度亏损/JNG_03 连续三年盈利；SFX_01~11 依次为按钮点击、卡片选择、确认、返回、非法操作、随机公司名、招聘成功、创建部门、裁员、速度切换、现金警告。配置已更新为生产版 `assets/resources/config/audio/{audio_manifest(18KB,status=produced_original_audio),audio_event_map,audio_settings,audio_asset_manifest}.json`（删除设计期 package_files.json）。WAV 母版(16)、试听合辑、QA_REPORT.csv、原创合成脚本仅留存根 `audio/`，**不入包**；版权状态 original_waveforms（本项目 Python 合成、无外部采样），商用前仍需项目侧合规确认。AudioManager + UI-12 三开关（master/music/effects，总开关一票否决、立即静音、持久化、首次触摸解锁、切后台暂停、离线不逐条播）在 M3 实现；真机听感/MP3 无缝循环待 TapTap 真机验证；音频为可选增强，不参与经营逻辑。
 
 ## 错误与遗留事项
 

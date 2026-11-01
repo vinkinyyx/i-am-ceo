@@ -103,6 +103,8 @@ export function createCompany(
   state.company = company;
   state.ceo = ceo;
   state.initializedCapital = true;
+  // 第1经营年开盘现金 = 唯一注资额（年报 cashOpen 口径，设计 12.9）
+  state.yearOpenCashYuan = { 1: INITIAL_CAPITAL_YUAN };
   state.phase = 'HIRING_INITIAL';
   state.speed = 0;
   state.onboarding.stepId = 'TUT-03';

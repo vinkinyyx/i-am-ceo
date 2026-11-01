@@ -234,5 +234,7 @@ export interface GameState {
   target3YearsAchieved: boolean;
   rescueCapitalUsed: boolean;
   cashRisk: CashRisk;
+  /** 各经营年第 1 月结算前的现金快照（年报 cashOpen 口径，含初始注资）。 */
+  yearOpenCashYuan: Record<number, number>;
   executedCommandIds: string[];
 }

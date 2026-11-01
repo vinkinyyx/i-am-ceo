@@ -151,7 +151,7 @@ export function hireEmployee(
     firstHire = state.onboarding.initialHiresCompleted === 1;
     if (state.onboarding.initialHiresCompleted >= 2) {
       state.phase = 'TUTORIAL_DASHBOARD';
-      state.onboarding.completedSteps.push('TUT-03');
+      pushStep(state, 'TUT-03');
     }
   }
 
@@ -165,6 +165,13 @@ export function hireEmployee(
 
 function candidateToEmployeeId(state: GameState, candidateId: string): string {
   return `emp_${state.runId}_${candidateId}`;
+}
+
+/** 幂等记录已完成引导步骤，避免重复 push。 */
+function pushStep(state: GameState, step: string): void {
+  if (!state.onboarding.completedSteps.includes(step)) {
+    state.onboarding.completedSteps.push(step);
+  }
 }
 
 /** 首聘完成后由引导/玩家显式开始经营（时钟启动，speed=1）。 */
@@ -183,6 +190,8 @@ export function startOperating(
   if (hasCommand(state, ctx.commandId)) return;
   state.phase = 'RUNNING';
   state.speed = 1;
-  state.onboarding.completedSteps.push('TUT-04', 'TUT-05');
+  // 玩家在看板确认「开始经营」：完成三指标认知 TUT-04，并启动时钟 TUT-05
+  pushStep(state, 'TUT-04');
+  pushStep(state, 'TUT-05');
   recordCommand(state, ctx.commandId);
 }

@@ -8,9 +8,12 @@ import { getOffer, refreshOffer } from './OfferService';
 import { hireEmployee, startOperating } from './RecruitmentService';
 import { closeCompanyPreview, confirmCloseCompany } from './ResetService';
 import { createInitialState } from '../domain/gameStateFactory';
-import type { CandidateOffer, Employee, GameState, IndustryId } from '../domain/types';
+import type { AnnualReport, CandidateOffer, Employee, GameSpeed, GameState, IndustryId, MonthlyLedger } from '../domain/types';
 import { NameGenerator } from '../domain/NameGenerator';
 import { Rng, deriveSeed } from '../simulation/rng';
+import { GameClock, type ClockTickResult } from '../simulation/GameClock';
+import { investInBusiness, previewInvest, type InvestPreview } from './InvestmentService';
+import type { EconomyConfig } from '../config/EconomyConfig';
 
 export interface BootstrapResult {
   state: GameState;
@@ -38,21 +41,27 @@ const GameErrorCodeLike: Record<string, true> = Object.fromEntries(
 export class GameFacade {
   private store: GameStore;
   private readonly platform: ITapPlatform;
+  private readonly cfg: EconomyConfig;
+  private readonly clock = new GameClock();
 
-  private constructor(platform: ITapPlatform, store: GameStore) {
+  private constructor(platform: ITapPlatform, store: GameStore, cfg: EconomyConfig) {
     this.platform = platform;
     this.store = store;
+    this.cfg = cfg;
   }
 
-  static async bootstrap(platform: ITapPlatform): Promise<GameFacade> {
+  static async bootstrap(platform: ITapPlatform, cfg: EconomyConfig): Promise<GameFacade> {
     const loaded = await GameStore.load(platform);
     const store = loaded ?? new GameStore(platform, createInitialState(Date.now()));
-    return new GameFacade(platform, store);
+    return new GameFacade(platform, store, cfg);
   }
 
   /** 测试/首启直接注入存储。 */
-  static async fromStorage(storage: IStorageBackend & ITapPlatform): Promise<GameFacade> {
-    return GameFacade.bootstrap(storage);
+  static async fromStorage(
+    storage: IStorageBackend & ITapPlatform,
+    cfg: EconomyConfig,
+  ): Promise<GameFacade> {
+    return GameFacade.bootstrap(storage, cfg);
   }
 
   getState(): GameState {
@@ -160,5 +169,82 @@ export class GameFacade {
 
   getEnvironment(): 'EDITOR' | 'TAPTAP' {
     return this.platform.getEnvironment();
+  }
+
+  // ---------------------------------------------------------------- M1 经营
+
+  /** 设置倍速（0 暂停 / 1 / 2 / 5），成功后持久化。 */
+  async setSpeed(
+    speed: GameSpeed,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<true>> {
+    try {
+      await this.store.mutate((draft) => {
+        this.clock.setSpeed(draft, speed);
+        return { revision: 0 };
+      }, ctx.expectedRunId);
+      return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /**
+   * 推进真实毫秒数（在线时钟）。可能触发多月/年结，成功后持久化。
+   */
+  async advanceRealTime(
+    elapsedRealMs: number,
+    expectedRunId: string,
+  ): Promise<CommandResult<ClockTickResult>> {
+    try {
+      const result = await this.store.mutate(
+        (draft) => this.clock.tick(draft, this.cfg, elapsedRealMs),
+        expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, result.result);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 扩产预览（只读，不改状态）。 */
+  previewInvest(amount: number): CommandResult<InvestPreview> {
+    try {
+      return ok(
+        this.store.current.runId,
+        this.store.currentRevision,
+        previewInvest(this.store.current, this.cfg, amount),
+      );
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 确认扩产（幂等由 ctx.commandId 保证）。 */
+  async invest(
+    amount: number,
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<InvestPreview>> {
+    try {
+      const { result } = await this.store.mutate(
+        (draft) => investInBusiness(draft, this.cfg, amount),
+        ctx.expectedRunId,
+      );
+      return ok(this.store.current.runId, this.store.currentRevision, result);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /** 最近年度报告（按年）。 */
+  getAnnualReport(year: number): AnnualReport | null {
+    return this.store.read((s) => s.annualReports.find((r) => r.year === year) ?? null);
+  }
+
+  /** 当年已结算月份（只读）。 */
+  getYearLedgers(year: number): MonthlyLedger[] {
+    const runId = this.store.current.runId;
+    return this.store
+      .read((s) => s.monthlyLedgersRolling.filter((l) => l.runId === runId && l.year === year));
   }
 }

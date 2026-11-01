@@ -1,0 +1,81 @@
+{
+  "version": "1.1",
+  "fileCount": 16,
+  "files": [
+    {
+      "path": "AGENT_AUDIO_HANDOFF.md",
+      "size": 2015,
+      "sha256": "3143609db3d9d891a84875e798626643ac2907d68b48caba2004ce3d2de3f21b"
+    },
+    {
+      "path": "CocosDropIn/assets/resources/audio/bgm/.gitkeep",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "CocosDropIn/assets/resources/audio/jingles/.gitkeep",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "CocosDropIn/assets/resources/audio/sfx/.gitkeep",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Config/audio_event_map.json",
+      "size": 848,
+      "sha256": "5bdb61b0fa1932e3edbbb51940bc1059f256ed939dcc39fc9f6a3ad608d3f43e"
+    },
+    {
+      "path": "Config/audio_manifest.json",
+      "size": 13124,
+      "sha256": "6235fe38aa05632673ba8e742d83fe14e63cf670ee3e577d5eeb30783a485283"
+    },
+    {
+      "path": "README_CN.md",
+      "size": 2841,
+      "sha256": "ff6b5850921abab5faefc68d71a49ca7104ceb4116bc668627716dac7c3da8c3"
+    },
+    {
+      "path": "ReferenceOnly/PromoOriginalMusic_26s.wav",
+      "size": 1664044,
+      "sha256": "f3c62bd4c19e6176ee13a3a14f8773a4def3c7208c80741516ff85433716b492"
+    },
+    {
+      "path": "ReferenceOnly/README.md",
+      "size": 457,
+      "sha256": "c8856d35f49c481eedf36971a720b00f1dea9b5f64200cada7ad562cc86df80f"
+    },
+    {
+      "path": "Specs/01_Audio_Asset_List.md",
+      "size": 8984,
+      "sha256": "a967f8384d0ae01562731b418dfa69834d9de5edd52fe4e9dacb1dcd481f8afe"
+    },
+    {
+      "path": "Specs/02_Music_Brief.md",
+      "size": 2673,
+      "sha256": "d9e5d2c8aaa07cd9009d91fe75cde8909f3020690d8ba8fa966e567ade615b18"
+    },
+    {
+      "path": "Specs/03_Cocos_TapTap_Integration.md",
+      "size": 4254,
+      "sha256": "79fa322c073a39a1abacae04edd3344e6adfaede516d3d165d6c73cd7a03a23d"
+    },
+    {
+      "path": "Specs/04_Audio_QA.md",
+      "size": 3640,
+      "sha256": "22dcc900f229d062778fb85b7fe5ea8383e32c63e8300adbe76a52007512238f"
+    },
+    {
+      "path": "UI_PATCH/UI-12_Settings_AudioSwitch.md",
+      "size": 1917,
+      "sha256": "bee6084e63d2b2a75ff1840c6f74be3ef205c8c65893fb390e3a154150c27260"
+    },
+    {
+      "path": "UI_PATCH/audio_settings.json",
+      "size": 399,
+      "sha256": "6574270c5a78645fdfd4ceaf7e7f6962f067bd8b5d48bc7164f86705075109e1"
+    }
+  ]
+}

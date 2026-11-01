@@ -1,0 +1,236 @@
+{
+  "version": "golden-cases-v1.0.0",
+  "moneyUnit": "integerYuan",
+  "common": {
+    "industryYear": 1,
+    "ceoSkills": {
+      "business": 50,
+      "management": 50,
+      "finance": 50
+    },
+    "businessEmployees": [
+      {
+        "skill": 60,
+        "potential": 60,
+        "teamwork": 50
+      },
+      {
+        "skill": 60,
+        "potential": 60,
+        "teamwork": 50
+      }
+    ],
+    "event": "NONE",
+    "supportDepartments": [],
+    "businessAssetsInvestYuan": 0
+  },
+  "cases": [
+    {
+      "id": "G001",
+      "industry": "TRADE",
+      "employeeSalaryMonthlyYuan": [
+        5000,
+        5000
+      ],
+      "recruitmentFeesYuan": [
+        5000,
+        5000
+      ],
+      "expected": {
+        "revenueYuan": 720000,
+        "directCostYuan": 432000,
+        "otherOperatingCostYuan": 57600,
+        "afterSalesCostYuan": 14400,
+        "fixedCostYuan": 48000,
+        "payrollYuan": 120000,
+        "recruitmentCostYuan": 10000,
+        "profitYuan": 38000,
+        "startingCashYuan": 300000,
+        "endingCashYuan": 338000
+      }
+    },
+    {
+      "id": "G002",
+      "industry": "SOFTWARE",
+      "employeeSalaryMonthlyYuan": [
+        6500,
+        6500
+      ],
+      "recruitmentFeesYuan": [
+        6500,
+        6500
+      ],
+      "expected": {
+        "revenueYuan": 400000,
+        "directCostYuan": 100000,
+        "otherOperatingCostYuan": 44000,
+        "afterSalesCostYuan": 4000,
+        "fixedCostYuan": 48000,
+        "payrollYuan": 156000,
+        "recruitmentCostYuan": 13000,
+        "profitYuan": 35000,
+        "startingCashYuan": 300000,
+        "endingCashYuan": 335000
+      }
+    },
+    {
+      "id": "G003",
+      "industry": "SERVICE",
+      "employeeSalaryMonthlyYuan": [
+        6000,
+        6000
+      ],
+      "recruitmentFeesYuan": [
+        6000,
+        6000
+      ],
+      "expected": {
+        "revenueYuan": 450000,
+        "directCostYuan": 157500,
+        "otherOperatingCostYuan": 38250,
+        "afterSalesCostYuan": 6750,
+        "fixedCostYuan": 48000,
+        "payrollYuan": 144000,
+        "recruitmentCostYuan": 12000,
+        "profitYuan": 43500,
+        "startingCashYuan": 300000,
+        "endingCashYuan": 343500
+      }
+    },
+    {
+      "id": "G004",
+      "scenario": "PROCUREMENT_UNIT",
+      "revenueYuan": 1600000,
+      "directCostBeforeSavingYuan": 960000,
+      "procurementEligibleDirectCostBps": 9500,
+      "savingBps": 1000,
+      "salaryMonthlyYuan": 5000,
+      "recruitmentFeeYuan": 5000,
+      "departmentSetupFeeYuan": 10000,
+      "expected": {
+        "eligibleDirectCostYuan": 912000,
+        "savedDirectCostYuan": 91200,
+        "departmentPayrollAnnualYuan": 60000,
+        "departmentNetContributionFirstYearYuan": 16200
+      }
+    },
+    {
+      "id": "G005",
+      "scenario": "SEVERANCE",
+      "salaryMonthlyYuan": 8000,
+      "completedTenureYears": 3,
+      "expected": {
+        "severanceMonths": 2,
+        "severanceYuan": 16000
+      }
+    },
+    {
+      "id": "G006",
+      "scenario": "INITIAL_HIRING",
+      "startingCapitalYuan": 300000,
+      "recruitmentFeesYuan": [
+        5000,
+        5000
+      ],
+      "expected": {
+        "afterInitialHiresCashYuan": 290000,
+        "year1RecruitmentExpenseYuan": 10000
+      }
+    },
+    {
+      "id": "G007",
+      "scenario": "CAPEX",
+      "startingCashYuan": 300000,
+      "startingBusinessAssetBookYuan": 0,
+      "capexYuan": 10000,
+      "expected": {
+        "endingCashYuan": 290000,
+        "endingBusinessAssetBookYuan": 10000,
+        "assetDeltaYuan": 0,
+        "immediateOperatingProfitEffectYuan": 0
+      }
+    },
+    {
+      "id": "G008",
+      "scenario": "GAME_CLOCK",
+      "onlineYearMsAt1x": 300000,
+      "expected": {
+        "onlineYearMsAt2x": 150000,
+        "onlineYearMsAt5x": 60000,
+        "onlineMonthsPerYear": 12
+      }
+    },
+    {
+      "id": "G009",
+      "scenario": "OFFLINE",
+      "offlineRealHours": 40,
+      "expected": {
+        "maxProcessedMonths": 36,
+        "maxProcessedYears": 3
+      }
+    },
+    {
+      "id": "G012",
+      "scenario": "CAPITAL_INJECTION",
+      "rescueCapitalYuan": 100000,
+      "expected": {
+        "cashDeltaYuan": 100000,
+        "paidInCapitalDeltaYuan": 100000,
+        "revenueDeltaYuan": 0,
+        "profitDeltaYuan": 0
+      }
+    },
+    {
+      "id": "G014",
+      "scenario": "CUSTOMER_SERVICE",
+      "baseAfterSalesYuan": 5000,
+      "savingBps": 3500,
+      "expected": {
+        "savingsYuan": 1750,
+        "afterSalesPaidYuan": 3250
+      }
+    },
+    {
+      "id": "G015",
+      "scenario": "FINANCE",
+      "fixedCostYuan": 48000,
+      "savingBps": 2000,
+      "expected": {
+        "savingsYuan": 9600,
+        "fixedCostPaidYuan": 38400
+      }
+    },
+    {
+      "id": "G016",
+      "scenario": "FINANCE_LARGE",
+      "fixedCostYuan": 48000,
+      "otherControllableOpCostYuan": 152000,
+      "savingBps": 2000,
+      "expected": {
+        "totalSavingsYuan": 40000,
+        "fixedCostSavingsYuan": 40000,
+        "otherOpSavingsYuan": 0
+      }
+    },
+    {
+      "id": "G017",
+      "scenario": "HR_BUSINESS_CAPACITY",
+      "baseCapacityYuan": 800000,
+      "marketDemandYuan": 1000000,
+      "hrBonusBps": 600,
+      "expected": {
+        "capacityAfterHrYuan": 848000,
+        "maxAdditionalRevenueYuan": 48000
+      }
+    }
+  ],
+  "invariants": [
+    "Each runId:year:month settled at most once",
+    "Each commandId applied at most once",
+    "annual profit equals sum of signed monthly profits",
+    "end assets equals end cash plus business asset book value",
+    "capital injection does not count as revenue or profit",
+    "one-time fees paid on command and attributed to accounting month without re-paying",
+    "closing company invalidates all tasks with old runId"
+  ]
+}

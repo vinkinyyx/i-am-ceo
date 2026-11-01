@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+﻿import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { EditorMockPlatform } from '@core/platform/EditorMockPlatform';
 import { MemoryStorage } from '@core/platform/MemoryStorage';
 import { GameFacade } from '@core/application/GameFacade';
@@ -6,10 +6,18 @@ import { createInitialState } from '@core/domain/gameStateFactory';
 import { createCompany } from '@core/application/CompanyService';
 import { GameStore } from '@core/application/GameStore';
 import { SAVE_KEYS, type SaveEnvelope } from '@core/persistence/SaveTypes';
+import rawEconomy from '../../assets/resources/config/economy.v1.json';
+import { registerConfig } from '@core/config/configLoader';
+import type { EconomyConfig } from '@core/config/EconomyConfig';
+
+let cfg: EconomyConfig;
+beforeAll(() => {
+  cfg = registerConfig(rawEconomy as never);
+});
 
 async function freshFacade(): Promise<{ facade: GameFacade; platform: EditorMockPlatform }> {
   const platform = new EditorMockPlatform(new MemoryStorage());
-  const facade = await GameFacade.bootstrap(platform);
+  const facade = await GameFacade.bootstrap(platform, cfg);
   return { facade, platform };
 }
 
@@ -48,7 +56,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
 
   it('A16: 只预览不确认时一切不变', async () => {
     const platform = new EditorMockPlatform(storage);
-    const facade = await GameFacade.bootstrap(platform);
+    const facade = await GameFacade.bootstrap(platform, cfg);
     await completeOnboarding(facade);
     const before = structuredClone(facade.getState());
 
@@ -63,7 +71,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
 
   it('A17: 确认重开后人事/财务/年限/引导全部清零，新 runId 且未注资', async () => {
     const platform = new EditorMockPlatform(storage);
-    const facade = await GameFacade.bootstrap(platform);
+    const facade = await GameFacade.bootstrap(platform, cfg);
     await completeOnboarding(facade);
     const oldRunId = facade.getState().runId;
 
@@ -87,7 +95,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
 
   it('重开后可再次创建公司并独立获得 30 万（每轮一次注资）', async () => {
     const platform = new EditorMockPlatform(storage);
-    const facade = await GameFacade.bootstrap(platform);
+    const facade = await GameFacade.bootstrap(platform, cfg);
     await completeOnboarding(facade);
     const token = facade.beginCloseCompany(7000);
     await facade.confirmCloseCompany(token, 7000);
@@ -104,7 +112,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
 
   it('A25: 旧 runId 的迟到录用/创建命令被 RUN_CHANGED 拒绝，不污染新 run', async () => {
     const platform = new EditorMockPlatform(storage);
-    const facade = await GameFacade.bootstrap(platform);
+    const facade = await GameFacade.bootstrap(platform, cfg);
     await completeOnboarding(facade);
     const oldRunId = facade.getState().runId;
 
@@ -123,14 +131,14 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
 
   it('A18: 重开并重新 bootstrap（模拟重启），不复活旧 run、不领取旧收益', async () => {
     const platform = new EditorMockPlatform(storage);
-    let facade = await GameFacade.bootstrap(platform);
+    let facade = await GameFacade.bootstrap(platform, cfg);
     await completeOnboarding(facade);
     const oldRunId = facade.getState().runId;
     const token = facade.beginCloseCompany(9000);
     await facade.confirmCloseCompany(token, 9000);
 
     // 杀进程后重新启动
-    facade = await GameFacade.bootstrap(new EditorMockPlatform(storage));
+    facade = await GameFacade.bootstrap(new EditorMockPlatform(storage), cfg);
     const loaded = facade.getState();
     expect(loaded.runId).not.toBe(oldRunId);
     expect(loaded.phase).toBe('CREATING');
@@ -153,7 +161,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
       return origRemove(key);
     };
     const platform2 = new EditorMockPlatform(partialFailStorage);
-    const facade = await GameFacade.bootstrap(platform2);
+    const facade = await GameFacade.bootstrap(platform2, cfg);
     await completeOnboarding(facade);
     const oldRunId = facade.getState().runId;
     const token = facade.beginCloseCompany(10000);
@@ -161,7 +169,7 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
     await expect(facade.confirmCloseCompany(token, 10000)).resolves.toBeDefined();
 
     // 即便旧槽物理残留，带墓碑重新加载也必须被屏蔽
-    const reopened = await GameFacade.bootstrap(new EditorMockPlatform(partialFailStorage));
+    const reopened = await GameFacade.bootstrap(new EditorMockPlatform(partialFailStorage), cfg);
     expect(reopened.getState().runId).not.toBe(oldRunId);
     expect(reopened.getState().company).toBeNull();
   });
@@ -181,7 +189,7 @@ describe('持久化往返（B11 中断恢复）', () => {
   it('首聘 1/2 杀进程重启后精确恢复到 1/2，不重注资', async () => {
     const storage = new MemoryStorage();
     const platform = new EditorMockPlatform(storage);
-    let facade = await GameFacade.bootstrap(platform);
+    let facade = await GameFacade.bootstrap(platform, cfg);
     const s0 = facade.getState();
     await facade.createCompany(
       { companyName: '中断公司', industry: 'TRADE', ceoName: '王五', ceoTrait: 'PEOPLE' },
@@ -196,7 +204,7 @@ describe('持久化往返（B11 中断恢复）', () => {
     );
 
     // 重启
-    facade = await GameFacade.bootstrap(new EditorMockPlatform(storage));
+    facade = await GameFacade.bootstrap(new EditorMockPlatform(storage), cfg);
     const restored = facade.getState();
     expect(restored.phase).toBe('HIRING_INITIAL');
     expect(restored.onboarding.initialHiresCompleted).toBe(1);

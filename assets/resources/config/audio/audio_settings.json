@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "storageKey": "ceo.audio.settings.v1",
+  "defaults": {
+    "masterEnabled": true,
+    "musicEnabled": true,
+    "effectsEnabled": true
+  },
+  "busRouting": {
+    "BGM": "musicEnabled",
+    "JNG": "effectsEnabled",
+    "SFX": "effectsEnabled"
+  },
+  "behavior": {
+    "masterDisabled": "mute_all_now",
+    "restoreSubSwitches": true,
+    "neverQueueMutedEvents": true
+  }
+}
