@@ -4,6 +4,12 @@ import type { GameState, MonthlyLedger } from '../domain/types';
 import { settleMonth } from './monthly';
 import { annualSettlement } from './annual';
 import { applyDueTransfers } from './departments';
+import {
+  ensureAnnualEvent,
+  monthlyDemandEventBps,
+  applyEventForMonth,
+} from './annualEvent';
+import { annualDemand } from './market';
 
 export interface AdvanceResult {
   ledger: MonthlyLedger;
@@ -49,6 +55,13 @@ export function advanceMonth(state: GameState, cfg: EconomyConfig): AdvanceResul
   if (month === 1 && state.yearOpenCashYuan[year] === undefined) {
     state.yearOpenCashYuan[year] = cashBefore;
   }
+
+  // 年度事件：每年首月惰性生成（固定 seed），触发月应用需求/费用/离职效果
+  const annualEvent = ensureAnnualEvent(state, cfg, year);
+  const eventDemandBps = monthlyDemandEventBps(annualEvent, month);
+  const yearDemandBasis = annualDemand(cfg, state.company.industry, year).annualDemandYuan;
+  const eventLossYuan = applyEventForMonth(state, cfg, annualEvent, month, yearDemandBasis);
+
   const amounts = settleMonth({
     state,
     cfg,
@@ -57,7 +70,9 @@ export function advanceMonth(state: GameState, cfg: EconomyConfig): AdvanceResul
     month,
     monthIndex,
     acqMultiplierBps: 10_000, // M1 首年基线；获客系数随市场部/CEO商业在后续接入
+    eventDemandBps,
     businessCapacityInvestmentYuan: state.company.businessCapacityInvestmentYuan,
+    eventLossYuan,
   });
 
   const ledger: MonthlyLedger = {

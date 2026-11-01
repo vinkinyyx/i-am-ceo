@@ -73,10 +73,34 @@ function estimateAnnualBenefit(
 
   if (dept.type === 'BUSINESS') {
     const skillBps = cfg.productivity.skillBaseBps + candidate.skill * cfg.productivity.skillPerPointBps;
-    // 单人年交付产能（不含团队乘数，保守）
-    return Math.round(
+    // 新人年交付产能（不含团队乘数，保守）
+    const newCapacity = Math.round(
       (ind.baseAnnualCapacityPerSkill60EmployeeYuan * skillBps) / 10_000,
     );
+
+    // 只在「现有业务产能不足以交付当年需求」时才认可新员工贡献（06.6：订单不约束时不扩招）。
+    const year = state.gameYear;
+    const annualDemand = Math.round(ind.firstYearDemandYuan * (1 + cfg.demand.naturalAnnualGrowthBps / 10_000) ** (year - 1));
+    const mIndex = monthIndexOf(state);
+    const businessDept = state.departments.find((d) => d.type === 'BUSINESS');
+    const currentCapacity = state.employees
+      .filter(
+        (e) =>
+          e.status === 'ACTIVE' &&
+          businessDept &&
+          e.departmentId === businessDept.deptId &&
+          e.effectiveFromMonthIndex <= mIndex,
+      )
+      .reduce((sum, e) => {
+        const bps = cfg.productivity.skillBaseBps + e.skill * cfg.productivity.skillPerPointBps;
+        return sum + (ind.baseAnnualCapacityPerSkill60EmployeeYuan * bps) / 10_000;
+      }, 0);
+
+    const gap = Math.max(0, annualDemand - currentCapacity);
+    // 新增可交付收入取「新产能」与「缺口」较小者，再乘毛利率（保守按边际贡献）
+    const addedRevenue = Math.min(newCapacity, gap);
+    const grossMarginBps = 10_000 - ind.directCostBps;
+    return Math.round((addedRevenue * grossMarginBps) / 10_000);
   }
 
   // 支持部门：以「当前年营收」为基数，按一人一档效益比例估算节省/增益

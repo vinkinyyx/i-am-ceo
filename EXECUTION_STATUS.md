@@ -10,7 +10,7 @@
 | M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 128c0ad | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
 | M1 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | c4a8807 | 78 单测/黄金/集成全过；G001-G003 黄金账分毫不差；web-mobile 无头构建+Chromium 走通在线时钟/跨年/扩产/年报 | TapTap 真机、音频真机听感为外部项（ISSUE-ENV-02） |
 | M2 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | d0a6a9e | 99 单测/黄金/集成全过；G004/G005/G013/G014/G015 部门与裁员黄金用例；web-mobile 无头构建+Chromium 走通建部/招聘/裁员/调岗/方针 | TapTap 真机为外部项（ISSUE-ENV-02） |
-| M3 | TODO | - | - | TapTap 开发者认证/AppID/备案为外部门禁，尚无凭证 |
+| M3 | READY_FOR_QA（核心/UI/文档全绿；真机与提审 BLOCKED） | 待提交 | 156 测试全过（含离线/事件/危机/榜单/35项Tap平台/E2E）；900 run 百种子5年模拟零负现金/零守恒失败；web-mobile 构建+Chromium 零错误（排行榜/声音设置/帮助重播） | M3-07 真机、M3-09 TapTap提审/AppID/版号需凭证（ISSUE-ENV-02） |
 
 ## 环境核查（2026-11-01）
 
@@ -22,8 +22,8 @@
 | Python | 3.14.3 |
 | 设计基线自检 | `python docs/工具/校验设计基线.py` → PASS（14 fixtures；仅证明设计参考自洽） |
 | Cocos Creator 编辑器 | **已安装 3.8.8**：`C:\ProgramData\cocos\editors\Creator\3.8.8\CocosCreator.exe`（exe ProductVersion=3.8.8，2026-11-01 复核） |
-| TapTap 适配扩展 | 全局扩展仅见 `sud-game-platform-op`（派对岛平台，非 TapTap）；编辑器内置扩展目录未见 TapTap 发布插件 → M0-10 前需安装官方 Tap 小游戏适配扩展并记录版本（DEC-026 VERIFY） |
-| TapTap 凭证 | 无 AppID、无适配插件、无开发者后台授权 → M0-10/M3-07~09 只能 BLOCKED 或 Mock PoC |
+| TapTap 适配扩展 | **官方 `taptap-minigame-tools` v1.2.2 已安装**至项目 `extensions/taptap-minigame-tools`（2026-11-01；官方 zip 多一层嵌套目录导致扩展管理器报"解压失败"，手动解压复制）；zip SHA256=`6B8A9A3CC62B6C54CEFAB397097BABB771D9D99F90442CDDFF06310A4C9ED73F`；`editor>=3.8.0` 覆盖 3.8.8；机制=构建微信小游戏→11 步转换→`build/TapBuild/game.zip`；CLI 无头构建已实际出包验证 |
+| TapTap 凭证 | 开发者认证 DONE（个人主体）；小游戏 AppID=MiniApp ID 已获得（仅存本地未入库配置）；Server Secret/Client Token 仅服务端用途不入库 → M0-10/M3 剩余阻塞=真机自测与备案 |
 | 设计文档版本 | V1.0；economy-v1.0.0 / golden-cases-v1.0.0 / save schemaVersion=1 |
 
 ### TASK-M0-01
@@ -82,9 +82,9 @@
 - 变更文件：application/{ResetService,GameStore,GameFacade,MutationContext}.ts
 
 ### TASK-M0-10
-- 状态：BLOCKED（TapTap 真机部分）；web-mobile 构建 PoC DONE
-- 证据：build/web-mobile 可启动；evidence/m0/m0-10/{s01-company,s02-ceo,s03-hiring,s03-hired2,t01-company}.png
-- 阻塞项：ISSUE-ENV-02 官方 Tap 小游戏适配扩展、AppID、Android/iOS 真机、备案
+- 状态：BLOCKED（真机联调部分）；web-mobile 构建 PoC DONE；**TapTap 打包链路 DONE**（2026-11-01 CLI 出包成功）
+- 证据：build/web-mobile 可启动；evidence/m0/m0-10/{s01-company,s02-ceo,s03-hiring,s03-hired2,t01-company}.png；build/TapBuild/game.zip（3.98MB ≤ 20MB 目标，结构/入口/无密钥自检通过）
+- 阻塞项：仅剩 上传包体库 + Android/iOS 真机自测（用户后台操作）；扩展/AppID 已解除
 - QA复核：待
 
 ## M1 财务引擎（2026-11-01）
@@ -188,6 +188,64 @@
 - 证据：evidence/m2/m2-08/{m2-dept-list,m2-create-dept-dialog,m2-dept-created,m2-hire-dialog,m2-talent-list,m2-employee-detail,m2-layoff-confirm}.png；Chromium 390×844 零 JS 错误
 - QA复核：待
 
+## M3 挂机、事件、风控、排行与发布准备（2026-11-01）
+
+### TASK-M3-01
+- 状态：DONE
+- 内容：离线每完整40分钟结1月、最多36月、余量 offlineRemainderMs 跨次累积、24h封顶丢弃、暂停(speed=0)不结、设备时间回拨0结算、危机中断不凭空跳月；回前台先结算后恢复在线；离线摘要弹窗
+- 变更：simulation/offline.ts；GameFacade.settleOffline；AppView onShow/onHide
+- 测试：offlineM3（G009/A09/A10/B08/B09/B10）
+
+### TASK-M3-02
+- 状态：DONE
+- 内容：5种年度事件（订单增/减、成本上涨、员工意外离职、设备损失），hash(seed,runId,year,'event') 固定、每年≤1、概率25%、首年新手保护恒无；费用事件入 EVENT 成本、需求事件作用当月订单、离职次月无补偿离岗；触发月后不追溯
+- 变更：simulation/annualEvent.ts、monthly.ts、advanceMonth.ts、types.ts
+- 测试：eventRiskM3（B13 固定/五种类型/离职无补偿/年≤1）
+
+### TASK-M3-03
+- 状态：DONE
+- 内容：风险分层 NORMAL/WARNING（现金不足6个月刚性支出）/DISTRESS（下月刚性费用不可覆盖，冻结月结）；一次性10万CEO救助（全run仅1次、计实收资本、不计收入利润、重复拒绝）；救助后解除冻结；GameClock.afterMonthSettle 钩子
+- 变更：application/RiskService.ts、simulation/GameClock.ts、GameFacade.injectRescueCapital/assessRisk
+- 测试：eventRiskM3（G010/G012/B12）
+
+### TASK-M3-04
+- 状态：DONE
+- 内容：12个确定性本地模拟企业（sharedSeed 派生，重开同种子一致、不继承玩家）；资产榜/年限榜双榜，玩家按现金+业务资产、年限按已入册年报；年结时 bot 同步推进1年（玩家不推进 bot 不凭空增长）
+- 变更：simulation/leaderboard.ts、annual.ts；AppView 排行榜页（双榜切换、玩家高亮、排名）
+- 测试：eventRiskM3（A14 排序/确定性/玩家资产口径）
+
+### TASK-M3-05
+- 状态：DONE
+- 内容：帮助重播（设置→重新查看操作指引，不改业务状态）、首次无年度报告空态提示保留、四 Tab 竖屏可达；离线/危机失败恢复弹窗
+- 变更：scripts/ui/AppView.ts（replayTutorial/renderDistressDialog/renderOfflineSummary）
+
+### TASK-M3-06
+- 状态：DONE
+- 内容：三行业黄金保持一致；新增 21 个 M3 单测；百种子×三行业×三策略 5 年批量模拟（900 run）：零负现金、零财务守恒失败、零自动重复救助、单年自动招聘≤3；输出 CSV
+- 变更：tests/unit/{offlineM3,eventRiskM3}、tests/simulation/simulate5year、tools/simulate5year.ts
+- 证据：evidence/m3/simulate5year.csv（900行）
+
+### TASK-M3-07
+- 状态：代码侧 DONE（真机执行仍 BLOCKED，需凭证）
+- 说明：真机平台脚手架已接入——core/platform/TapPlatform.ts（封装 globalThis.tap，异常转领域错误不泄漏 errMsg）+ scripts/platform/PlatformFactory.ts（真机 tap 运行时用 TapPlatform、编辑器/预览回落 CocosPlatform；生产入口不 import Mock，避免打进正式包）；AppView 已改用 createPlatform()。35 项 Tap 平台单测全过。剩余：Android/iOS 真机音频/安全区/前后台/包体实测，须取得 TapTap AppID
+- 测试：tests/unit/tapPlatform.test.ts（35 项）
+
+### TASK-M3-08
+- 状态：DONE（文档/自查）；⚠️ 主体资质项待开发者
+- 内容：隐私/数据、内容安全、素材与音频许可、TapTap上架前置（版号/软著/隐私政策）、真机验收清单；明确本地单机不联网不采集、音频程序原创 original_waveforms
+- 变更：docs/发布合规清单.md
+
+### TASK-M3-09
+- 状态：BLOCKED（需凭证）
+- 说明：版本冻结、提审包、AppID/版号、渠道规则核对依赖开发者主体账号；Release 真机包待 M3-07
+
+### 音频接入（配合 UI-12）
+- 状态：DONE
+- 内容：AudioManager 三开关（master/music/effects，一票否决、持久化 localStorage、首次触摸解锁、切后台暂停恢复、失败静默降级）；2 BGM 循环 + 3 JNG（年盈/年亏/三连）+ 11 SFX 已接关键动作；设置页三开关
+- 变更：scripts/audio/AudioManager.ts；AppView 音频挂载；真机无缝循环听感待 M3-07
+
+- QA复核：待
+
 ## 设计素材收录
 
 - UI（CEO_UI_DevHandoff_B01-B06_v1.5）：67 张 B06 PNG 已入 `assets/resources/ui/{avatars,components,departments,industries,navigation,status,time}`，编辑器已生成 meta。整屏 PNG/SVG 仅在 design/ 作参考，不入运行时。
@@ -199,15 +257,17 @@
 | Issue ID | 关联TASK | 优先级P0-P3 | 复现步骤 | 证据 | 责任 | 状态 |
 |---|---|---|---|---|---|---|
 | ISSUE-ENV-01 | M0-01 | - | 曾误判编辑器未安装，实际在 C:\ProgramData\cocos\editors\Creator\3.8.8（深度5、系统隐藏目录），此前递归深度不足 | exe ProductVersion=3.8.8 | 环境 | CLOSED（2026-11-01 复核） |
-| ISSUE-ENV-02 | M0-10/M3-07 | P1 | TapTap 官方小游戏适配扩展未确认安装；现有仅 sud-game-platform-op（派对岛） | 全局/编辑器扩展目录核查 | 环境 | OPEN：需经 Dashboard/官方渠道安装并记录插件版本与 hash |
+| ISSUE-ENV-02 | M0-10/M3-07 | P1 | TapTap 官方小游戏适配扩展未确认安装 | 官方 v1.2.2 已安装并实际出包：build/TapBuild/game.zip 3.98MB（SHA256=113A05ED6B72AB639A13E4BD464AD19EF55CA35DA24C5E54583EB612527A0FFC，443 项，game.json=portrait/1.0.0，无密钥） | 环境 | CLOSED（2026-11-01；3.8.8 新构建面板未渲染扩展选项，已验证路径=CLI `--build configPath=temp\build-tap.config.json`；tapAppid 选项不被转换器消费，AppID 在上传包体库时绑定） |
 
 ## 发布控制
 
-- 开发者认证：NOT_STARTED
-- Tap小游戏AppID：未填写（不在公开仓库存密钥）
-- 最终引擎版本与插件版本：待验证（DEC-026 VERIFY）
-- Android真机：未测试
+- 开发者认证：DONE（个人主体，已认证）
+- Tap小游戏AppID：已获得（MiniApp ID，仅存本地未入库配置，不进 git）
+- 最终引擎版本与插件版本：Creator 3.8.8 + taptap-minigame-tools 1.2.2，出包验证 DONE（DEC-026 完成）
+- 首个Tap包体：build/TapBuild/game.zip 3.98MB（≤20MB 目标）；v2 含真机平台层（SHA256=6681E5A9…31CD7，2026-11-01 12:55），包内已验证 resolveTapRuntime 存在
+- v4 包体（2026-11-01 13:44，SHA256=C84F526E…F0C7B8，273 项）：含 BootTrap 启动自显示诊断 + TapPlatform 全回调防挂死（CallbackGuard：get 超时→按无存档降级、set 超时→SAVE_FAILED、login 10s→AUTH_REQUIRED、getNetworkType→unknown、remove→best-effort）；针对华为 nova 15 Ultra / HarmonyOS 7.0.0 卡启动页（疑似运行时不回存储回调导致启动 Promise 挂起）；156/156 测试绿（新增 6 个 silent 运行时用例）；包内已验证 BOOT TIMEOUT×1、callback timeout×2
+- Android真机：云端准入测试 5 机全过（用户自测）
 - iOS真机：未测试
-- 前置备案：未开始
+- 前置备案：IN_PROGRESS（ICP 核准卡在小游戏包体选择，包体已产出待上传；软著申请为长尾项）
 - 包体提审：未开始
 - 公开发布：未开始

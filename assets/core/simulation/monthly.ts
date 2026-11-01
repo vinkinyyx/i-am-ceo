@@ -28,8 +28,12 @@ export interface MonthlyInput {
   monthIndex: number; // 创业第1年第1月 = 0
   /** 当月获客系数 bps（M1 首年=10000） */
   acqMultiplierBps: number;
+  /** 当月需求侧事件影响 bps（ORDER_SURGE 正 / ORDER_DROP 负），无事件 0 */
+  eventDemandBps: number;
   /** 当月业务资产投资额（M1 由扩张命令累计，无事件） */
   businessCapacityInvestmentYuan: number;
+  /** 当月一次性事件损失（COST_RISE/ASSET_LOSS，元），计入 EVENT 费用 */
+  eventLossYuan: number;
 }
 
 export interface MonthlyAmounts {
@@ -98,14 +102,15 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
     ? active.filter((e) => deptIdAtMonth(e, monthIndex) === businessDept.deptId)
     : [];
 
-  // 1-3. 需求（市场部提升潜在订单）→ 交付产能（HR 提升业务产能）→ 实际收入 min
+  // 1-3. 需求（市场部 + 需求事件提升潜在订单）→ 交付产能（HR 提升业务产能）→ 实际收入 min
+  const demandUpliftBps = support.marketing.effectBps + (input.eventDemandBps ?? 0);
   const potentialOrder = monthlyPotentialOrder(
     cfg,
     industry,
     year,
     month,
     input.acqMultiplierBps,
-    support.marketing.effectBps,
+    demandUpliftBps,
   );
   const cap = monthlyCapacity(
     cfg,
@@ -170,7 +175,8 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
   const recruitment = sumFee('RECRUITMENT');
   const severance = sumFee('SEVERANCE');
   const deptSetup = sumFee('DEPT_SETUP');
-  const event = sumFee('EVENT');
+  // EVENT：一次性事件损失（命令无关，由年度事件在触发月直接计入）
+  const event = sumFee('EVENT') + (input.eventLossYuan ?? 0);
   // 折旧 M1 无（扩产从次年起，M1-07 接入；默认 0）
   const depreciation = 0;
 
@@ -199,7 +205,8 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
   const unpaidOneTime = -fees
     .filter((f) => f.isCash && !f.alreadyPaid)
     .reduce((s, f) => s + f.amountAbs, 0);
-  const unpaidCashDelta = recurringCashDelta + unpaidOneTime;
+  // 年度事件损失（COST_RISE/ASSET_LOSS）未预付，月结时真实扣现金
+  const unpaidCashDelta = recurringCashDelta + unpaidOneTime - (input.eventLossYuan ?? 0);
 
   return {
     revenue,

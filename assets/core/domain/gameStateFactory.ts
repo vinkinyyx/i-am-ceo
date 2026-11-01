@@ -41,6 +41,7 @@ export function createInitialState(nowEpochMs: number, seed?: number): GameState
     annualReports: [],
     pendingEntries: [],
     eventHistory: [],
+    annualEvents: [],
     botCompanies: [],
     consecutiveProfitableYears: 0,
     target3YearsAchieved: false,

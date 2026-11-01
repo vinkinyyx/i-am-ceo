@@ -1,4 +1,4 @@
-import { GameErrorCode, errorMessage } from '../domain/errors';
+import { GameError, GameErrorCode, errorMessage } from '../domain/errors';
 import type { CommandResult } from '../domain/result';
 import { ok, fail } from '../domain/result';
 import type { IStorageBackend, ITapPlatform } from '../platform/ITapPlatform';
@@ -28,6 +28,9 @@ import {
 } from './LayoffService';
 import { runMonthlyAutoHire, appendAutomationLog } from './AutoHireService';
 import { previewTransfer, transferEmployee } from './TransferService';
+import { injectRescueCapital, assessRisk, refreshRisk } from './RiskService';
+import { settleOffline } from '../simulation/offline';
+import { assetsLeaderboard, yearsLeaderboard } from '../simulation/leaderboard';
 import type { AutomationLogEntry, Department, Policy, StaffingMode, SupportDeptType } from '../domain/types';
 import type { EconomyConfig } from '../config/EconomyConfig';
 
@@ -39,9 +42,11 @@ export interface BootstrapResult {
 }
 
 function toFailure(err: unknown): CommandResult<never> {
-  const code = err instanceof Error && err.message in GameErrorCodeLike
-    ? (err.message as GameErrorCode)
-    : GameErrorCode.NOT_READY;
+  const code = err instanceof GameError
+    ? err.code
+    : err instanceof Error && err.message in GameErrorCodeLike
+      ? (err.message as GameErrorCode)
+      : GameErrorCode.NOT_READY;
   return fail(code, errorMessage(code));
 }
 
@@ -69,6 +74,8 @@ export class GameFacade {
       const decision = runMonthlyAutoHire(s, this.cfg);
       appendAutomationLog(s, decision);
     };
+    // 月结后刷新现金风险；进入 DISTRESS 时返回 false 让时钟冻结
+    this.clock.afterMonthSettle = (s) => refreshRisk(s, this.cfg) !== 'DISTRESS';
   }
 
   static async bootstrap(platform: ITapPlatform, cfg: EconomyConfig): Promise<GameFacade> {
@@ -416,6 +423,88 @@ export class GameFacade {
         ctx.expectedRunId,
       );
       return ok(this.store.current.runId, this.store.currentRevision, true);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  // ---------------------------------------------------------------- M3 风控 / 救助 / 离线
+
+  /** 当前现金风险评估（只读）。 */
+  assessRisk() {
+    return this.store.read((s) => assessRisk(s, this.cfg));
+  }
+
+  /** 资产榜（含玩家，降序）。 */
+  assetsLeaderboard() {
+    return this.store.read((s) => assetsLeaderboard(s, this.cfg));
+  }
+
+  /** 经营年限榜（含玩家，降序）。 */
+  yearsLeaderboard() {
+    return this.store.read((s) => yearsLeaderboard(s, this.cfg));
+  }
+
+  /** 领取一次性救助资本 10 万元（全 run 仅一次，不计收入/利润）。 */
+  async injectRescueCapital(
+    ctx: { commandId: string; expectedRunId: string },
+  ): Promise<CommandResult<{ amountYuan: number; cashAfterYuan: number }>> {
+    try {
+      const { result } = await this.store.mutate(
+        (draft) => injectRescueCapital(draft, this.cfg, ctx),
+        ctx.expectedRunId,
+      );
+      if (!result.granted) {
+        return fail(GameErrorCode.ALREADY_USED, errorMessage(GameErrorCode.ALREADY_USED));
+      }
+      // 救助后若恢复 NORMAL，解除 DISTRESS 冻结，回到暂停态由玩家手动恢复经营
+      if (this.store.current.phase === 'DISTRESS') {
+        await this.store.mutate(
+          (draft) => {
+            draft.phase = 'RUNNING';
+            return { revision: 0 };
+          },
+          ctx.expectedRunId,
+        );
+      }
+      return ok(this.store.current.runId, this.store.currentRevision, {
+        amountYuan: result.amountYuan,
+        cashAfterYuan: result.cashAfterYuan,
+      });
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
+  /**
+   * 离线结算（应用回前台调用）。
+   * 内部先结算月份（含自动招聘/事件/风险），成功后持久化；遇危机中断不跳月。
+   */
+  async settleOffline(nowMs: number): Promise<
+    CommandResult<{
+      monthsSettled: number;
+      yearsClosed: number[];
+      interrupted: boolean;
+      cashBefore: number;
+      cashAfter: number;
+      newRemainderMs: number;
+    }>
+  > {
+    const expectedRunId = this.store.current.runId;
+    try {
+      const out = await this.store.mutate((draft) => {
+        const r = settleOffline({ state: draft, cfg: this.cfg, nowMs });
+        return r;
+      }, expectedRunId);
+      const r = out.result;
+      return ok(this.store.current.runId, out.revision, {
+        monthsSettled: r.monthsSettled,
+        yearsClosed: r.yearsClosed,
+        interrupted: r.interrupted,
+        cashBefore: r.cashBefore,
+        cashAfter: this.store.current.company?.cashYuan ?? r.cashBefore,
+        newRemainderMs: r.newRemainderMs,
+      });
     } catch (err) {
       return toFailure(err);
     }

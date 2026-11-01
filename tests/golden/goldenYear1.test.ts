@@ -42,6 +42,17 @@ function standardRun(industry: IndustryId, salary: number, seed = 20261101): Gam
   state.employees = [mk('g1'), mk('g2')];
   state.onboarding.initialHiresCompleted = 2;
   state.onboarding.completedSteps.push('TUT-03', 'TUT-04', 'TUT-05');
+  // 黄金定义为「无事件无投资」：显式预置第1年无事件（生产环境首年也稳定，事件自第2年起）
+  state.annualEvents.push({
+    key: `${state.runId}:1`,
+    year: 1,
+    happened: false,
+    type: null,
+    month: 0,
+    effectBps: 0,
+    amountYuan: 0,
+    applied: true,
+  });
   state.phase = 'RUNNING';
   state.speed = 1;
   // 运行时开盘现金：招聘费在录用时已扣，故为 300000-2*salary（G006：290000）。

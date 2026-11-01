@@ -120,6 +120,8 @@ export interface Departments {
 export interface Risk {
   eventAnnualChanceBps: number;
   eventMaxPerYear: number;
+  eventEffectMinBps: number;
+  eventEffectMaxBps: number;
   oneTimeRescueCapitalYuan: number;
   cashWarningRequiredMonths: number;
 }
@@ -140,6 +142,8 @@ export interface LocalBots {
   initialCompletedYearsMax: number;
   baseAnnualAssetGrowthBpsMin: number;
   baseAnnualAssetGrowthBpsMax: number;
+  yearJitterBpsMin: number;
+  yearJitterBpsMax: number;
   sharedSeed: string;
 }
 

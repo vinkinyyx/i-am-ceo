@@ -1,5 +1,6 @@
 import type { EconomyConfig } from '../config/EconomyConfig';
 import type { AnnualReport, Ceo, GameState } from '../domain/types';
+import { advanceBotsOneYear } from './leaderboard';
 
 /**
  * 年结（设计文档 03.8 / 03.10 / 05.2 / 05.5）。
@@ -105,6 +106,9 @@ export function annualSettlement(
   // 年结后对业务资产计提折旧（影响次年产能/账面，不追溯本年利润）。
   // 设计 03.6：扩产从次年起按 10% 折旧。
   depreciateAfterAnnual(state, cfg);
+
+  // 本地模拟企业同步推进一个经营年（玩家不年结，bot 也不凭空增长）。
+  advanceBotsOneYear(state, cfg, year);
 
   return report;
 }

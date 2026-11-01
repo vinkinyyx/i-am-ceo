@@ -35,6 +35,12 @@ export class GameClock {
   beforeMonthSettle: ((state: GameState, cfg: EconomyConfig) => void) | null = null;
 
   /**
+   * 月结后钩子（应用层注入现金风险刷新等）。
+   * 返回 false 表示进入资金危机（DISTRESS），时钟应停止继续跳月（冻结）。
+   */
+  afterMonthSettle: ((state: GameState, cfg: EconomyConfig) => boolean) | null = null;
+
+  /**
    * 推进真实毫秒数。阈值按当前倍速对应的"真实毫秒/月"（G008）：
    * 1× 25000ms/月、2× 12500ms/月、5× 5000ms/月。
    */
@@ -62,6 +68,12 @@ export class GameClock {
       result.monthsAdvanced += 1;
       if (closed.yearClosed) {
         result.yearsClosed.push(state.gameYear - 1);
+      }
+      // 月结后风险刷新：返回 false（进入 DISTRESS）则冻结，停止继续跳月
+      if (this.afterMonthSettle && !this.afterMonthSettle(state, cfg)) {
+        state.phase = 'DISTRESS';
+        state.speed = 0;
+        break;
       }
     }
     if (state.progressMsInMonth < 0) state.progressMsInMonth = 0;

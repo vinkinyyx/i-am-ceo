@@ -82,6 +82,8 @@ export interface Employee {
   hireCommandId?: string;
   /** 来源候选 ID（防止同一候选被重复录用）。 */
   candidateId?: string;
+  /** 因年度事件「意外离职」而离岗（无裁员补偿）。 */
+  leftVoluntarily?: boolean;
 }
 
 export interface Department {
@@ -191,6 +193,33 @@ export interface EventRecord {
   month: number;
 }
 
+/** 五种轻度年度事件（设计 3.7，每年至多 1 次、概率 25%、固定 seed）。 */
+export type AnnualEventType =
+  | 'ORDER_SURGE' // 订单临时增加（潜在订单 +）
+  | 'ORDER_DROP' // 订单临时减少（潜在订单 −）
+  | 'COST_RISE' // 采购/成本上涨（一次性成本）
+  | 'EMPLOYEE_LEAVE' // 员工意外离职（次月移除、无补偿）
+  | 'ASSET_LOSS'; // 一次性设备/售后损失（一次性成本）
+
+export interface AnnualEvent {
+  /** 唯一键 `${runId}:${year}`，保证一年只生成一次 */
+  key: string;
+  year: number;
+  /** 是否发生（75% 为 false，即该年无事件） */
+  happened: boolean;
+  type: AnnualEventType | null;
+  /** 发生月份 1..12（已发生时） */
+  month: number;
+  /** 影响幅度 bps（500..1200，作用于相关基数的百分比） */
+  effectBps: number;
+  /** 影响金额（费用事件为正=损失；离职事件为 0） */
+  amountYuan: number;
+  /** 离职事件选中的员工 id */
+  employeeId?: string;
+  /** 是否已在月结中应用（防重复） */
+  applied: boolean;
+}
+
 /** 自动招聘等自动化决策的可解释日志（最近保留若干条，不参与财务勾稽）。 */
 export interface AutomationLogEntry {
   logId: string;
@@ -249,6 +278,8 @@ export interface GameState {
   annualReports: AnnualReport[];
   pendingEntries: JournalEntry[];
   eventHistory: EventRecord[];
+  /** 各年度事件计划（每年至多 1 条，固定 seed 惰性生成；含未发生年）。 */
+  annualEvents: AnnualEvent[];
   botCompanies: BotCompany[];
   consecutiveProfitableYears: number;
   target3YearsAchieved: boolean;
