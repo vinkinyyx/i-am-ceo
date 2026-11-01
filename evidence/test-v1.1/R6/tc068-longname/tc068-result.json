@@ -1,0 +1,19 @@
+{
+  "longNameChars": 20,
+  "before": {
+    "name": "认真搞钱好物严选铺子",
+    "cash": 286275
+  },
+  "after": {
+    "name": "江南智造数字科技产业发展集团有限责任公司",
+    "cash": 100000000000,
+    "checksum": "5fb18f87"
+  },
+  "checks": {
+    "name20": true,
+    "cash100b": true,
+    "checksumStable": false
+  },
+  "dir": "evidence/test-v1.1/R6/tc068-longname",
+  "errors": []
+}

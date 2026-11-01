@@ -12,6 +12,18 @@ const dir = process.argv[3] || 'evidence/m3/m3-ui';
     args: ['--no-sandbox'],
   });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  // 预置隐私同意记录，避免隐私弹窗遮挡后续点击（测试专用，不改产品逻辑）
+  await page.addInitScript(() => {
+    try {
+      const k = 'ceo/privacy/consent';
+      if (!window.localStorage.getItem(k)) {
+        window.localStorage.setItem(
+          k,
+          JSON.stringify({ accepted: true, policyVersion: 1, acceptedAtMs: Date.now() }),
+        );
+      }
+    } catch (e) {}
+  });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url, { waitUntil: 'load', timeout: 60000 });
@@ -45,10 +57,10 @@ const dir = process.argv[3] || 'evidence/m3/m3-ui';
 
   // 回公司页，打开设置（顶部右侧设置按钮：世界 y≈402, x≈145）
   await tap(-141, -372, 500);
-  await tap(145, 402, 700);
+  await tap(145, 360, 700);
   await shot('m3-settings');
-  // 操作指引重播（设置弹窗内「重新查看操作指引」y≈-44）
-  await tap(0, -14, 700);
+  // 操作指引重播（设置弹窗内「重新查看操作指引」世界 y≈-42）
+  await tap(0, -42, 1000);
   await shot('m3-tutorial-replay');
 
   console.log(JSON.stringify({ errors: [...new Set(errors)].slice(0, 10) }, null, 2));

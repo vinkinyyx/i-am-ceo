@@ -12,6 +12,18 @@ const dir = process.argv[3] || 'evidence/m0/m0-10';
     args: ['--no-sandbox'],
   });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  // 预置隐私同意记录，避免隐私弹窗遮挡后续点击（测试专用，不改产品逻辑）
+  await page.addInitScript(() => {
+    try {
+      const k = 'ceo/privacy/consent';
+      if (!window.localStorage.getItem(k)) {
+        window.localStorage.setItem(
+          k,
+          JSON.stringify({ accepted: true, policyVersion: 1, acceptedAtMs: Date.now() }),
+        );
+      }
+    } catch (e) {}
+  });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto(url, { waitUntil: 'load', timeout: 60000 });
@@ -34,6 +46,8 @@ const dir = process.argv[3] || 'evidence/m0/m0-10';
     await page.waitForTimeout(700);
   };
 
+  // S01：输入公司名页（隐私已同意）
+  await page.screenshot({ path: `${dir}/s01-company-name.png` });
   // S01：直接点底部"下一步：创建 CEO"（设计 y=-330）
   await tap(0, -330);
   await page.waitForTimeout(500);

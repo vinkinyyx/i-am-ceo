@@ -1,0 +1,37 @@
+﻿
+> im-ceo@0.1.0 test
+> vitest run
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/Workspace/TapTap/我是CEO[39m
+
+ [32m✓[39m tests/unit/authService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/companyCreate.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/saveRepository.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 17[2mms[22m[39m
+ [32m✓[39m tests/unit/tapPlatform.test.ts [2m([22m[2m35 tests[22m[2m)[22m[90m 194[2mms[22m[39m
+ [32m✓[39m tests/unit/initialHiring.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m tests/golden/goldenYear1.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/departmentsM2.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/eventRiskM3.test.ts [2m([22m[2m13 tests[22m[2m)[22m[90m 24[2mms[22m[39m
+ [32m✓[39m tests/unit/staffingM2.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 33[2mms[22m[39m
+ [32m✓[39m tests/integration/resetCompany.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 66[2mms[22m[39m
+ [32m✓[39m tests/unit/robustnessM3.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 134[2mms[22m[39m
+ [32m✓[39m tests/unit/investment.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/packageHygiene.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/offlineM3.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/capacityMarket.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/annualGoal.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/safeArea.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+ [32m✓[39m tests/unit/clock.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m tests/unit/config.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m tests/unit/smoke.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/privacyConsent.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 5[2mms[22m[39m
+ [32m✓[39m tests/simulation/simulate5year.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 919[2mms[22m[39m
+   [33m[2m✓[22m[39m 百种子 × 三行业 × 三策略 5 年模拟[2m > [22m全部 900 个 run 财务守恒、现金不为负、无重复救助、每年≤3自动招聘 [33m598[2mms[22m[39m
+   [33m[2m✓[22m[39m 百种子 × 三行业 × 三策略 5 年模拟[2m > [22mCSV 可生成（首列为表头字段） [33m318[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m22 passed[39m[22m[90m (22)[39m
+[2m      Tests [22m [1m[32m197 passed[39m[22m[90m (197)[39m
+[2m   Start at [22m 15:59:20
+[2m   Duration [22m 3.71s[2m (transform 2.44s, setup 0ms, collect 6.86s, tests 1.58s, environment 6ms, prepare 8.64s)[22m
+

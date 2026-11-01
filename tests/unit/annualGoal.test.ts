@@ -46,16 +46,28 @@ function runYears(state: GameState, years: number): void {
 }
 
 describe('M1-06 年结/连盈/CEO成长', () => {
-  it('贸易连盈 3 年后达成目标，且不影响继续经营', () => {
+  it('G011/A12: 连续 3 年利润>0 后目标达成（target3YearsAchieved），仍可继续自由经营', () => {
     const state = runningCompany('TRADE', 5000, 'BOLD', 101);
     runYears(state, 3);
     expect(state.annualReports).toHaveLength(3);
     expect(state.consecutiveProfitableYears).toBe(3);
     expect(state.target3YearsAchieved).toBe(true);
-    // 仍可继续推进
+    // 仍可继续推进（不强制结局）
     expect(state.phase).toBe('RUNNING');
     runYears(state, 1);
     expect(state.annualReports).toHaveLength(4);
+  });
+
+  it('G010: 某一年亏损会把连续盈利计数清零，存档保留、次年可继续', () => {
+    // 用高工资制造年度亏损：2 名 8000 月薪 → 年工资 192000，贸易首年毛利不足
+    const state = runningCompany('TRADE', 8000, 'BOLD', 777);
+    runYears(state, 1);
+    expect(state.annualReports[0]!.profitYuan).toBeLessThan(0);
+    expect(state.consecutiveProfitableYears).toBe(0);
+    expect(state.target3YearsAchieved).toBe(false);
+    // 不删档、不破产
+    expect(state.phase).not.toBe('RESETTING');
+    expect(state.company).not.toBeNull();
   });
 
   it('软件行业首年黄金利润 35000', () => {

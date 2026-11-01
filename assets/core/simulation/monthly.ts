@@ -148,21 +148,31 @@ export function settleMonth(input: MonthlyInput): MonthlyAmounts {
   const directNet = Math.max(0, grossDirect - procurementSave);
   const directCost = directNet - ytdDirectBefore;
 
-  // 其他运营费（无部门节省，M2）
-  const otherOperating =
-    roundHalfUp((ytdRevenue * ind.otherOperatingCostBps) / 10_000) - ytdOtherBefore;
-
   // 售后费用：客服部门按 effectBps 节省，不能扣到负数。
   const grossAfter = roundHalfUp((ytdRevenue * ind.afterSalesCostBps) / 10_000);
   const afterNet = roundHalfUp((grossAfter * (10_000 - support.customerService.effectBps)) / 10_000);
   const afterSales = Math.max(0, afterNet - ytdAfterBefore);
 
-  // 固定管理费：财务部按 effectBps 节省「固定管理费 + 其他可控运营费」中的固定部分（G015）。
+  // 其他可控运营费（毛额，按收入比例）。
+  const grossOtherAnnual = roundHalfUp((ytdRevenue * ind.otherOperatingCostBps) / 10_000);
+
+  // 财务部（G015/G016，V1.0 细化决定）：按 effectBps 合并节省
+  // 「固定管理费 + 其他可控运营费」，先抵固定管理费、余额再抵其他可控运营费；
+  // 节省不超过两者之和，不产生负费用。无财务员工时 effectBps=0，黄金账不变。
   const fixedAnnualGross = ind.fixedManagementAnnualYuan;
-  const fixedAnnualNet = roundHalfUp(
-    (fixedAnnualGross * (10_000 - support.finance.effectBps)) / 10_000,
+  const financeSaveAnnual = roundHalfUp(
+    ((fixedAnnualGross + grossOtherAnnual) * support.finance.effectBps) / 10_000,
   );
+  const saveAgainstFixed = Math.min(fixedAnnualGross, financeSaveAnnual);
+  const saveAgainstOther = Math.max(0, financeSaveAnnual - saveAgainstFixed);
+
+  // 固定管理费净额（YTD 残差法保证全年精确；12 月补差）
+  const fixedAnnualNet = fixedAnnualGross - saveAgainstFixed;
   const fixed = month === 12 ? fixedAnnualNet - ytdFixedBefore : Math.round(fixedAnnualNet / 12);
+
+  // 其他可控运营费净额（财务节省的余额部分）
+  const otherAnnualNet = Math.max(0, grossOtherAnnual - saveAgainstOther);
+  const otherOperating = Math.max(0, otherAnnualNet - ytdOtherBefore);
 
   // 7. 工资（active 已在前面计算）
   const payroll = active.reduce((s, e) => s + e.salaryMonthlyYuan, 0);

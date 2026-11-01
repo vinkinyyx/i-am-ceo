@@ -6,13 +6,21 @@ import {
   profiler,
   Size,
   UITransform,
+  Vec3,
+  view,
   Widget,
 } from 'cc';
 import { GameFacade } from '../../core/application/GameFacade';
 import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport, SupportDeptType, Policy, Department, Employee } from '../../core/domain/types';
 import { SUPPORT_DEPARTMENTS } from '../../core/domain/types';
 import { createPlatform } from '../platform/PlatformFactory';
+import { resolveSafeAreaTransform } from '../platform/SafeArea';
 import { loadEconomyConfig } from '../platform/loadConfig';
+import { loadRuntimeConfig } from '../platform/loadRuntimeConfig';
+import { getRuntimeConfig } from '../platform/runtimeConfig';
+import { AuthService } from '../../core/platform/AuthService';
+import { acceptPrivacy, hasAcceptedPrivacy } from '../../core/platform/privacyConsent';
+import { GameError } from '../../core/domain/errors';
 import { bootTrapError, bootTrapReady, bootTrapWatchdog } from '../boot/BootTrap';
 import {
   createButton,
@@ -64,6 +72,9 @@ function nextCommandId(prefix: string): string {
  */
 export class AppView extends Component {
   private facade!: GameFacade;
+  private platform: ReturnType<typeof createPlatform> | null = null;
+  private auth: AuthService | null = null;
+  private authed = false;
   private root!: Node;
   private toastNode: Node | null = null;
   private selectedIndustry: IndustryId = 'TRADE';
@@ -84,12 +95,23 @@ export class AppView extends Component {
     profiler.hideStats();
     audioManager.loadSettings();
     const platform = createPlatform();
-    const cfg = await loadEconomyConfig();
+    this.platform = platform;
+    const [cfg] = await Promise.all([loadEconomyConfig(), loadRuntimeConfig()]);
+    this.auth = new AuthService(platform, { endpoint: getRuntimeConfig().authEndpoint });
     this.facade = await GameFacade.bootstrap(platform, cfg);
     // 回前台先记录时间点；进入后台记录水位，用于离线结算
     this.lastForegroundMs = Date.now();
     this.buildRoot();
     this.render();
+
+    // 首次启动隐私告知：未同意当前版本隐私政策前，先展示政策弹窗（A23）
+    const privacyAccepted = await hasAcceptedPrivacy(platform);
+    if (!privacyAccepted) {
+      this.renderPrivacyDialog();
+    } else {
+      void this.ensurePlatformLogin(false);
+    }
+
     bootTrapReady();
 
     // 首次触摸解锁音频（浏览器自动播放策略），并播放经营 BGM
@@ -116,6 +138,146 @@ export class AppView extends Component {
     }
   }
 
+  /**
+   * 平台登录（设计 08.4）。
+   * 真机：隐私同意后调用；失败不阻断本地单机玩法，展示可重试的提示条。
+   * @param silent true=静默尝试验证已有会话（回前台等场景），失败不弹强提示
+   */
+  private async ensurePlatformLogin(silent: boolean): Promise<void> {
+    if (!this.auth) return;
+    if (this.authed) return;
+    try {
+      const session = await this.auth.ensureAuthenticated();
+      this.authed = true;
+      if (!silent || session.kind === 'taptap') this.toast('平台登录成功');
+    } catch (err) {
+      this.authed = false;
+      const code = err instanceof GameError ? err.code : '';
+      if (silent) return;
+      if (code === 'PLATFORM_UNAVAILABLE') {
+        this.toast('网络或登录服务暂不可用，可先本地游玩');
+      } else {
+        this.renderLoginRetry();
+      }
+    }
+  }
+
+  /** 登录失败的可重试浮层（不抹本地经营档，可跳过进入单机玩法）。 */
+  private renderLoginRetry(): void {
+    const overlay = this.modalOverlay();
+    createRect({ width: 300, height: 250, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '平台登录未完成', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 92);
+    createLabel({
+      text: 'TapTap 登录暂时失败。\n你的经营进度只保存在本机，不会丢失。\n可重试登录，或先进入单机游玩。',
+      fontSize: 13,
+      color: THEME.text,
+      width: 250,
+      lineHeight: 22,
+      parent: overlay,
+    }).setPosition(0, 20);
+    createButton({
+      text: '重试登录',
+      width: 220,
+      height: 46,
+      parent: overlay,
+      onClick: () => {
+        overlay.destroy();
+        void this.ensurePlatformLogin(false);
+      },
+    }).setPosition(0, -56);
+    createButton({
+      text: '先进入单机游玩',
+      width: 220,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.primary,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -106);
+  }
+
+  /** 首次启动隐私政策告知弹窗（同意前不进行任何平台登录/网络请求）。 */
+  private renderPrivacyDialog(): void {
+    const overlay = this.modalOverlay();
+    const hasUrl = getRuntimeConfig().privacyPolicyUrl.length > 0;
+    const cardH = hasUrl ? 420 : 396;
+    createRect({ width: 312, height: cardH, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '隐私保护提示', fontSize: 19, bold: true, parent: overlay }).setPosition(0, cardH / 2 - 28);
+    createLabel({
+      text:
+        '《我是CEO》是本地单机经营游戏。\n' +
+        '· 公司、员工、财务等经营数据仅保存在本设备，不上传、不采集；\n' +
+        '· 无广告、无内购、不申请位置/相机/麦克风等无关权限；\n' +
+        '· 平台登录仅用于完成 TapTap 必要的身份核验；\n' +
+        '· 关闭公司只清除本机本局经营档，不注销平台账号。\n' +
+        '点击“同意并继续”即表示你已阅读并同意《隐私政策》。',
+      fontSize: 12,
+      color: THEME.text,
+      width: 268,
+      lineHeight: 19,
+      align: 'left',
+      parent: overlay,
+    }).setPosition(0, hasUrl ? 42 : 30);
+
+    if (hasUrl) {
+      createButton({
+        text: '查看《隐私政策》',
+        width: 200,
+        height: 38,
+        fontSize: 13,
+        color: Color.WHITE,
+        textColor: THEME.primary,
+        parent: overlay,
+        onClick: () => this.openPrivacyPolicy(getRuntimeConfig().privacyPolicyUrl),
+      }).setPosition(0, -cardH / 2 + 104);
+    }
+    createButton({
+      text: '同意并继续',
+      width: 240,
+      height: 48,
+      parent: overlay,
+      onClick: () => void this.onAcceptPrivacy(overlay),
+    }).setPosition(0, -cardH / 2 + 34);
+  }
+
+  private async onAcceptPrivacy(overlay: Node): Promise<void> {
+    if (!this.platform) return;
+    await acceptPrivacy(this.platform);
+    overlay.destroy();
+    await this.ensurePlatformLogin(false);
+    this.render();
+  }
+
+  /** 打开隐私政策：真机经 tap 能力受限，最小实现为复制/展示 URL；web 用新窗口。 */
+  private openPrivacyPolicy(url: string): void {
+    const overlay = this.modalOverlay();
+    createRect({ width: 290, height: 190, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '隐私政策链接', fontSize: 17, bold: true, parent: overlay }).setPosition(0, 66);
+    createLabel({ text: url, fontSize: 12, color: THEME.primary, width: 240, parent: overlay }).setPosition(0, 16);
+    createLabel({
+      text: '如未自动打开，请在浏览器访问以上地址查看完整政策。',
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: 240,
+      parent: overlay,
+    }).setPosition(0, -24);
+    createButton({
+      text: '知道了',
+      width: 180,
+      height: 42,
+      parent: overlay,
+      onClick: () => overlay.destroy(),
+    }).setPosition(0, -68);
+    // web/编辑器可直接打开；真机运行时没有 DOM，打开失败静默（链接已展示）
+    try {
+      const g = globalThis as { open?: (u: string) => void };
+      g.open?.(url);
+    } catch {
+      // ignore：小游戏运行时无 window.open
+    }
+  }
+
   private lastForegroundMs = 0;
   private lastBackgroundMs = 0;
 
@@ -125,6 +287,8 @@ export class AppView extends Component {
     const leftAt = this.lastBackgroundMs || this.lastForegroundMs;
     this.lastForegroundMs = now;
     audioManager.onAppShow();
+    // 回到前台静默重验平台会话（过期则后台刷新，不打断单机玩法）
+    void this.ensurePlatformLogin(true);
     if (!leftAt || now <= leftAt) return;
     const s = this.facade.getState();
     if (s.phase !== 'RUNNING' || s.speed === 0) return;
@@ -186,12 +350,46 @@ export class AppView extends Component {
 
   private buildRoot(): void {
     const canvas = this.node;
+    // 全屏背景（不随安全区缩放），保证安全区外的留白与应用底色一致
+    const backdrop = createRect({
+      name: 'Backdrop',
+      width: DESIGN_WIDTH,
+      height: DESIGN_HEIGHT,
+      color: THEME.bg,
+      radius: 0,
+      parent: canvas,
+    });
+    backdrop.setPosition(0, 0);
+    stretchToParent(backdrop);
+
     this.root = new Node('AppRoot');
     this.root.parent = canvas;
     this.root.addComponent(UITransform).setContentSize(new Size(DESIGN_WIDTH, DESIGN_HEIGHT));
+    // 安全区避让（A21）：375×812 内容层在安全区内等比缩放并居中；
+    // 编辑器/无安全区时为恒等变换（scale=1），与历史布局一致。
+    let scaled = false;
+    if (this.platform) {
+      const safe = resolveSafeAreaTransform(this.platform);
+      if (safe.applied) {
+        this.root.setScale(new Vec3(safe.scale, safe.scale, 1));
+        this.root.setPosition(safe.offsetX, safe.offsetY, 0);
+        scaled = true;
+      }
+    }
+    // 无安全区数据（Web 预览/旧机型）时按可视高度兜底缩放：
+    // 640 高度机型上 812 设计高会被上下裁切，导致顶部信息与底部导航不可见（BUG-002）
+    if (!scaled) {
+      const visible = view.getVisibleSize();
+      const fit = visible.height > 0 ? visible.height / DESIGN_HEIGHT : 1;
+      if (fit < 0.98) {
+        this.root.setScale(new Vec3(fit, fit, 1));
+      }
+    }
     const widget = this.root.addComponent(Widget);
     widget.isAlignTop = widget.isAlignBottom = widget.isAlignLeft = widget.isAlignRight = true;
     widget.top = widget.bottom = widget.left = widget.right = 0;
+    // 已手动设置安全区缩放/位移，禁止 Widget 再次对齐覆盖
+    widget.enabled = false;
   }
 
   private clearRoot(): void {
@@ -602,7 +800,9 @@ export class AppView extends Component {
     const body = new Node('Body');
     body.parent = panel;
     body.addComponent(UITransform).setContentSize(new Size(375, 700));
-    body.setPosition(0, 30);
+    // BUG-004：原 +30 位移会把顶部栏推出 812 设计高上边界（公司名被裁切），
+    // 与底部导航也无冲突，故按设计坐标原点对齐。
+    body.setPosition(0, 0);
 
     if (this.activeTab === 'COMPANY') this.renderCompanyTab(body);
     else if (this.activeTab === 'DEPARTMENT') this.renderDepartmentTab(body);
@@ -1542,8 +1742,8 @@ export class AppView extends Component {
   private renderSettings(): void {
     const overlay = this.modalOverlay();
     const audio = audioManager.getSettings();
-    createRect({ width: 320, height: 432, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '设置', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 180);
+    createRect({ width: 320, height: 468, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '设置', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 198);
 
     const toggle = (
       y: number,
@@ -1569,19 +1769,19 @@ export class AppView extends Component {
       const a = audioManager.getSettings();
       audioManager.updateSettings({ masterEnabled: !a.masterEnabled });
       audioManager.uiTap();
-      this.render();
+      this.rebuildSettings(overlay);
     });
     toggle(56, '背景音乐', audio.musicEnabled, () => {
       const a = audioManager.getSettings();
       audioManager.updateSettings({ musicEnabled: !a.musicEnabled });
       audioManager.uiTap();
-      this.render();
+      this.rebuildSettings(overlay);
     });
     toggle(12, '操作音效/提示', audio.sfxEnabled, () => {
       const a = audioManager.getSettings();
       audioManager.updateSettings({ sfxEnabled: !a.sfxEnabled });
       if (!a.sfxEnabled) audioManager.uiTap();
-      this.render();
+      this.rebuildSettings(overlay);
     });
 
     createButton({
@@ -1596,7 +1796,22 @@ export class AppView extends Component {
         overlay.destroy();
         this.replayTutorial();
       },
-    }).setPosition(0, -44);
+    }).setPosition(0, -40);
+
+    createButton({
+      text: '隐私政策',
+      width: 240,
+      height: 40,
+      fontSize: 13,
+      color: Color.WHITE,
+      textColor: THEME.primary,
+      parent: overlay,
+      onClick: () => {
+        const url = getRuntimeConfig().privacyPolicyUrl;
+        if (url) this.openPrivacyPolicy(url);
+        else this.toast('隐私政策地址将在正式上架前配置');
+      },
+    }).setPosition(0, -88);
 
     createButton({
       text: '关闭公司并重新创业',
@@ -1610,7 +1825,7 @@ export class AppView extends Component {
         overlay.destroy();
         this.renderCloseConfirm();
       },
-    }).setPosition(0, -96);
+    }).setPosition(0, -136);
 
     createButton({
       text: '取消',
@@ -1619,7 +1834,19 @@ export class AppView extends Component {
       color: THEME.textWeak,
       parent: overlay,
       onClick: () => overlay.destroy(),
-    }).setPosition(0, -152);
+    }).setPosition(0, -184);
+  }
+
+  /**
+   * 设置弹窗内切换开关后重建弹窗自身（BUG-001）：
+   * 直接 this.render() 会重建整个页面并销毁弹窗，导致用户看到弹窗"消失"。
+   */
+  private rebuildSettings(overlay: Node): void {
+    this.scheduleOnce(() => {
+      if (!overlay.isValid) return;
+      overlay.destroy();
+      this.renderSettings();
+    }, 0);
   }
 
   /** 帮助重播（M3-05）：重新展示关键操作说明，不改变业务状态。 */

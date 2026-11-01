@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  .card {
+    position: relative;
+    width: 768px;
+    height: 768px;
+    overflow: hidden;
+    background: #0B1526; /* 与启动画面背景色一致，保证留白区域无缝 */
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    opacity: .55;
+  }
+  .glow {
+    position: absolute; left: 50%; top: 38%;
+    width: 620px; height: 620px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255,190,64,.26) 0%, rgba(255,190,64,0) 64%);
+  }
+  .skyline {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 250px; opacity: .38;
+  }
+  .badge {
+    position: absolute; left: 50%; top: 300px; transform: translate(-50%, -50%);
+    width: 250px; height: 250px;
+  }
+  .title {
+    position: absolute; left: 0; right: 0; top: 452px;
+    text-align: center;
+    font-size: 108px; font-weight: 800; letter-spacing: 10px;
+    background: linear-gradient(180deg, #FFF3C9 0%, #FFD066 48%, #E39A26 100%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 42px rgba(255,190,64,.28);
+  }
+  .sub {
+    position: absolute; left: 0; right: 0; top: 604px;
+    text-align: center;
+    font-size: 27px; letter-spacing: 8px; color: #A9BCD6;
+  }
+  .rule {
+    position: absolute; left: 50%; top: 662px; transform: translateX(-50%);
+    width: 240px; height: 2px;
+    background: linear-gradient(90deg, rgba(255,208,102,0), rgba(255,208,102,.85), rgba(255,208,102,0));
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid"></div>
+  <div class="glow"></div>
+  <svg class="skyline" viewBox="0 0 768 250" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="bld" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2b4470" stop-opacity=".85"/>
+        <stop offset="100%" stop-color="#0a1424" stop-opacity=".2"/>
+      </linearGradient>
+    </defs>
+    <g fill="url(#bld)">
+      <rect x="12" y="96" width="72" height="154"/>
+      <rect x="92" y="60" width="54" height="190"/>
+      <rect x="154" y="130" width="66" height="120"/>
+      <rect x="228" y="44" width="58" height="206"/>
+      <rect x="296" y="112" width="82" height="138"/>
+      <rect x="388" y="70" width="48" height="180"/>
+      <rect x="446" y="138" width="74" height="112"/>
+      <rect x="528" y="52" width="56" height="198"/>
+      <rect x="592" y="108" width="80" height="142"/>
+      <rect x="680" y="76" width="48" height="174"/>
+    </g>
+  </svg>
+  <svg class="badge" viewBox="0 0 250 250">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFF0BE"/>
+        <stop offset="52%" stop-color="#FFC94F"/>
+        <stop offset="100%" stop-color="#D98916"/>
+      </linearGradient>
+      <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FFD870" stop-opacity=".95"/>
+        <stop offset="100%" stop-color="#B9740F" stop-opacity=".55"/>
+      </linearGradient>
+    </defs>
+    <circle cx="125" cy="125" r="112" fill="none" stroke="url(#ring)" stroke-width="3" opacity=".9"/>
+    <circle cx="125" cy="125" r="96" fill="none" stroke="#FFC94F" stroke-width="1" opacity=".35"/>
+    <!-- 皇冠 -->
+    <path d="M78 92 L99 74 L125 96 L151 74 L172 92 L163 118 L87 118 Z" fill="url(#gold)"/>
+    <circle cx="99" cy="70" r="6" fill="#FFE9AE"/>
+    <circle cx="151" cy="70" r="6" fill="#FFE9AE"/>
+    <circle cx="125" cy="90" r="6" fill="#FFE9AE"/>
+    <!-- 三根增长柱 -->
+    <rect x="86" y="150" width="20" height="42" rx="3" fill="url(#gold)" opacity=".95"/>
+    <rect x="115" y="132" width="20" height="60" rx="3" fill="url(#gold)" opacity=".95"/>
+    <rect x="144" y="112" width="20" height="80" rx="3" fill="url(#gold)" opacity=".95"/>
+    <!-- 上升箭头 -->
+    <path d="M78 176 L108 160 L134 168 L170 130" fill="none" stroke="#FFE9AE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    <path d="M170 130 L156 132 L168 144 Z" fill="#FFE9AE" opacity=".9"/>
+  </svg>
+  <div class="title">我是CEO</div>
+  <div class="sub">经营模拟 · 三年盈利</div>
+  <div class="rule"></div>
+</div>
+</body>
+</html>

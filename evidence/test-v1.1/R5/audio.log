@@ -1,0 +1,14 @@
+﻿{
+  "errors": [],
+  "keyInit": null,
+  "keyBefore": null,
+  "keyMusicOff": "{\"masterEnabled\":true,\"musicEnabled\":false,\"sfxEnabled\":true}",
+  "keyAfterReload": "{\"masterEnabled\":true,\"musicEnabled\":false,\"sfxEnabled\":true}",
+  "keyMasterOff": "{\"masterEnabled\":false,\"musicEnabled\":false,\"sfxEnabled\":true}",
+  "keyMasterOn": "{\"masterEnabled\":false,\"musicEnabled\":false,\"sfxEnabled\":true}",
+  "checks": {
+    "musicOffPersisted": true,
+    "masterOffAllFalse": true,
+    "masterOnKeepsMusicOff": true
+  }
+}

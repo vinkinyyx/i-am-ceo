@@ -1,0 +1,4 @@
+{
+  "authEndpoint": "https://your-api-domain.example.com",
+  "privacyPolicyUrl": "https://your-site.example.com/privacy"
+}

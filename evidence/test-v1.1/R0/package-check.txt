@@ -1,0 +1,11 @@
+﻿package: build/TapBuild/game.zip
+size_bytes: 4657311
+size_mb: 4.44
+mtime: 11/01/2026 17:48:24
+sha256: 6C204AFB379DBF6BC36424D9AFCFD5D933D6674611A0BB3348654E0363911415
+deviceOrientation: portrait
+productVersion: 1.0.0
+convertScriptVersion: 2.0.4-ts
+splash_logo_bytes: 195571
+splash_slogan_bytes: 1058
+limit_20mb_ok: True

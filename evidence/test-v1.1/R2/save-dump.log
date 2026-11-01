@@ -1,0 +1,32 @@
+﻿{
+  "out": "evidence/test-v1.1/R2/save-dump.json",
+  "errors": [],
+  "check": {
+    "months": 12,
+    "sumRevenue": 720000,
+    "sumCosts": -709248,
+    "sumProfit": 10752,
+    "lineCheck": 10752,
+    "sumCashDelta": 10752,
+    "report": {
+      "year": 1,
+      "revenueYuan": 720000,
+      "directCostYuan": -432000,
+      "otherOperatingCostYuan": -57600,
+      "afterSalesCostYuan": -14400,
+      "fixedCostYuan": -48000,
+      "payrollYuan": -145152,
+      "recruitmentCostYuan": -12096,
+      "severanceCostYuan": 0,
+      "deptSetupCostYuan": 0,
+      "eventCostYuan": 0,
+      "depreciationYuan": 0,
+      "profitYuan": 10752,
+      "cashOpenYuan": 300000,
+      "cashCloseYuan": 310752,
+      "assetCloseYuan": 310752,
+      "headcountClose": 2,
+      "settled": true
+    }
+  }
+}

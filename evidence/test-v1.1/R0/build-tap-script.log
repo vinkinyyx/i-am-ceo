@@ -1,0 +1,19 @@
+﻿[1/3] 构建 wechatgame ...
+wechatgame 构建返回码: （Cocos 正常退出可能为非 0，以产物时间为准）
+wechatgame 产物时间: 11/01/2026 16:14:21
+[2/3] 转换为 Tap 包 ...
+powershell : node : [BABEL] Note: The code generator has deoptimised the styling of D:\Workspace\TapTap\我是CEO\build\Tap
+Build\game\co
+所在位置 行:15 字符: 3263
++ ... M = 'dumb'; powershell -ExecutionPolicy Bypass -File tools/build-tap. ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (node : [BABEL] ...apBuild\game\co:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+cos-js\_virtual_cc-C7iGm02z.js as it exceeds the max of 500KB.
+At D:\Workspace\TapTap\我是CEO\tools\build-tap.ps1:34 char:3
++   node (Join-Path $root 'tools\convert-tap.cjs') $GameVersion *> (Joi ...
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([BABEL] Note: T...e max of 500KB.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

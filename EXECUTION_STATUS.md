@@ -10,15 +10,15 @@
 | M0 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | 128c0ad | 39 单测/集成全过；web-mobile 无头构建+Chromium 运行通过 | TapTap 官方适配扩展/AppID/真机为外部前置（ISSUE-ENV-02） |
 | M1 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | c4a8807 | 78 单测/黄金/集成全过；G001-G003 黄金账分毫不差；web-mobile 无头构建+Chromium 走通在线时钟/跨年/扩产/年报 | TapTap 真机、音频真机听感为外部项（ISSUE-ENV-02） |
 | M2 | READY_FOR_QA（核心全绿，平台真机项 BLOCKED） | d0a6a9e | 99 单测/黄金/集成全过；G004/G005/G013/G014/G015 部门与裁员黄金用例；web-mobile 无头构建+Chromium 走通建部/招聘/裁员/调岗/方针 | TapTap 真机为外部项（ISSUE-ENV-02） |
-| M3 | READY_FOR_QA（核心/UI/文档全绿；真机与提审 BLOCKED） | 5b00000 | 156 测试全过（含离线/事件/危机/榜单/35项Tap平台/E2E）；900 run 百种子5年模拟零负现金/零守恒失败；web-mobile 构建+Chromium 零错误（排行榜/声音设置/帮助重播） | M3-07 真机、M3-09 TapTap提审/AppID/版号需凭证（ISSUE-ENV-02） |
+| M3 | READY_FOR_QA→**代码/自动化 QA 通过，真机与提审仍 BLOCKED** | 5b00000 + 发布前补齐轮(未提交) | **204** 测试全过（含离线/事件/危机/榜单/35项Tap平台/安全区/隐私/登录/完整性/历史裁剪/包体卫生/E2E）；900 run 零负现金/零守恒失败；web-mobile 无头 Chromium 走通隐私首启→同意→创建流程零错误；v5.1 Tap 包 4.44MB（4,657,311B / 454 条目 / sha256 `6C204AFB…1415`）自检通过；G016 财务口径已修正；详见 evidence/QA_REPORT_M3_FINAL.md | iOS 真机、包体上传扫码自测、登录服务端真机联调、备案/软著、实机截图/录屏、提审需凭证 |
 
 ## 环境核查（2026-11-01）
 
 | 项 | 结果 |
 |---|---|
-| 仓库性质 | 纯设计包仓库，无任何游戏工程代码（仅 AGENT.md + docs/） |
+| 仓库性质 | **完整 Cocos Creator 3.8.8 游戏工程**（assets/ + tests/ + tools/ + docs/ + evidence/ + server/ + extensions/），最初仅为设计包，M0—M3 已落地全部代码 |
 | Node / npm | v24.13.0 / 11.6.2 |
-| Git | 2.53.0（当前目录尚未 git init） |
+| Git | 2.53.0（仓库已初始化，分支 main，远端 github.com/vinkinyyx/i-am-ceo） |
 | Python | 3.14.3 |
 | 设计基线自检 | `python docs/工具/校验设计基线.py` → PASS（14 fixtures；仅证明设计参考自洽） |
 | Cocos Creator 编辑器 | **已安装 3.8.8**：`C:\ProgramData\cocos\editors\Creator\3.8.8\CocosCreator.exe`（exe ProductVersion=3.8.8，2026-11-01 复核） |
@@ -233,7 +233,7 @@
 ### TASK-M3-08
 - 状态：DONE（文档/自查）；⚠️ 主体资质项待开发者
 - 内容：隐私/数据、内容安全、素材与音频许可、TapTap上架前置（版号/软著/隐私政策）、真机验收清单；明确本地单机不联网不采集、音频程序原创 original_waveforms
-- 变更：docs/发布合规清单.md
+- 变更：合规自查内容并入 docs/08_TapTap适配_审核与交付.md（原独立的 docs/发布合规清单.md 内容已过期，随本次仓库清理移除）
 
 ### TASK-M3-09
 - 状态：BLOCKED（需凭证）
@@ -258,6 +258,7 @@
 |---|---|---|---|---|---|---|
 | ISSUE-ENV-01 | M0-01 | - | 曾误判编辑器未安装，实际在 C:\ProgramData\cocos\editors\Creator\3.8.8（深度5、系统隐藏目录），此前递归深度不足 | exe ProductVersion=3.8.8 | 环境 | CLOSED（2026-11-01 复核） |
 | ISSUE-ENV-02 | M0-10/M3-07 | P1 | TapTap 官方小游戏适配扩展未确认安装 | 官方 v1.2.2 已安装并实际出包：build/TapBuild/game.zip 3.98MB（SHA256=113A05ED6B72AB639A13E4BD464AD19EF55CA35DA24C5E54583EB612527A0FFC，443 项，game.json=portrait/1.0.0，无密钥） | 环境 | CLOSED（2026-11-01；3.8.8 新构建面板未渲染扩展选项，已验证路径=CLI `--build configPath=temp\build-tap.config.json`；tapAppid 选项不被转换器消费，AppID 在上传包体库时绑定） |
+| ISSUE-HARMONY-01 | M3-07 | P1 | 华为 nova 15 Ultra（HarmonyOS 7.0.0 / 纯血鸿蒙 NEXT）进入小游戏后长期停留在 Cocos 启动页 | v2/v3/v4 均复现；云端准入测试 5 台安卓机全过（同一包体）；TapTap 官方 SDK 文档环境要求仅列 Android 5.0+/iOS 12+，**未声明 HarmonyOS**；Cocos 3.8.8 原生平台支持 HarmonyOS Next，但小游戏（微信转换式包体）在鸿蒙 ArkWeb 运行时的支持无官方声明 | 平台兼容 | IN_PROGRESS（2026-11-01）。已做：TapPlatform 全回调防挂死（v4）、构建侧注入 CEO-BOOT-DIAG 启动诊断 + 非 iOS 平台分支修正（v5，待实机取证）。**判断：大概率为 TapTap 小游戏容器在鸿蒙的支持限制，非包体逻辑缺陷**（依据：同包安卓全过 + 官方环境要求未列鸿蒙）；ICP 备案/上架主线不依赖此项，可继续 |
 
 ## 发布控制
 
@@ -267,7 +268,38 @@
 - 首个Tap包体：build/TapBuild/game.zip 3.98MB（≤20MB 目标）；v2 含真机平台层（SHA256=6681E5A9…31CD7，2026-11-01 12:55），包内已验证 resolveTapRuntime 存在
 - v4 包体（2026-11-01 13:44，SHA256=C84F526E…F0C7B8，273 项）：含 BootTrap 启动自显示诊断 + TapPlatform 全回调防挂死（CallbackGuard：get 超时→按无存档降级、set 超时→SAVE_FAILED、login 10s→AUTH_REQUIRED、getNetworkType→unknown、remove→best-effort）；针对华为 nova 15 Ultra / HarmonyOS 7.0.0 卡启动页（疑似运行时不回存储回调导致启动 Promise 挂起）；156/156 测试绿（新增 6 个 silent 运行时用例）；包内已验证 BOOT TIMEOUT×1、callback timeout×2
 - Android真机：云端准入测试 5 机全过（用户自测）
+- v5 诊断包（2026-11-01，SHA256=AA6F7017…89AB4E，273 项，4.15MB）：在构建产物 `build/TapBuild/game/game.js` 注入 CEO-BOOT-DIAG（不改工程源码，脚本 `tools/diag-inject.mjs`）：
+  - 启动节点打点 10 处（webAdapter/polyfills/systemjs/warmup/splash/loadApplication/loadEngine/engineAdapter/engineInit/appStart）+ require 轨迹 + firstScreen 进度
+  - 捕获 console.error / wx.onError / unhandledrejection；错误经 `wx.showModal`/`tap.showModal` 原生弹窗上屏（小游戏无 DOM，覆盖层不可见）
+  - 12 秒仍未跑起来（以场景内存在 `AppRoot` 节点为"跑起来"判据）才弹窗，避免正常启动误报
+  - 平台分支修正：原模板仅 `platform==='android'` 走 requestAnimationFrame（等第二帧拿正确画布尺寸），鸿蒙/未知平台走同步路径 → 改为"非 iOS 一律走 rAF"
 - iOS真机：未测试
 - 前置备案：IN_PROGRESS（ICP 核准卡在小游戏包体选择，包体已产出待上传；软著申请为长尾项）
 - 包体提审：未开始
 - 公开发布：未开始
+
+## 发布前平台补齐轮（2026-11-01，v5.1；自动化 156→204 全绿）
+
+> 针对完结性检查发现的平台/测试缺口一次性补齐；typecheck/lint 0 错误。独立 QA 报告：`evidence/QA_REPORT_M3_FINAL.md`。
+
+### 平台与合规代码（已过测）
+- **安全区 A21**：新增纯函数 `core/platform/safeArea.ts`（computeSafeAreaTransform），AppView 内容层 375×812 在安全区内等比缩放居中；编辑器/无安全区恒等。测试 safeArea.test（6）。
+- **隐私 A23**：首启隐私告知弹窗（同意前不登录/不联网）、版本化同意记录 `core/platform/privacyConsent.ts`、设置页「隐私政策」入口；真机无 DOM 时展示 URL 不崩。测试 privacyConsent.test（4）。
+- **TapTap 登录 DEC-027**：`core/platform/AuthService.ts`（tap.login→POST {endpoint}/v1/auth/taptap/exchange→短期 sessionToken；编辑器 mock 不联网；失败可重试或进单机；会话本地持久化、独立于业务存档）。ITapPlatform 新增 request；TapPlatform 走 tap.request（CallbackGuard 防挂死），CocosPlatform 走 fetch/XHR。测试 authService.test（11）。
+- **最小服务端**：`server/auth-server.mjs`（零依赖 Node18；AppID/Server Secret/code2Session URL 仅环境变量；不回传 session_key/openid；/healthz）；`server/selftest.mjs` 8/8 PASS。端点经不入库 `assets/resources/config/runtime.config.json` 注入（当前空=真机明确报未配置，不伪造登录），样例 runtime.config.example.json。
+- **DEC-028 已核实**：普通小游戏 WebGL 运行时无加桌面 API（tap-minigame.d.ts 835 行无 shortcut/desktop；桌面快捷方式属 APK TapPlay）；真正必接为 TapTap 登录。已更新 docs/08 §8.5、docs/11 DEC-027/028。
+
+### 财务口径修正
+- **G016**：财务部原仅省固定管理费，与设计 09 G016/V1.0 细化决定（合并省"固定管理费+其他可控运营费"）不符。改 monthly.ts：按合并基数算节省、先抵固定再抵其他、不产生负费用；无财务员工时黄金账不变。departmentsM2 改 G015/G016 组合断言+溢出用例。
+
+### 健壮性/卫生（新增测试）
+- **B05** 并发命令串行锁；**B14** 新增 `persistence/stateIntegrity.ts`，装载拒绝奇异存档并回退另一槽；**B15** 新增 `persistence/statePrune.ts`，年结裁剪年报(≤100)/月账(≤24)/开盘快照/事件/日志，120 年存档 <500KB；**B16** packageHygiene.test（不打包 Mock、核心不依赖 window/document/localStorage、无硬编码密钥）。测试 robustnessM3.test（11）、packageHygiene.test（6）。
+
+### 验证与包体
+- web-mobile 无头 + Chromium 390×844：`tools/verify-v5.cjs` 隐私弹窗渲染→点击同意写 ceo/privacy/consent→重载不再弹，零 JS 错误；截图 evidence/v5/{v5-01..03}.png、v5-headless.json。
+- **v5.1 Tap 包**：`build/TapBuild/game.zip` 4.18MB/446 项；SHA256=`0A833DEA46EE4A3DE95FBCA98BEF2E7E46BAB86EBDB86E73058061DED10A5699`；含隐私/登录交换/完整性/安全区/历史裁剪；不含 EditorMock、不含 Secret/Token/session_key/私钥；runtime.config 空端点安全默认。（覆盖此前 v5 诊断包 game.zip）
+- 清理误建空壳工程 `我是CEO/我是CEO`（36.3MB，独立 .git、assets 空、uuid 不同、未跟踪）；.gitignore 增加 runtime.config.json/.env 等敏感项。
+
+### 仍 BLOCKED（需用户/真机/凭证）
+- iOS 真机；Android 上传后扫码自测；登录服务端真机联调（需官方 code2Session 真实 URL + Server Secret 部署）；runtime.config 填隐私政策 URL/authEndpoint；备案/软著；≥3 实机截图+竖屏实机录屏（动画 CG 不可代替）；后台提审发布。
+

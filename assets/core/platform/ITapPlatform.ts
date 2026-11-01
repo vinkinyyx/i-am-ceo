@@ -29,6 +29,20 @@ export interface LoginResult {
   mock?: boolean;
 }
 
+/** 平台无关的 HTTP 请求结果（用于 code2Session 最小服务端交换）。 */
+export interface PlatformHttpResponse<T = unknown> {
+  statusCode: number;
+  data: T;
+}
+
+export interface PlatformHttpRequest {
+  url: string;
+  method?: 'GET' | 'POST';
+  data?: unknown;
+  headers?: Record<string, string>;
+  timeoutMs?: number;
+}
+
 export type Unsubscribe = () => void;
 
 export interface IStorageBackend {
@@ -44,4 +58,9 @@ export interface ITapPlatform extends IStorageBackend {
   onHide(callback: () => void): Unsubscribe;
   login(): Promise<LoginResult>;
   getNetworkState(): Promise<NetworkState>;
+  /**
+   * 发起 HTTPS 请求（真机走 tap.request；web/编辑器走 fetch/XHR）。
+   * 仅用于与项目自有最小服务端交换登录 code，不采集/上传任何经营数据。
+   */
+  request<T = unknown>(req: PlatformHttpRequest): Promise<PlatformHttpResponse<T>>;
 }

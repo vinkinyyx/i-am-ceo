@@ -1,0 +1,32 @@
+{
+  "url": "http://127.0.0.1:8123/",
+  "shots": [
+    {
+      "ms": 300,
+      "file": "evidence/test-v1.1/R6/splash/splash-300ms.png"
+    },
+    {
+      "ms": 700,
+      "file": "evidence/test-v1.1/R6/splash/splash-700ms.png"
+    },
+    {
+      "ms": 1200,
+      "file": "evidence/test-v1.1/R6/splash/splash-1200ms.png"
+    },
+    {
+      "ms": 1800,
+      "file": "evidence/test-v1.1/R6/splash/splash-1800ms.png"
+    },
+    {
+      "ms": 3000,
+      "file": "evidence/test-v1.1/R6/splash/splash-3000ms.png"
+    }
+  ],
+  "settings": {
+    "logoType": "custom",
+    "totalTime": 1500,
+    "base64Chars": 260786
+  },
+  "errorCount": 0,
+  "errors": []
+}

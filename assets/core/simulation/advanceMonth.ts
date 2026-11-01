@@ -10,6 +10,7 @@ import {
   applyEventForMonth,
 } from './annualEvent';
 import { annualDemand } from './market';
+import { pruneStateHistory } from '../persistence/statePrune';
 
 export interface AdvanceResult {
   ledger: MonthlyLedger;
@@ -125,6 +126,8 @@ export function advanceMonth(state: GameState, cfg: EconomyConfig): AdvanceResul
   if (month === 12) {
     // 年初现金快照（第1月结算前，M1 即 30 万注资），由 annual 直接取用
     annualSettlement(state, cfg, state.yearOpenCashYuan[year] ?? cashBefore);
+    // 超长经营历史裁剪（B15）：超 100 份年报/开盘快照/日志等只保留最近窗口
+    pruneStateHistory(state, cfg);
     yearClosed = true;
     state.gameYear += 1;
     state.gameMonth = 1;

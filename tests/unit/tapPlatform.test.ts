@@ -45,6 +45,12 @@ class FakeTap implements TapRuntime {
   networkType = 'wifi';
   networkMode: 'ok' | 'fail' | 'throw' | 'silent' = 'ok';
 
+  requestMode: 'ok' | 'fail' | 'throw' | 'silent' = 'ok';
+  requestStatus = 200;
+  requestData: unknown = { sessionToken: 'srv-token', expiresInSec: 3600 };
+  requestErrMsg = 'request:fail network';
+  readonly requestCalls: Array<{ url: string; method?: string; data?: unknown }> = [];
+
   getWindowInfo(): TapWindowInfoResult {
     if (this.windowInfoThrows) throw new Error('native getWindowInfo boom');
     return this.windowInfo;
@@ -140,6 +146,22 @@ class FakeTap implements TapRuntime {
       return;
     }
     params?.success?.({ networkType: this.networkType });
+  }
+
+  request(params: {
+    url: string;
+    method?: string;
+    data?: unknown;
+  } & TapSuccessFailCallback<{ data: unknown; statusCode: number }>): { abort?: () => void } {
+    this.requestCalls.push({ url: params.url, method: params.method, data: params.data });
+    if (this.requestMode === 'throw') throw new Error('native request boom');
+    if (this.requestMode === 'silent') return {};
+    if (this.requestMode === 'fail') {
+      params.fail?.({ errMsg: this.requestErrMsg });
+      return {};
+    }
+    params.success?.({ statusCode: this.requestStatus, data: this.requestData });
+    return {};
   }
 }
 

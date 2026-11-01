@@ -3,6 +3,8 @@ import type {
   IStorageBackend,
   LoginResult,
   NetworkState,
+  PlatformHttpRequest,
+  PlatformHttpResponse,
   Unsubscribe,
   WindowInfo,
 } from './ITapPlatform';
@@ -19,6 +21,10 @@ export class EditorMockPlatform implements ITapPlatform {
   private readonly hideListeners = new Set<() => void>();
   private network: NetworkState = 'online';
   private windowInfo: WindowInfo;
+  /** 测试注入的 HTTP 应答器；默认返回 503（模拟无服务端）。 */
+  private httpHandler:
+    | ((req: PlatformHttpRequest) => Promise<PlatformHttpResponse> | PlatformHttpResponse)
+    | null = null;
 
   constructor(storage?: IStorageBackend, windowInfo?: WindowInfo) {
     this.storage = storage ?? new MemoryStorage();
@@ -29,6 +35,15 @@ export class EditorMockPlatform implements ITapPlatform {
       pixelRatio: 2,
       safeArea: { top: 44, bottom: 34, left: 0, right: 0 },
     };
+  }
+
+  /** 测试：注入 HTTP 应答器（模拟最小服务端）。 */
+  setHttpHandler(
+    handler:
+      | ((req: PlatformHttpRequest) => Promise<PlatformHttpResponse> | PlatformHttpResponse)
+      | null,
+  ): void {
+    this.httpHandler = handler;
   }
 
   getEnvironment(): 'EDITOR' {
@@ -85,5 +100,13 @@ export class EditorMockPlatform implements ITapPlatform {
 
   remove(key: string): Promise<void> {
     return this.storage.remove(key);
+  }
+
+  async request<T = unknown>(req: PlatformHttpRequest): Promise<PlatformHttpResponse<T>> {
+    if (this.httpHandler) {
+      return (await this.httpHandler(req)) as PlatformHttpResponse<T>;
+    }
+    // 无注入应答器时模拟“服务端不可用”，不静默成功
+    return { statusCode: 503, data: { code: 'TAPTAP_UPSTREAM_UNAVAILABLE' } as T };
   }
 }

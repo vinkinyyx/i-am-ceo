@@ -1,0 +1,54 @@
+{
+  "candidate_files": [
+    {
+      "name": "Cover_Landscape_460x215.jpg",
+      "size": [
+        460,
+        215
+      ],
+      "bytes": 42818,
+      "under_2MB": true
+    },
+    {
+      "name": "Cover_Portrait_600x900.jpg",
+      "size": [
+        600,
+        900
+      ],
+      "bytes": 171962,
+      "under_2MB": true
+    },
+    {
+      "name": "Icon_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 328131,
+      "under_2MB": true
+    },
+    {
+      "name": "Promo_Landscape_1920x1080.jpg",
+      "size": [
+        1920,
+        1080
+      ],
+      "bytes": 518791,
+      "under_2MB": true
+    },
+    {
+      "name": "Promo_Square_1440x1440.jpg",
+      "size": [
+        1440,
+        1440
+      ],
+      "bytes": 412665,
+      "under_2MB": true
+    }
+  ],
+  "concept_count": 4,
+  "ui_concept_count": 6,
+  "ascii_paths": true,
+  "not_actual_gameplay": true,
+  "note": "尺寸/格式/文件大小通过自动检查，但不代表TapTap人工内容审核通过；商城实机截图与录屏尚需开发后采集。"
+}

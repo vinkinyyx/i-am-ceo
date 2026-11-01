@@ -84,7 +84,7 @@ function makeSupportEmployee(
 }
 
 describe('M2-04 部门创建 / 去重 / 0员工无效益', () => {
-  it('G013: 采购部不存在或存在但0人，节省均为0；重复建部门拒绝且只扣一次', () => {
+  it('G013/B06: 采购部不存在或存在但0人，节省均为0；重复建部门拒绝且只扣一次（连点）', () => {
     const state = runWithBusiness('TRADE', 5000, 1_000_000);
     // 无采购部：直接结一年，直成与黄金一致（60% 收入）
     for (let i = 0; i < 12; i++) advanceMonth(state, cfg);
@@ -170,7 +170,7 @@ describe('M2-05 部门量化效益（G004 / G014 / G015）', () => {
     expect(rep.directCostYuan).toBe(-432_000);
   });
 
-  it('G015: 财务 1 人 skill60 节省固定管理费 20%（其他可控费=0）', () => {
+  it('G015/G016: 财务 1 人 skill60 按 20% 合并节省「固定管理费+其他可控运营费」，先抵固定再抵其他', () => {
     const state = runWithBusiness('TRADE', 5000, 5_000_000);
     const fin = createDepartment(state, cfg, 'FINANCE', {
       commandId: 'mk-fin', expectedRunId: state.runId,
@@ -178,9 +178,41 @@ describe('M2-05 部门量化效益（G004 / G014 / G015）', () => {
     makeSupportEmployee(state, fin.deptId, 'fin1', 60, 5000);
     for (let i = 0; i < 12; i++) advanceMonth(state, cfg);
     const rep = state.annualReports[0]!;
-    // 48000 × (1-20%) = 38400
-    expect(rep.fixedCostYuan).toBe(-38_400);
-    // 财务员工年工资另减
+    // 毛额：固定管理费 48000；其他可控运营费 = 720000 × 8% = 57600
+    // 财务省 20%（基数 105600）= 21120，未超固定费 → 全部抵固定，其他运营费不减
+    expect(rep.fixedCostYuan).toBe(-(48_000 - 21_120)); // -26880
+    expect(rep.otherOperatingCostYuan).toBe(-57_600);
+    // 财务员工年工资另减（业务 2×5000 + 财务 5000）×12
     expect(rep.payrollYuan).toBe(-(10_000 * 12 + 60_000));
+  });
+
+  it('G016(黄金口径): 固定48000+其他152000、财务1人20% → 省40000，抵固定40000、其他0，费率只应用一次', () => {
+    const fixedGross = 48_000;
+    const otherGross = 152_000;
+    const effectBps = 2_000; // 1 名 skill60 财务
+    const save = Math.round(((fixedGross + otherGross) * effectBps) / 10_000);
+    const saveFixed = Math.min(fixedGross, save);
+    const saveOther = Math.max(0, save - saveFixed);
+    expect(save).toBe(40_000);
+    expect(saveFixed).toBe(40_000);
+    expect(saveOther).toBe(0);
+    expect(fixedGross - saveFixed).toBe(8_000);
+    expect(otherGross - saveOther).toBe(152_000);
+    // 合计净费用 = 毛合计 − 单次节省（不重复扣）
+    expect(fixedGross + otherGross - save).toBe(160_000);
+  });
+
+  it('G016(溢出): 节省超过固定管理费时余额才抵其他可控费，且不产生负费用', () => {
+    const fixedGross = 10_000;
+    const otherGross = 90_000;
+    const effectBps = 4_000; // 构造 40% 命中封顶口径
+    const save = Math.round(((fixedGross + otherGross) * effectBps) / 10_000);
+    const saveFixed = Math.min(fixedGross, save);
+    const saveOther = Math.min(otherGross, Math.max(0, save - saveFixed));
+    expect(save).toBe(40_000);
+    expect(saveFixed).toBe(10_000);
+    expect(saveOther).toBe(30_000);
+    expect(fixedGross - saveFixed).toBe(0); // 不出现负固定费
+    expect(otherGross - saveOther).toBe(60_000);
   });
 });

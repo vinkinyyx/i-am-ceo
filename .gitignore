@@ -8,6 +8,7 @@
 /local/
 /build/
 /profiles/
+/.creator/
 /native/engine/android/**/*/assets
 
 # 编辑器无关的兄弟实验工程（非本仓库）
@@ -27,3 +28,11 @@ node_modules/
 # WebStorm
 #//////////////////////////
 .idea/
+
+#//////////////////////////
+# 敏感/本地运行配置（永不入库，见 docs/08 与 server/README）
+#//////////////////////////
+assets/resources/config/runtime.config.json
+server/.env
+.env
+.env.*

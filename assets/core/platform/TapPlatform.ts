@@ -3,6 +3,8 @@ import type {
   ITapPlatform,
   LoginResult,
   NetworkState,
+  PlatformHttpRequest,
+  PlatformHttpResponse,
   Unsubscribe,
   WindowInfo,
 } from './ITapPlatform';
@@ -59,6 +61,15 @@ export interface TapRuntime {
   removeStorage(params: { key: string } & TapSuccessFailCallback): void;
   login(params?: { timeout?: number } & TapSuccessFailCallback<{ code: string }>): void;
   getNetworkType(params?: TapSuccessFailCallback<{ networkType: string }>): void;
+  request(params: {
+    url: string;
+    data?: unknown;
+    header?: Record<string, string>;
+    method?: string;
+    timeout?: number;
+  } & TapSuccessFailCallback<{ data: unknown; statusCode: number; header?: unknown }>): {
+    abort?: () => void;
+  };
 }
 
 const REQUIRED_METHODS = [
@@ -72,6 +83,7 @@ const REQUIRED_METHODS = [
   'removeStorage',
   'login',
   'getNetworkType',
+  'request',
 ] as const;
 
 /**
@@ -406,6 +418,29 @@ export class TapPlatform implements ITapPlatform {
         });
       } catch (err) {
         guard.fire(() => reject(saveError('removeStorage', key, err)));
+      }
+    });
+  }
+
+  request<T = unknown>(req: PlatformHttpRequest): Promise<PlatformHttpResponse<T>> {
+    const timeoutMs = req.timeoutMs ?? Math.max(this.opTimeoutMs, 5000);
+    return new Promise((resolve, reject) => {
+      const guard = new CallbackGuard(timeoutMs, () =>
+        reject(platformError('request', `timeout after ${timeoutMs}ms`)),
+      );
+      try {
+        this.tap.request({
+          url: req.url,
+          method: req.method ?? 'GET',
+          data: req.data,
+          header: req.headers,
+          timeout: timeoutMs,
+          success: (res) =>
+            guard.fire(() => resolve({ statusCode: res.statusCode, data: res.data as T })),
+          fail: (res) => guard.fire(() => reject(platformError('request', res))),
+        });
+      } catch (err) {
+        guard.fire(() => reject(platformError('request', err)));
       }
     });
   }

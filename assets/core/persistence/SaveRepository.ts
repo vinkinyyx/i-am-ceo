@@ -4,6 +4,7 @@ import type { GameState } from '../domain/types';
 import { canonicalStringify } from './canonical';
 import { encodeEnvelope, verifyEnvelope } from './SaveCodec';
 import { migrateEnvelope } from './SaveMigration';
+import { validateGameState } from './stateIntegrity';
 import {
   SAVE_KEYS,
   type ResetTombstone,
@@ -175,6 +176,11 @@ export class SaveRepository {
       if (!raw) return null;
       const verify = verifyEnvelope(raw);
       if (!verify.ok) return null;
+      // 业务级完整性（B14）：checksum 通过但状态非法的槽位按不可用处理，
+      // 使 load 能回退到另一槽而非带奇异状态启动。
+      const migrated = migrateEnvelope(raw, 1);
+      const integrity = validateGameState(migrated.payload);
+      if (!integrity.ok) return null;
       return raw;
     } catch {
       return null;
@@ -183,6 +189,12 @@ export class SaveRepository {
 
   private finalize(envelope: SaveEnvelope, recovered: boolean, recoveryNote?: string): LoadedSave {
     const migrated = migrateEnvelope(envelope, 1);
+    // 业务级完整性校验（B14）：checksum 通过但状态语义非法时拒绝恢复，
+    // 不在此处静默新建公司——交给 load 的双槽枚举/损坏分支处理。
+    const check = validateGameState(migrated.payload);
+    if (!check.ok) {
+      throw new Error(`${GameErrorCode.SAVE_CORRUPT}:${check.reason ?? 'invalid-state'}`);
+    }
     return { envelope: migrated, state: migrated.payload, recovered, recoveryNote };
   }
 }
