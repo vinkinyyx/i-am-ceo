@@ -1,4 +1,4 @@
-# code2Session 最小服务端（设计文档 08.4）
+# code2Session 最小服务端（详见 `docs/我是CEO_项目总览.md` §9.4）
 
 零第三方依赖的 Node.js（≥18）服务，仅用于把 TapTap 客户端一次性 `code`
 换成项目自有的短期会话 token。**不保存任何公司经营数据、CEO/员工姓名。**
