@@ -1,13 +1,23 @@
 # 《我是CEO》登录云函数（LeanCloud 云引擎部署指南）
 
-零服务器方案：把 TapTap code2Session 换取接口部署到 LeanCloud 云引擎（TapTap 自家 TDS 生态），使用平台共享域名（已备案），**无需购买服务器、无需域名 ICP 备案**。
+零服务器方案：把 TapTap code2Session 换取接口部署到 TapTap TDS 的云引擎，免去买服务器。
 
 与 `server/auth-server.mjs` 行为完全等价：相同路由 `POST /v1/auth/taptap/exchange`、相同请求 `{code}`、相同响应 `{sessionToken, expiresInSec}`、相同错误码。**游戏客户端无需改动。**
 
+## 前置条件：域名与备案（先看这一节）
+
+按 [TDS 域名备案指南](https://developer.taptap.cn/docs/v3/sdk/domain/icp/)，**国内节点绑定云引擎域名和 API 域名都需要域名已完成工信部 ICP 备案**。平台只对 API 侧提供「共享/测试域名」，且官方明确说明其仅供测试、可能被回收、不保证可用性——**不能作为正式发布依赖**。因此：
+
+- 正式上线 **必须**买一个域名并完成备案（域名约 ¥30–60/年，备案本身免费，需 1–3 周；TDS 可作为接入商）。
+- 没有备案域名时，云引擎部署仍可完成，但**外部无法访问**，只能先跑通部署自测，域名到位后再绑域名、再验证接口。
+
+建议与「小游戏前置备案」并行推进，两者都要走，别等。
+
 ## 部署步骤（约 30 分钟）
 
-1. **注册 TDS / LeanCloud**：用 TapTap 开发者账号登录 [TDS 控制台](https://developer.taptap.cn/)（或 LeanCloud 国际/国内控制台），创建一个应用（区域选**国内**）。
-2. **进入 云引擎**：应用 → 云引擎 → 创建分组（选 Node.js 18+ 运行环境）。
+1. **注册 TDS**：用 TapTap 开发者账号登录 [开发者中心](https://developer.taptap.cn/)，创建游戏（应用）。
+2. **进入云引擎**：路径是 **开发者中心 → 你的游戏 → 游戏服务 → 云服务 → 云引擎 → 管理部署**。
+   **不需要创建分组**：每个应用默认已有一个 `web` 分组，直接用默认分组即可；只有需要多套后端程序、多域名时才建新分组。
 3. **上传代码**：把本目录（`server/leanengine/`）整个作为云引擎项目部署，两种方式任选：
    - 控制台「Git 部署」：把本目录推到一个仓库分支绑定；
    - 或安装 CLI：`npm i -g leancloud-cli`，在本目录执行 `lean login` → `lean switch <应用名>` → `lean deploy --prod`。
@@ -20,20 +30,21 @@
    | `TAPTAP_CODE2SESSION_URL` | 官方 code2Session 地址 | 以 TapTap 当期官方文档为准，真机联调时核对 |
    | `SESSION_TTL_SEC` | `3600`（可选） | 会话有效期 |
 
-5. **自测**：云引擎会给一个 `https://<你的应用>.lc-cn-n1-shared.com` 形式的访问域名，依次验证：
-   - `GET  https://<域名>/healthz` → `{"ok":true}`
-   - `POST https://<域名>/v1/auth/taptap/exchange`，body `{"code":"bad"}` → 预期 401 `{"code":"TAPTAP_CODE_INVALID"}`（说明链路已通，bad code 被上游拒绝属正常）
-6. **回写游戏配置**：把该域名告诉我（或自行）写入项目根 `assets/resources/config/runtime.config.json`（已被 gitignore，不会上传）：
+5. **绑定访问域名**：**云引擎 → 管理部署 → 你的分组（默认 `web`）→ 设置 → 访问域名**。绑定一个已备案子域名（如 `api.yourdomain.com`），控制台会自动申请 SSL。
+6. **自测**（域名绑定生效后）：
+   - `GET  https://api.yourdomain.com/healthz` → `{"ok":true}`
+   - `POST https://api.yourdomain.com/v1/auth/taptap/exchange`，body `{"code":"bad"}` → 预期 401 `{"code":"TAPTAP_CODE_INVALID"}`（说明链路已通，bad code 被上游拒绝属正常）
+7. **回写游戏配置**：把该域名写入项目根 `assets/resources/config/runtime.config.json`（已被 gitignore，不会上传）：
 
    ```json
    {
-     "authEndpoint": "https://<你的应用>.lc-cn-n1-shared.com",
+     "authEndpoint": "https://api.yourdomain.com",
      "privacyPolicyUrl": "<隐私政策页面地址>"
    }
    ```
 
    然后重打包：`powershell -ExecutionPolicy Bypass -File tools/build-tap.ps1`。
-7. **TapTap 后台白名单**：小游戏管理后台把该域名加入服务器域名白名单。
+8. **TapTap 后台白名单**：小游戏管理后台把该域名加入服务器域名白名单。
 
 ## 运维说明
 
