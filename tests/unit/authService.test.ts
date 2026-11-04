@@ -10,7 +10,7 @@ import type {
   PlatformHttpRequest,
   PlatformHttpResponse,
 } from '@core/platform/ITapPlatform';
-import { EditorMockPlatform } from '@core/platform/EditorMockPlatform';
+import { EditorMockPlatform } from '../helpers/EditorMockPlatform';
 
 /** 可控假真机平台（TAPTAP 环境）。 */
 class FakeTapPlatform implements ITapPlatform {

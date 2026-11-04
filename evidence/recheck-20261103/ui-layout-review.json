@@ -1,0 +1,35 @@
+{
+  "scope": "fresh browser run of existing current web-mobile; real UI transfer command; isolated localStorage",
+  "card": {
+    "x": 16,
+    "y": 454.00000000000006,
+    "width": 343,
+    "height": 76,
+    "xMax": 359,
+    "yMax": 530
+  },
+  "pay": {
+    "text": "月薪 ¥5,328｜入职 1 个月",
+    "box": {
+      "x": 27.5,
+      "y": 466.2900000000001,
+      "width": 210,
+      "height": 21.41999999999996,
+      "xMax": 237.5,
+      "yMax": 487.71000000000004
+    }
+  },
+  "status": {
+    "text": "调岗下月生效→客服部（当月仍按原部门计薪）",
+    "box": {
+      "x": 27.5,
+      "y": 441.7900000000001,
+      "width": 210,
+      "height": 38.41999999999996,
+      "xMax": 237.5,
+      "yMax": 480.21000000000004
+    }
+  },
+  "verticalIntersection": 13.919999999999959,
+  "statusOverflowsCard": true
+}

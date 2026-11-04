@@ -50,7 +50,10 @@ export function createInitialState(nowEpochMs: number, seed?: number): GameState
     autoHireCountByYear: {},
     automationLogs: [],
     yearOpenCashYuan: {},
+    cashFlowsByYear: {},
+    cashFlowTrackingStartYear: 1,
     executedCommandIds: [],
+    adRewards: { localDay: '', promptsShown: 0, grantsUsed: 0, couponIds: [], completedSessionIds: [] },
   };
 }
 

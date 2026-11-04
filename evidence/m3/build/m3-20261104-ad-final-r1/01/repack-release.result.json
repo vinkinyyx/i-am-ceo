@@ -1,0 +1,13 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\repack-release.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261104-ad-final-r1\\01\\tap\\game",
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261104-ad-final-r1\\01\\game.zip"
+  ],
+  "startedAt": "2026-11-03T18:30:33.269Z",
+  "finishedAt": "2026-11-03T18:30:34.273Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-ad-final-r1\\01\\repack-release.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-ad-final-r1\\01\\repack-release.err.log"
+}

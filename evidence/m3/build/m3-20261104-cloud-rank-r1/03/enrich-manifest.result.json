@@ -1,0 +1,17 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\enrich-manifest.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\03",
+    "m3-20261104-cloud-rank-r1",
+    "03",
+    "product-test-candidate",
+    "36"
+  ],
+  "startedAt": "2026-11-04T15:32:21.159Z",
+  "finishedAt": "2026-11-04T15:32:23.782Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\03\\enrich-manifest.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\03\\enrich-manifest.err.log"
+}

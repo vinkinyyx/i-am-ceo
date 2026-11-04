@@ -1,0 +1,4 @@
+R6 manifest metadata readback result: the dirty-source array omitted docs/我是CEO_项目总览.md because Git path output was quoted as octal escapes on Windows.
+Observed r6 dirtySourceSha256 count: 1409; exact Unicode authority-doc path was absent.
+ZIP SHA256 and static package verification were correct; this is a manifest source-attribution defect only.
+Retained r6 unchanged. Fixed git path enumeration to use NUL-delimited raw UTF-8, added regression, and will rebuild with a new releaseId.

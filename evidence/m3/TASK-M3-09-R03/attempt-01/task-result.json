@@ -1,0 +1,20 @@
+{
+  "taskId": "TASK-M3-09-R03",
+  "title": "安装引擎前诊断和启动状态机",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T01:53:00+08:00",
+  "delivered": [
+    { "file": "assets/core/platform/bootDiagnostics.ts", "note": "引擎无关诊断核心：entry/adapter/polyfills/modules/engine/scene/config/save/interactive 九段、有界缓冲≤30×300字符、敏感值(code/token/secret/sessionKey/payload/checksum)屏蔽、attemptId 重试、看门狗可配、ready 仅由 markInteractive 确认、onError/onUnhandledRejection" },
+    { "file": "assets/scripts/boot/cocosBootHost.ts", "note": "宿主适配：接 Cocos/小游戏全局错误监听、releaseId 从 globalThis.__CEO_RELEASE_ID__ 读取" },
+    { "file": "assets/scripts/ui/AppView.ts", "note": "start() 补 engine/scene/config/save 阶段打点；UI+事件绑定完成后 markInteractive；失败 renderBootError(错误编号/阶段/重试/退出)，不再黑屏" },
+    { "file": "tests/unit/bootDiagnostics.test.ts", "note": "7 例 T01—T04" }
+  ],
+  "cases": [
+    { "id": "R03-T01", "result": "PASS", "note": "modules 阶段显式 fail 留下首错，无需 Cocos/业务模块导入成功" },
+    { "id": "R03-T02", "result": "PASS", "note": "仅 end(engine) 时 ready=false；markInteractive 才置 ready" },
+    { "id": "R03-T03", "result": "PASS", "note": "看门狗未 ready 触发一次 BOOT_WATCHDOG_TIMEOUT；ready 后迟到触发无新增；重试 attemptId 递增旧 watchdog 作废" },
+    { "id": "R03-T04", "result": "PASS", "note": "缓冲有界；code=/secret=/token=/payload={...} 值被屏蔽为 ***，不泄漏授权与存档正文" }
+  ],
+  "commands": [{ "cmd": "npm run typecheck", "exitCode": 0 }, { "cmd": "npm run lint", "exitCode": 0 }, { "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 32 files / 291 tests" }],
+  "remaining": "引擎前（game.js 最早处）物理注入由 R20 在统一补丁流水线注入并从最终 zip 解包验证；真机首错闭环由 R09（外部设备）。READY_FOR_QA 不含真机通过结论。"
+}

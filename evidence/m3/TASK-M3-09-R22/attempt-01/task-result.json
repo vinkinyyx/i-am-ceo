@@ -1,0 +1,19 @@
+{
+  "taskId": "TASK-M3-09-R22",
+  "title": "Cocos 表现层纳入真实类型/lint/命令门禁",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T02:38:00+08:00",
+  "changes": [
+    { "file": "tsconfig.ui.json", "action": "新增表现层严格检查（引用 3.8.8 引擎 .d.ts，strict+noUncheckedIndexedAccess+noImplicitOverride）" },
+    { "file": "assets/scripts/**", "action": "修复全部表现层类型错误：onLoad/start override、Game.EVENT_SHOW/HIDE 静态访问、EditBox.textLabel.fontSize、年度索引守卫、TOUCH_END 事件类型、ScrollView content 类型、resources.load 回调签名、??/|| 括号、未用变量、不规则空白" },
+    { "file": "package.json", "action": "新增 typecheck:ui/check/release-build/web-build/tap-build/static-server；lint 范围扩展到 assets/scripts" },
+    { "file": "vitest.config.ts", "action": "include 增加 tests/**/*.test.mjs（流水线 Node 测试）" }
+  ],
+  "commands": [
+    { "cmd": "npm run typecheck", "exitCode": 0 },
+    { "cmd": "npm run typecheck:ui", "exitCode": 0, "result": "PASS（首次运行暴露并修复 12+5 个表现层问题）" },
+    { "cmd": "npm run lint（含 assets/scripts）", "exitCode": 0 },
+    { "cmd": "npm run test", "exitCode": 0, "result": "PASS 36 files / 325 tests" }
+  ],
+  "notes": "不依赖 Creator 运行时生成 cc 声明；使用固定安装路径引擎声明 + temp/declarations/env。后续 UI 任务（R23+）在本门禁下开发，类型回归会被立即捕获。"
+}

@@ -1,0 +1,43 @@
+{
+  "releaseId": "m3-20261103-diag-e",
+  "gameVersion": "1.0.0",
+  "builtAt": "2026-11-03T00:22:14.975Z",
+  "zipPath": "build\\release\\m3-20261103-diag-e\\01\\game.zip",
+  "sizeBytes": 5152130,
+  "sizeMib": 4.913,
+  "sha256": "63e0a348340c4313b3c40913438574f7fe535f619b35889931455b23f22c3094",
+  "entryCount": 452,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "m3-20261103-diag-e",
+    "gameVersion": "1.0.0"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [
+      "application.js"
+    ],
+    "forbidden": [
+      "assets/main/index.a4e34.js: EditorMockPlatform in package"
+    ],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": [
+      "game.js -> application.js"
+    ]
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "sha256": "05e946662b9ce5ce761a0bc751272833fe53a038796e7646f143c15415c43730",
+  "bytes": 5499092,
+  "entries": 472,
+  "backslashEntries": 0,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "earlyBootDiagInZip": false,
+  "diskEntryByteEqualToZip": true,
+  "diskEntryNewlineNormalizedEqual": true,
+  "nonIosRafPatchInZip": false,
+  "fetchThrowInZip": false,
+  "mainIndexFiles": [
+    "assets/main/index.0bbba.js",
+    "assets/main/index.1119a.js",
+    "assets/main/index.1ace5.js",
+    "assets/main/index.5e4b1.js",
+    "assets/main/index.a15ad.js",
+    "assets/main/index.f4e40.js"
+  ],
+  "criticalFiles": [
+    {
+      "path": "game.js",
+      "size": 3467,
+      "sha256": "5d93b92d29eb87bd2fbee02817105e36cd2947316800f72b6a8310be58aca862"
+    },
+    {
+      "path": "first-screen.js",
+      "size": 9883,
+      "sha256": "6678fa5054ace45dd60b3235d7d50258ce9d0445ae6a77702586edce2800a173"
+    },
+    {
+      "path": "check-version.js",
+      "size": 1740,
+      "sha256": "88961210a47cc687aa958ac234ef1e22006d4430c272f1771cddc52e52ccc433"
+    }
+  ],
+  "featureOccurrences": {
+    "TextEncoder": [
+      "assets/main/index.0bbba.js",
+      "assets/main/index.1119a.js",
+      "assets/main/index.1ace5.js",
+      "assets/main/index.5e4b1.js",
+      "assets/main/index.a15ad.js",
+      "assets/main/index.f4e40.js"
+    ],
+    "structuredClone": [
+      "assets/main/index.0bbba.js",
+      "assets/main/index.1119a.js",
+      "assets/main/index.1ace5.js",
+      "assets/main/index.5e4b1.js",
+      "assets/main/index.a15ad.js",
+      "assets/main/index.f4e40.js"
+    ]
+  }
+}

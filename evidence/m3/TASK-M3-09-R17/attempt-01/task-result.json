@@ -1,0 +1,19 @@
+{
+  "taskId": "TASK-M3-09-R17",
+  "title": "真实平台登录态与 checkSession、失败、离线恢复",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T02:14:00+08:00",
+  "changes": [
+    { "file": "assets/core/platform/AuthService.ts", "action": "新增 checkSession：none/valid/expired/unknown 四态，不触发 login、不发请求；SAVE_UNAVAILABLE 返回 unknown 不吞成无会话" },
+    { "file": "assets/core/platform/TapPlatform.ts", "action": "登录失败 cause 经 redactSecrets 脱敏（code/secret/token 不回显）" },
+    { "file": "tests/unit/authCheckSession.test.ts", "action": "新增 4 例 T01/T02/T03/T06" }
+  ],
+  "commands": [{ "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 316 tests（含既有 authService 10 例）" }],
+  "cases": [
+    { "id": "R17-T01", "result": "PASS", "note": "checkSession 不调用 login/request；none/valid/expired 正确" },
+    { "id": "R17-T02", "result": "PASS", "note": "silent getStorage→unknown/timeout，不当未登录" },
+    { "id": "R17-T03", "result": "PASS", "note": "login deny→AUTH_REQUIRED 且零 setStorage 调用，经营存档键不被触碰" },
+    { "id": "R17-T06", "result": "PASS", "note": "失败 details 不含 code 值/secret/token" }
+  ],
+  "remaining": "AppView 接入 checkSession（替代 30 天 TTL 猜测）与真机 checkSession API 验证待 web E2E(R38)/真机(R41)；无端点纯单机分支既有测试保持。"
+}

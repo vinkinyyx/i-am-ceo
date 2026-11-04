@@ -1,0 +1,26 @@
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ❯ tests/integration/transactionRecovery.test.ts (6 tests | 1 failed) 68ms
+   × R12 unknown commit recovery regression > A-01 applies a post-recovery policy command without losing or replaying a committed investment 27ms
+     → expected [ 'create', 'hire-0', 'hire-1', …(2) ] to include 'a01-policy'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/integration/transactionRecovery.test.ts > R12 unknown commit recovery regression > A-01 applies a post-recovery policy command without losing or replaying a committed investment
+AssertionError: expected [ 'create', 'hire-0', 'hire-1', …(2) ] to include 'a01-policy'
+ ❯ tests/integration/transactionRecovery.test.ts:78:50
+     76|     expect(facade.getRevision()).toBe(beforeRevision + 2);
+     77|     expect(facade.getState().executedCommandIds).toContain('a01-invest…
+     78|     expect(facade.getState().executedCommandIds).toContain('a01-policy…
+       |                                                  ^
+     79| 
+     80|     const reloaded = await makeFacade(storage);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  23:41:58
+   Duration  1.38s (transform 403ms, setup 0ms, collect 652ms, tests 68ms, environment 0ms, prepare 194ms)
+

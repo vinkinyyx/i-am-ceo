@@ -1,0 +1,10 @@
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ✓ tests/integration/transactionRecovery.test.ts (6 tests) 48ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  23:42:09
+   Duration  1.54s (transform 453ms, setup 0ms, collect 725ms, tests 48ms, environment 0ms, prepare 270ms)
+

@@ -1,0 +1,41 @@
+{
+  "characters": 27621,
+  "sections": [
+    "20.1",
+    "20.2",
+    "20.3",
+    "20.4",
+    "20.5",
+    "20.6",
+    "20.7",
+    "20.8",
+    "20.9",
+    "20.10",
+    "20.11",
+    "20.12",
+    "20.13",
+    "20.14"
+  ],
+  "sectionsUnique": true,
+  "balancedFences": true,
+  "noReplacementCharacter": true,
+  "evidence": [
+    {
+      "path": "evidence/planning-release-20261104/npm-check.log",
+      "exists": true
+    },
+    {
+      "path": "evidence/planning-release-20261104/ad-source-probe.json",
+      "exists": true
+    },
+    {
+      "path": "evidence/planning-release-20261104/skill-preflight.json",
+      "exists": true
+    },
+    {
+      "path": "evidence/planning-release-20261104/r7-verify/package-check.json",
+      "exists": true
+    }
+  ],
+  "scope": "documentation and review evidence only; production source and original ZIP unmodified by this turn"
+}

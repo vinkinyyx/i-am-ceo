@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-05",
+  "url": "http://127.0.0.1:8165/",
+  "artifact": "build/release/m3-20261104-cloud-rank-r1/05/web-preview/web-mobile",
+  "scenario": "Paused 100-employee fixture; user clicks 5x, talent, detail; no close/back/mask action afterwards.",
+  "opened": {
+    "year": 1,
+    "month": 1,
+    "revision": 13
+  },
+  "samples": [
+    {
+      "elapsedMs": 412,
+      "present": true,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "revision": 14
+    },
+    {
+      "elapsedMs": 1463,
+      "present": true,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "revision": 14
+    },
+    {
+      "elapsedMs": 2078,
+      "present": true,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "revision": 15
+    },
+    {
+      "elapsedMs": 3688,
+      "present": false,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "revision": 16
+    }
+  ],
+  "reproducedUnexpectedClose": true,
+  "monthAdvancedWhenClosed": false,
+  "browserErrors": []
+}

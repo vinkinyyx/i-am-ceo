@@ -1,0 +1,33 @@
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ❯ tests/simulation/longRun120.test.ts (1 test | 1 failed) 8ms
+   × R40 120-year persistence boundary > retains the last 100 annual reports while preserving 120 operated years through save/reload 8ms
+     → expected -11842 to be 2579 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/simulation/longRun120.test.ts > R40 120-year persistence boundary > retains the last 100 annual reports while preserving 120 operated years through save/reload
+AssertionError: expected -11842 to be 2579 // Object.is equality
+
+- Expected
++ Received
+
+- 2579
++ -11842
+
+ ❯ tests/simulation/longRun120.test.ts:53:36
+     51|       }
+     52|       expect(ledger.runId).toBe(state.runId);
+     53|       expect(ledger.cashDeltaYuan).toBe(company.cashYuan - cashBefore);
+       |                                    ^
+     54|       expect(state.monthlyLedgersRolling.length).toBeLessThanOrEqual(1…
+     55|       const eventKeys = state.annualEvents.map((event) => `${state.run…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  22:43:27
+   Duration  821ms (transform 202ms, setup 0ms, collect 334ms, tests 8ms, environment 0ms, prepare 147ms)
+

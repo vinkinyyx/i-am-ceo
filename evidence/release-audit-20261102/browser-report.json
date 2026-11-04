@@ -1,0 +1,385 @@
+{
+  "build": "existing web-mobile, 2026-11-01; not a Tap runtime",
+  "checks": [
+    {
+      "name": "privacy persisted",
+      "status": "PASS"
+    },
+    {
+      "name": "first hire one charge",
+      "status": "PASS",
+      "details": {
+        "fee": 7581,
+        "cash": 292419
+      }
+    },
+    {
+      "name": "reload restores first hire",
+      "status": "PASS",
+      "details": {
+        "runId": "run_1fjquhr000000",
+        "phase": "HIRING_INITIAL",
+        "year": 1,
+        "month": 1,
+        "speed": 0,
+        "cash": 292419,
+        "assets": 0,
+        "industry": "TRADE",
+        "employees": [
+          {
+            "employeeId": "emp_run_1fjquhr000000_cand_aejpo5000001",
+            "name": "黄明",
+            "avatarId": "avatar_03",
+            "departmentId": "dp_1flj8ql000000",
+            "skill": 81,
+            "potential": 53,
+            "teamwork": 47,
+            "personality": "BOLD",
+            "salaryMonthlyYuan": 7581,
+            "hiredAtMonthIndex": 0,
+            "effectiveFromMonthIndex": 0,
+            "dismissedAtMonthIndex": null,
+            "status": "ACTIVE",
+            "hireCommandId": "hire_mvy1t31l_2",
+            "candidateId": "cand_aejpo5000001"
+          }
+        ],
+        "departments": [
+          {
+            "deptId": "dp_1flj8ql000000",
+            "type": "BUSINESS",
+            "enabled": true,
+            "staffingMode": "AUTO",
+            "targetCount": 0,
+            "createdMonthIndex": 0,
+            "setupPaid": true
+          }
+        ],
+        "reports": [],
+        "onboarding": {
+          "stepId": "TUT-03",
+          "completedSteps": [],
+          "skipped": false,
+          "lastKnownStep": "TUT-03",
+          "tutorialVersion": 1,
+          "initialHiresCompleted": 1
+        }
+      }
+    },
+    {
+      "name": "second hire completes onboarding",
+      "status": "PASS",
+      "details": {
+        "stepId": "TUT-03",
+        "completedSteps": [
+          "TUT-03"
+        ],
+        "skipped": false,
+        "lastKnownStep": "TUT-03",
+        "tutorialVersion": 1,
+        "initialHiresCompleted": 2
+      }
+    },
+    {
+      "name": "running via UI",
+      "status": "PASS",
+      "details": "RUNNING"
+    },
+    {
+      "name": "create department persists",
+      "status": "PASS",
+      "details": [
+        {
+          "deptId": "dp_1flj8ql000000",
+          "type": "BUSINESS",
+          "enabled": true,
+          "staffingMode": "AUTO",
+          "targetCount": 0,
+          "createdMonthIndex": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_1vuysh1000001",
+          "type": "HR",
+          "enabled": true,
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "createdMonthIndex": 0,
+          "setupPaid": true
+        }
+      ]
+    },
+    {
+      "name": "command layer 60s at 5x closes year",
+      "status": "PASS",
+      "details": {
+        "year": 2,
+        "reports": [
+          {
+            "year": 1,
+            "revenueYuan": 720000,
+            "directCostYuan": -432000,
+            "otherOperatingCostYuan": -57600,
+            "afterSalesCostYuan": -14400,
+            "fixedCostYuan": -48000,
+            "payrollYuan": -170256,
+            "recruitmentCostYuan": -14188,
+            "severanceCostYuan": 0,
+            "deptSetupCostYuan": -10000,
+            "eventCostYuan": 0,
+            "depreciationYuan": 0,
+            "profitYuan": -26444,
+            "cashOpenYuan": 300000,
+            "cashCloseYuan": 273556,
+            "assetCloseYuan": 273556,
+            "headcountClose": 2,
+            "settled": true
+          }
+        ],
+        "advance": {
+          "ok": true,
+          "runId": "run_1fjquhr000000",
+          "revision": 10,
+          "payload": {
+            "monthsAdvanced": 12,
+            "yearsClosed": [
+              1
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "UI pause freezes month",
+      "status": "PASS"
+    },
+    {
+      "name": "UI 5x advances full year in real time",
+      "status": "PASS",
+      "details": {
+        "before": 1,
+        "after": 2
+      }
+    },
+    {
+      "name": "cold viewport department 360x640",
+      "status": "PASS"
+    },
+    {
+      "name": "cold viewport department 428x926",
+      "status": "PASS"
+    },
+    {
+      "name": "reload keeps year and department",
+      "status": "PASS",
+      "details": {
+        "runId": "run_1fjquhr000000",
+        "phase": "RUNNING",
+        "year": 3,
+        "month": 1,
+        "speed": 0,
+        "cash": 292900,
+        "assets": 0,
+        "industry": "TRADE",
+        "employees": [
+          {
+            "employeeId": "emp_run_1fjquhr000000_cand_aejpo5000001",
+            "name": "黄明",
+            "avatarId": "avatar_03",
+            "departmentId": "dp_1flj8ql000000",
+            "skill": 85,
+            "potential": 53,
+            "teamwork": 47,
+            "personality": "BOLD",
+            "salaryMonthlyYuan": 7581,
+            "hiredAtMonthIndex": 0,
+            "effectiveFromMonthIndex": 0,
+            "dismissedAtMonthIndex": null,
+            "status": "ACTIVE",
+            "hireCommandId": "hire_mvy1t31l_2",
+            "candidateId": "cand_aejpo5000001"
+          },
+          {
+            "employeeId": "emp_run_1fjquhr000000_cand_j896i4000002",
+            "name": "黄宇航",
+            "avatarId": "avatar_08",
+            "departmentId": "dp_1flj8ql000000",
+            "skill": 64,
+            "potential": 91,
+            "teamwork": 69,
+            "personality": "STEADY",
+            "salaryMonthlyYuan": 6607,
+            "hiredAtMonthIndex": 0,
+            "effectiveFromMonthIndex": 0,
+            "dismissedAtMonthIndex": null,
+            "status": "ACTIVE",
+            "hireCommandId": "hire_mvy1t6h8_1",
+            "candidateId": "cand_j896i4000002"
+          }
+        ],
+        "departments": [
+          {
+            "deptId": "dp_1flj8ql000000",
+            "type": "BUSINESS",
+            "enabled": true,
+            "staffingMode": "AUTO",
+            "targetCount": 0,
+            "createdMonthIndex": 0,
+            "setupPaid": true
+          },
+          {
+            "deptId": "dp_1vuysh1000001",
+            "type": "HR",
+            "enabled": true,
+            "staffingMode": "LOCKED",
+            "targetCount": 0,
+            "createdMonthIndex": 0,
+            "setupPaid": true
+          }
+        ],
+        "reports": [
+          {
+            "year": 1,
+            "revenueYuan": 720000,
+            "directCostYuan": -432000,
+            "otherOperatingCostYuan": -57600,
+            "afterSalesCostYuan": -14400,
+            "fixedCostYuan": -48000,
+            "payrollYuan": -170256,
+            "recruitmentCostYuan": -14188,
+            "severanceCostYuan": 0,
+            "deptSetupCostYuan": -10000,
+            "eventCostYuan": 0,
+            "depreciationYuan": 0,
+            "profitYuan": -26444,
+            "cashOpenYuan": 300000,
+            "cashCloseYuan": 273556,
+            "assetCloseYuan": 273556,
+            "headcountClose": 2,
+            "settled": true
+          },
+          {
+            "year": 2,
+            "revenueYuan": 792000,
+            "directCostYuan": -475200,
+            "otherOperatingCostYuan": -63360,
+            "afterSalesCostYuan": -15840,
+            "fixedCostYuan": -48000,
+            "payrollYuan": -170256,
+            "recruitmentCostYuan": 0,
+            "severanceCostYuan": 0,
+            "deptSetupCostYuan": 0,
+            "eventCostYuan": 0,
+            "depreciationYuan": 0,
+            "profitYuan": 19344,
+            "cashOpenYuan": 273556,
+            "cashCloseYuan": 292900,
+            "assetCloseYuan": 292900,
+            "headcountClose": 2,
+            "settled": true
+          }
+        ],
+        "onboarding": {
+          "stepId": "TUT-03",
+          "completedSteps": [
+            "TUT-03",
+            "TUT-04",
+            "TUT-05"
+          ],
+          "skipped": false,
+          "lastKnownStep": "TUT-03",
+          "tutorialVersion": 1,
+          "initialHiresCompleted": 2
+        }
+      }
+    },
+    {
+      "name": "cancel reset preserves run",
+      "status": "PASS"
+    },
+    {
+      "name": "confirmed reset removes run data",
+      "status": "PASS",
+      "details": {
+        "runId": "run_zs9beb000002",
+        "phase": "CREATING",
+        "year": 1,
+        "month": 1,
+        "speed": 0,
+        "employees": [],
+        "departments": [],
+        "reports": [],
+        "onboarding": {
+          "stepId": "TUT-01",
+          "completedSteps": [],
+          "skipped": false,
+          "lastKnownStep": "TUT-01",
+          "tutorialVersion": 1,
+          "initialHiresCompleted": 0
+        }
+      }
+    },
+    {
+      "name": "reset survives reload",
+      "status": "PASS",
+      "details": {
+        "runId": "run_zs9beb000002",
+        "phase": "CREATING",
+        "year": 1,
+        "month": 1,
+        "speed": 0,
+        "employees": [],
+        "departments": [],
+        "reports": [],
+        "onboarding": {
+          "stepId": "TUT-01",
+          "completedSteps": [],
+          "skipped": false,
+          "lastKnownStep": "TUT-01",
+          "tutorialVersion": 1,
+          "initialHiresCompleted": 0
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "screens": [
+    "01-privacy",
+    "02-company",
+    "03-ceo",
+    "04-hiring",
+    "05-first-hire",
+    "06-tutorial",
+    "07-home",
+    "08-departments",
+    "09-create-dept",
+    "10-talent",
+    "11-employee",
+    "12-rank",
+    "13-report-empty",
+    "14-annual-report",
+    "14b-live-year",
+    "15-settings",
+    "16-live-resize-360x640",
+    "16-departments-360x640",
+    "17-home-360x640",
+    "16-live-resize-428x926",
+    "16-departments-428x926",
+    "17-home-428x926",
+    "18-reload",
+    "19-reset-dialog",
+    "20-reset"
+  ],
+  "onboardingAutoAdvanced": true,
+  "commandTimeAdvance": {
+    "ok": true,
+    "runId": "run_1fjquhr000000",
+    "revision": 10,
+    "payload": {
+      "monthsAdvanced": 12,
+      "yearsClosed": [
+        1
+      ]
+    }
+  }
+}

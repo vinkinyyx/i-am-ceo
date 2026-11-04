@@ -1,0 +1,27 @@
+{
+  "package": {
+    "configPresentByUuid": "assets/resources/import/9c/9cbbd66e-8e46-440f-8aeb-a4ba9568b5ec.476de.json",
+    "zip": "build/release/m3-20261103-adlocal-partial/01/game.zip",
+    "verified": true,
+    "purpose": "diagnostic",
+    "manifest": "evidence/m3/build/m3-20261103-adlocal-partial/01/manifest.json",
+    "sha256": "139fb1f7f228b5beb25bc25ff3d7442b4302d24423fd42ab50da38e7c2167c88",
+    "backgroundPresentByUuid": "assets/resources/import/d8/d857264b-ceed-4ff1-8d0b-e4e3ea00cec4.a2533.json and assets/resources/native/d8/d857264b-ceed-4ff1-8d0b-e4e3ea00cec4.bc7fe.png"
+  },
+  "limitations": [
+    "A-01—10 matrix incomplete",
+    "R31—R40 E2E/visual/long-run incomplete",
+    "real adUnitId and U14—U16 missing",
+    "privacy ad text and real-device ad verification not done",
+    "device/cloud tests not run"
+  ],
+  "tests": {
+    "log": "evidence/m3/TASK-M3-10-08/attempt-01/check-final.log",
+    "command": "npm run check",
+    "testFiles": 55,
+    "passed": 441,
+    "result": "PASS",
+    "skipped": 1
+  },
+  "task": "M3-10-07/08/09 local partial"
+}

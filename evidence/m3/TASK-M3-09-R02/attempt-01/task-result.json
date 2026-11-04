@@ -1,0 +1,38 @@
+{
+  "taskId": "TASK-M3-09-R02",
+  "title": "把已复现缺陷变成有判定的回归夹具",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T01:12:00+08:00",
+  "deliveredFixtures": [
+    "tests/helpers/ControlledClock.ts：受控时钟，setTimeout/interval 入队，advance 显式排空，无真实 sleep",
+    "tests/helpers/faults.ts：ScriptedStorage(IStorageBackend: reject/timeout/io/permission/hang/corrupt-raw、调用记录、null=确认不存在)、ScriptedTapRuntime(tap.* 回调脚本：success/fail/silent/success-twice/fail-then-success/success-empty、迟到 delayMs、调用记录)、withoutGlobalCapability(TextEncoder/TextDecoder/structuredClone 作用域开关)、buildCommittedSave/makeEnvelope/tamperChecksum/makeTombstone/makePointer 旧档与损坏/跨run/墓碑夹具",
+    "tests/helpers/freshModule.ts：TS 转译+独立缓存的全新模块加载器，用于模拟模块导入期顶层 new TextEncoder() 失败",
+    "tests/integration/releaseFaults.test.ts：REL-02/03/04 缺陷回归入口（FIX 开关，当前记录旧缺陷行为，修复任务翻转）",
+    "tests/integration/faultFixtures.test.ts：夹具自身验收"
+  ],
+  "commands": [
+    { "cmd": "npm run typecheck", "exitCode": 0, "result": "PASS" },
+    { "cmd": "npm run lint", "exitCode": 0, "result": "PASS" },
+    { "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 25 files / 218 tests（基线 205 + 新增 13）" }
+  ],
+  "cases": [
+    { "id": "R02-T01", "result": "PASS", "note": "故障关闭时真实 SaveRepository commit→load 往返通过（faultFixtures）" },
+    { "id": "R02-T02", "result": "PASS", "note": "REL-02 缺 TextEncoder 全新加载 crc32 稳定抛 TextEncoder；REL-03 缺 structuredClone mutate 稳定失败；REL-04 silent getStorage 稳定 resolve(null) 旧缺陷——三项均有 reason/确定断言，非偶发" },
+    { "id": "R02-T03", "result": "PASS", "note": "每 test new ScriptedStorage/ScriptedTapRuntime，故障脚本一次性消耗后恢复正常；beforeEach 隔离" },
+    { "id": "R02-T04", "result": "PASS", "note": "hang 用 Promise 双微任务后 settled===false 判定；ControlledClock 显式 advance；无固定 sleep" }
+  ],
+  "oldDefectsConfirmed": [
+    "REL-02 crc32.ts 顶层 new TextEncoder()，缺能力环境导入期即抛（releaseFaults R04 用例，FIX.R04=false）",
+    "REL-03 GameStore.mutate 的 structuredClone 在锁设置后、try 外执行，缺能力时命令失败（FIX.R05=false）",
+    "REL-04 TapPlatform.get silent 超时 resolve(null)，无法区分 missing/unavailable（FIX.R10=false）"
+  ],
+  "artifacts": [
+    "tests/helpers/ControlledClock.ts",
+    "tests/helpers/faults.ts",
+    "tests/helpers/freshModule.ts",
+    "tests/integration/releaseFaults.test.ts",
+    "tests/integration/faultFixtures.test.ts",
+    "evidence/m3/TASK-M3-09-R02/attempt-01/task-result.json"
+  ],
+  "handoff": "R04/R05/R10—R14 共用 tests/helpers/faults.ts，不得各自再造假平台；修复落地时把 releaseFaults.test.ts 的 FIX.Rnn 置 true 并改安全行为断言。"
+}

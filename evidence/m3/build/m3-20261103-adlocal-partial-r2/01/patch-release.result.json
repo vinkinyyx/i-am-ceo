@@ -1,0 +1,14 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\patch-release.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261103-adlocal-partial-r2\\01\\tap\\game",
+    "m3-20261103-adlocal-partial-r2",
+    "1.0.0"
+  ],
+  "startedAt": "2026-11-03T14:11:53.364Z",
+  "finishedAt": "2026-11-03T14:11:53.429Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261103-adlocal-partial-r2\\01\\patch-release.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261103-adlocal-partial-r2\\01\\patch-release.err.log"
+}

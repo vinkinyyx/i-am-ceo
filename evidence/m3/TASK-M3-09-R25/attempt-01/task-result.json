@@ -1,0 +1,38 @@
+{
+  "taskId": "TASK-M3-09-R25",
+  "title": "可滚动弹窗、输入与确认通用件（ConfirmDialog/ScrollableDialog/InputDialog 替换 AppView 工厂调用）",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T21:20:00+08:00",
+  "changes": [
+    { "file": "assets/scripts/ui/dialogModel.ts", "action": "新增无引擎依赖的弹窗核心：DialogPhase（IDLE/SUBMITTING/UNCERTAIN/FAILED/CLOSED）、ConfirmGuard（begin 仅 IDLE/FAILED 成功、succeed 仅 SUBMITTING、close 仅 IDLE/FAILED、UNCERTAIN 锁定）、computeDialogGeometry（按可视高压缩正文并保证标题/底部可见，minBody=96）、computeInputCardY（卡片固定上半区避让键盘）、dialogInputLength（emoji 按 1 字）、basicInputError（空/最短/最长文案）" },
+    { "file": "assets/scripts/ui/dialogs.ts", "action": "新增通用件：DialogHandle（overlay/card/body/footer/phase/busy/canClose/setBusy/setError/fail/markUncertain/succeed/cancel/close/onClose）；buildScaffold 固定标题+正文+底部（footer 108/标题 56）；buildScroll 自建 ScrollView+Mask+BlockInputEvents+纵向 Layout（CONTAINER 撑高），修正旧工厂把 UITransform 误赋给 sv.content；模块级返回键栈 + input KEY_DOWN（MOBILE_BACK/ESC）只调 requestCancel，绝不触发确认；openScrollableDialog/openConfirmDialog/openInputDialog；确认按钮连点由 guard.begin() 拦截，忙碌时确认/取消同时置灰；关闭销毁遮罩并清空回调；输入弹窗含标签/提示/字数/内联错误，EditBox 标签改深色并修正 anchor=(0,1) 以免文字落到输入框外（失焦后仍显示在框内）" },
+    { "file": "assets/scripts/ui/AppView.ts", "action": "替换 6 处弹窗为通用件：renderPrivacyDialog→ScrollableDialog（正文汇总 summary/sections/生效日期，底部并排同意/退出）；openCustomNameDialog→InputDialog（min2/max20 + validateCompanyName 中文文案，EditBox 不再手写）；openHireConfirm→ConfirmDialog（commandId/originRunId 开框时固定，confirmEnabled 取领域层 affordable，OFFER_EXPIRED/RUN_CHANGED 只 succeed+toast，明确失败 fail 可同意图重试）；openLayoffConfirm→ConfirmDialog（token/commandId/originRunId 开框固定，删除 layoffToken 与 doLayoff）；renderAnnualReport→ScrollableDialog（空报告提示 + 固定关闭）；renderCloseConfirm→ConfirmDialog（开框取 token，删除 doClose，成功后 resetCreateStateAfterClose）；新增 privacyBusy 防重复同意；移除已不再使用的 EditBox/Label/createScrollContainer 导入" },
+    { "file": "tests/unit/dialogModel.test.mjs", "action": "新增 16 用例：状态机（连点只一次、提交中不可关闭、UNCERTAIN 锁定、FAILED 可重试 attempts=2、succeed 后全失效、IDLE 可直接关闭）、几何（812/640/260 屏 clamp 与短内容不压缩）、输入卡片键盘避让（812→y=203、卡顶不越屏）、输入校验（空/空白/过短/过长/emoji 计数 '👍🏽'=2）" },
+    { "file": "tools/shot-r25.cjs", "action": "新增 R25 证据脚本：375×812 隐私全文滚动+遮罩防穿透→输入弹窗（空值校验/输入计数/失焦后内容与按钮保留/提交生效）→首聘确认快速双击（读存档核对仅 1 次录用、现金只扣一次）→关闭公司摘要滚屏+遮罩+ESC 只取消；360×640 复用运行中存档验证：隐私全文小屏滚动、关闭摘要、裁员赔偿摘要与底部按钮可达" },
+    { "file": "evidence/m3/TASK-M3-09-R25/attempt-01/dialog-state-machine.svg", "action": "新增通用状态图（IDLE/SUBMITTING/FAILED/UNCERTAIN/CLOSED 迁移 + 7 条通用件契约）" }
+  ],
+  "commands": [
+    { "cmd": "npm run typecheck", "exitCode": 0 },
+    { "cmd": "npm run typecheck:ui", "exitCode": 0 },
+    { "cmd": "npm run lint", "exitCode": 0 },
+    { "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 43 files / 358 tests（342→358，新增 dialogModel 16 例，无回归）" },
+    { "cmd": "powershell -ExecutionPolicy Bypass -File tools/build-web.ps1", "exitCode": 0, "result": "web-mobile 构建成功（exit=36），产物包含 R25 通用件" },
+    { "cmd": "node tools/shot-r25.cjs http://localhost:8123/ evidence/m3/TASK-M3-09-R25/attempt-01/shots", "exitCode": 0, "result": "35 张截图 + r25-report.json；pageerror=0；rapidTapOnlyOneHire=true、privacyMaskKeptOpen=true、escCancelKeptSave=true" }
+  ],
+  "acceptance": {
+    "T01": "长内容滚动：375-privacy-long-top/bottom、360-privacy-long-top/bottom（隐私全文滚到生效日期，底部同意/退出固定可见）；360-close-confirm、360-layoff-confirm（小屏关闭摘要与赔偿摘要正文、确认与取消均完整可见）",
+    "T02": "遮罩防穿透：375-privacy-mask-no-passthrough、375-close-mask-no-passthrough、360-close-mask-no-passthrough；点击卡片外空白不关闭、不触发底层按钮（r25-report privacyMaskKeptOpen=true）",
+    "T03": "连点只发一次意图：375-after-double-confirm + r25-report hireStateBefore/After（双击确认后 hires=1、employees=1，现金仅扣一次招聘费）",
+    "T04": "忙碌/未知不可悄悄重试：ConfirmGuard 单测覆盖（SUBMITTING 时 cancel/close/返回键全部无效；UNCERTAIN 锁定不可关闭不可重试；FAILED 可同意图重试 attempts=2）；UI 层 setBusy 同时禁用确认与取消",
+    "T05": "输入失焦后保留：375-input-typed（6/20 计数）→375-input-after-keyboard-hidden（文字仍在框内、计数与按钮保留、activeElement=CANVAS）→375-input-applied（自定义名称生效并高亮）",
+    "T06": "返回键：input KEY_DOWN（MOBILE_BACK/ESC）只走 requestCancel；375-close-esc-cancelled / 360-close-esc-cancelled 证明 ESC 关闭弹窗且存档 runId/员工/阶段不变（escCancelKeptSave=true）"
+  },
+  "notes": "关键假设与边界：① TapTap d.ts 无 onBackPressed，返回键按引擎 input KEY_DOWN(MOBILE_BACK=6/ESCAPE=27) 处理，不臆造平台 API；② 真机系统键盘的遮挡与滚屏需真机验收，web 预览无虚拟键盘，已用 computeInputCardY 纯函数单测（812 屏卡顶不越上半区）+ 失焦截图证明内容/按钮保留，真机项归 R35—R39（依赖 U05）；③ UNCERTAIN 状态缺少可注入的故障入口，未做 UI 截图，由 dialogModel 16 例单测覆盖锁定语义；④ 首聘/部门招聘仍走既有 openHireConfirm（R26 的 preview→confirm 事务），R25 只替换弹窗壳，未改费用公式与现金；⑤ 隐私、年报、关闭摘要、裁员赔偿均只读领域层 preview/policy 文本，通用件不修改现金、不调用平台登录。",
+  "evidence": [
+    "evidence/m3/TASK-M3-09-R25/attempt-01/dialog-state-machine.svg（通用状态图）",
+    "evidence/m3/TASK-M3-09-R25/attempt-01/r25-report.json（过程数据与断言）",
+    "evidence/m3/TASK-M3-09-R25/attempt-01/shots/（375×812 + 360×640，共 35 张）",
+    "evidence/m3/TASK-M3-09-R25/attempt-01/shots/seed-save.json（小屏复用的运行中存档快照）",
+    "tests/unit/dialogModel.test.mjs（16 用例）"
+  ]
+}

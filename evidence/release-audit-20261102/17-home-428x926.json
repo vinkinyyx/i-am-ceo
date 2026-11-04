@@ -1,0 +1,243 @@
+{
+  "labels": [
+    "乘风破浪的优选电商有限公司",
+    "电商贸易 · 创业第 3 年 · 第 1 月",
+    "设置",
+    "现金",
+    "¥292,900",
+    "本年收入",
+    "¥0",
+    "本年利润",
+    "¥0",
+    "时间",
+    "暂停",
+    "1×",
+    "2×",
+    "5×",
+    "CEO462（进取）",
+    "商业 54 · 管理 52 · 财务 52",
+    "员工 2 人",
+    "业务资产：¥0（产能加成）",
+    "扩大产能（1万起）",
+    "年度报告",
+    "连续盈利：1/3 年",
+    "公司",
+    "部门",
+    "人才",
+    "排行"
+  ],
+  "buttons": [
+    {
+      "text": "设置",
+      "x": 332.5,
+      "y": 765.6658878504672,
+      "width": 56,
+      "height": 34,
+      "scale": 1
+    },
+    {
+      "text": "暂停",
+      "x": 121.5,
+      "y": 615.6658878504672,
+      "width": 52,
+      "height": 36,
+      "scale": 1
+    },
+    {
+      "text": "1×",
+      "x": 181.5,
+      "y": 615.6658878504672,
+      "width": 52,
+      "height": 36,
+      "scale": 1
+    },
+    {
+      "text": "2×",
+      "x": 241.5,
+      "y": 615.6658878504672,
+      "width": 52,
+      "height": 36,
+      "scale": 1
+    },
+    {
+      "text": "5×",
+      "x": 301.5,
+      "y": 615.6658878504672,
+      "width": 52,
+      "height": 36,
+      "scale": 1
+    },
+    {
+      "text": "扩大产能（1万起）",
+      "x": 104.5,
+      "y": 441.6658878504673,
+      "width": 158,
+      "height": 42,
+      "scale": 1
+    },
+    {
+      "text": "年度报告",
+      "x": 270.5,
+      "y": 441.6658878504673,
+      "width": 158,
+      "height": 42,
+      "scale": 1
+    },
+    {
+      "text": "公司",
+      "x": 46.5,
+      "y": 33.6658878504673,
+      "width": 80,
+      "height": 56,
+      "scale": 1
+    },
+    {
+      "text": "部门",
+      "x": 140.5,
+      "y": 33.6658878504673,
+      "width": 80,
+      "height": 56,
+      "scale": 1
+    },
+    {
+      "text": "人才",
+      "x": 234.5,
+      "y": 33.6658878504673,
+      "width": 80,
+      "height": 56,
+      "scale": 1
+    },
+    {
+      "text": "排行",
+      "x": 328.5,
+      "y": 33.6658878504673,
+      "width": 80,
+      "height": 56,
+      "scale": 1
+    }
+  ],
+  "size": {
+    "width": 375,
+    "height": 811.3317757009346
+  },
+  "state": {
+    "runId": "run_1fjquhr000000",
+    "phase": "RUNNING",
+    "year": 3,
+    "month": 1,
+    "speed": 0,
+    "cash": 292900,
+    "assets": 0,
+    "industry": "TRADE",
+    "employees": [
+      {
+        "employeeId": "emp_run_1fjquhr000000_cand_aejpo5000001",
+        "name": "黄明",
+        "avatarId": "avatar_03",
+        "departmentId": "dp_1flj8ql000000",
+        "skill": 85,
+        "potential": 53,
+        "teamwork": 47,
+        "personality": "BOLD",
+        "salaryMonthlyYuan": 7581,
+        "hiredAtMonthIndex": 0,
+        "effectiveFromMonthIndex": 0,
+        "dismissedAtMonthIndex": null,
+        "status": "ACTIVE",
+        "hireCommandId": "hire_mvy1t31l_2",
+        "candidateId": "cand_aejpo5000001"
+      },
+      {
+        "employeeId": "emp_run_1fjquhr000000_cand_j896i4000002",
+        "name": "黄宇航",
+        "avatarId": "avatar_08",
+        "departmentId": "dp_1flj8ql000000",
+        "skill": 64,
+        "potential": 91,
+        "teamwork": 69,
+        "personality": "STEADY",
+        "salaryMonthlyYuan": 6607,
+        "hiredAtMonthIndex": 0,
+        "effectiveFromMonthIndex": 0,
+        "dismissedAtMonthIndex": null,
+        "status": "ACTIVE",
+        "hireCommandId": "hire_mvy1t6h8_1",
+        "candidateId": "cand_j896i4000002"
+      }
+    ],
+    "departments": [
+      {
+        "deptId": "dp_1flj8ql000000",
+        "type": "BUSINESS",
+        "enabled": true,
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "createdMonthIndex": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_1vuysh1000001",
+        "type": "HR",
+        "enabled": true,
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "createdMonthIndex": 0,
+        "setupPaid": true
+      }
+    ],
+    "reports": [
+      {
+        "year": 1,
+        "revenueYuan": 720000,
+        "directCostYuan": -432000,
+        "otherOperatingCostYuan": -57600,
+        "afterSalesCostYuan": -14400,
+        "fixedCostYuan": -48000,
+        "payrollYuan": -170256,
+        "recruitmentCostYuan": -14188,
+        "severanceCostYuan": 0,
+        "deptSetupCostYuan": -10000,
+        "eventCostYuan": 0,
+        "depreciationYuan": 0,
+        "profitYuan": -26444,
+        "cashOpenYuan": 300000,
+        "cashCloseYuan": 273556,
+        "assetCloseYuan": 273556,
+        "headcountClose": 2,
+        "settled": true
+      },
+      {
+        "year": 2,
+        "revenueYuan": 792000,
+        "directCostYuan": -475200,
+        "otherOperatingCostYuan": -63360,
+        "afterSalesCostYuan": -15840,
+        "fixedCostYuan": -48000,
+        "payrollYuan": -170256,
+        "recruitmentCostYuan": 0,
+        "severanceCostYuan": 0,
+        "deptSetupCostYuan": 0,
+        "eventCostYuan": 0,
+        "depreciationYuan": 0,
+        "profitYuan": 19344,
+        "cashOpenYuan": 273556,
+        "cashCloseYuan": 292900,
+        "assetCloseYuan": 292900,
+        "headcountClose": 2,
+        "settled": true
+      }
+    ],
+    "onboarding": {
+      "stepId": "TUT-03",
+      "completedSteps": [
+        "TUT-03",
+        "TUT-04",
+        "TUT-05"
+      ],
+      "skipped": false,
+      "lastKnownStep": "TUT-03",
+      "tutorialVersion": 1,
+      "initialHiresCompleted": 2
+    }
+  }
+}

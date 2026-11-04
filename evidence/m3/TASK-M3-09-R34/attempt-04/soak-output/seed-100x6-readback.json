@@ -1,0 +1,16 @@
+{
+  "runId": "run_134cdm7000000",
+  "revision": 11,
+  "employeeCount": 100,
+  "departments": [
+    "BUSINESS",
+    "HR",
+    "PROCUREMENT",
+    "MARKETING",
+    "CUSTOMER_SERVICE",
+    "FINANCE"
+  ],
+  "seed": 312539190,
+  "checksum": "a29c7450",
+  "note": "100-employee/6-department performance fixture; employee assignments are test-only distribution."
+}

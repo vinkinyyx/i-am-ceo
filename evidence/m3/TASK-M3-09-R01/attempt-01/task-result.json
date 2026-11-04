@@ -1,0 +1,18 @@
+{
+  "taskId": "TASK-M3-09-R01",
+  "title": "建立后台包与本地包对应、收集缺口",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T01:05:00+08:00",
+  "commands": [
+    { "cmd": "读取 evidence/release-audit-20261102/package-audit.json", "exitCode": 0 },
+    { "cmd": "读取总览 §14.2 对准入截图与 OPPO 日志的判读", "exitCode": 0 },
+    { "cmd": "枚举 evidence/ 与附件目录，确认仅 OPPO 日志、无 Redmi/vivo 日志", "exitCode": 0 }
+  ],
+  "cases": [
+    { "id": "R01-T01", "result": "PASS", "note": "无法建立云端1.1.0与本地1.0.0身份对应，mappingStatus=unknown，未猜同包" },
+    { "id": "R01-T02", "result": "PASS", "note": "OPPO PCEM00/Android11 日志单列；Redmi/vivo 标 unknown 且日志缺失，未以一机型冒充" },
+    { "id": "R01-T03", "result": "PASS", "note": "资料清单 U01—U06 含来源/阻塞任务/缺失项，其他本地任务可继续" }
+  ],
+  "artifacts": ["evidence/m3/TASK-M3-09-R01/attempt-01/package-device-map.json", "evidence/m3/TASK-M3-09-R01/attempt-01/task-result.json"],
+  "scopeNote": "DONE 仅表示对应关系与未知项登记准确，不代表外部资料已收到；未登录任何后台、未外发、未上传。"
+}

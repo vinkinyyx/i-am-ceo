@@ -1,0 +1,17 @@
+{
+  "taskId": "TASK-M3-09-R23",
+  "title": "UI 文本令牌与热区底线（禁缩字掩盖布局）",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T07:35:00+08:00",
+  "changes": [
+    { "file": "assets/scripts/ui/textTokens.ts", "action": "新增 TEXT_TOKENS（heading 20/28、title 17/24、bodyStrong 15/22、body 14/21、caption 12/18、money 16/22、button 15/21）、SPACE_TOKENS（cardPadding 12/cardGap 10/rowGap 8/sectionGap 16）、TOUCH_TARGET 44×44 与 ensureTouchSize 热区守卫" },
+    { "file": "assets/scripts/ui/UiFactory.ts", "action": "createLabel：字号下限 12、默认行高 round(fontSize*1.45)、verticalAlign TOP、给定 width 时 RESIZE_HEIGHT 换行——移除默认 SHRINK 缩字；createButton：ensureTouchSize 保底 ≥44×44 热区；createScrollContainer：修正 ScrollView content 绑定" },
+    { "file": "tests/unit/textTokens.test.mjs", "action": "新增 3 用例：字号令牌齐全且 caption≥12、行高≥1.4 倍、ensureTouchSize 小尺寸提升到 44×44 且大尺寸不缩" }
+  ],
+  "commands": [
+    { "cmd": "npx vitest run tests/unit/textTokens.test.mjs", "exitCode": 0, "result": "PASS 3 tests" },
+    { "cmd": "npm run typecheck:ui", "exitCode": 0 },
+    { "cmd": "npm run lint", "exitCode": 0 }
+  ],
+  "notes": "令牌为后续 R24—R33 逐页改造的统一度量来源；任何页面不得再用 SHRINK/缩小字号掩盖溢出，溢出必须通过换行或滚动解决（R24/R25 落地）。"
+}

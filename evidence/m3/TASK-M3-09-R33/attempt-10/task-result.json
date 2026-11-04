@@ -1,0 +1,17 @@
+{
+  "taskId": "TASK-M3-09-R33",
+  "attempt": "attempt-10",
+  "date": "2026-11-03",
+  "result": "PASS_PARTIAL",
+  "command": "node tools/e2e/r33-settings.cjs http://127.0.0.1:8154/ evidence/m3/TASK-M3-09-R33/attempt-10",
+  "evidence": [
+    "e2e-report.json",
+    "r33-settings.png",
+    "r33-audio-write-failure.png",
+    "r33-tutorial-replay.png"
+  ],
+  "passed": 6,
+  "failed": 0,
+  "browserErrors": 0,
+  "limitations": "offline summary, distress/rescue UI, hide/show and decode failure not run"
+}

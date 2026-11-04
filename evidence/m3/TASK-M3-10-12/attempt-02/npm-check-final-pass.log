@@ -1,0 +1,11 @@
+
+> im-ceo@0.1.0 check
+> npm run typecheck && npm run typecheck:ui && npm run lint && npm run test
+
+
+> im-ceo@0.1.0 typecheck
+> tsc -p tsconfig.core.json --noEmit
+
+assets/core/platform/TapRewardedAdProvider.ts(54,9): error TS2322: Type '(result: any) => void' is not assignable to type '() => undefined'.
+  Target signature provides too few arguments. Expected 1 or more, but got 0.
+assets/core/platform/TapRewardedAdProvider.ts(54,28): error TS7006: Parameter 'result' implicitly has an 'any' type.

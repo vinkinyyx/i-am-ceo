@@ -1,6 +1,7 @@
 import type { EconomyConfig } from '../config/EconomyConfig';
 import { newId } from '../domain/ids';
 import type {
+  AutomationLogEntry,
   Candidate,
   Department,
   GameState,
@@ -166,6 +167,11 @@ export function runMonthlyAutoHire(
   if (state.cashRisk !== 'NORMAL') return skip('现金风险，冻结自动招聘');
 
   const year = state.gameYear;
+  // 首月自动招聘在月结前已支付现金；年开盘快照需取付款前余额，
+  // 否则年报现金桥会把这笔招聘费既从期初余额扣除、又计入月账。
+  if (state.gameMonth === 1 && state.yearOpenCashYuan[year] === undefined) {
+    state.yearOpenCashYuan[year] = state.company.cashYuan;
+  }
   const yearCount = state.autoHireCountByYear[year] ?? 0;
   if (yearCount >= cfg.recruitment.maxAutoHiresPerYear) {
     return skip(`本年自动招聘已达上限 ${cfg.recruitment.maxAutoHiresPerYear} 人`);
@@ -264,19 +270,28 @@ export function runMonthlyAutoHire(
   return skip('无满足 ROI 门槛的自动招聘候选');
 }
 
-/** 写一条自动化决策日志（保留最近 50 条）。 */
+/**
+ * 写一条自动化决策日志（保留最近 50 条）。
+ * 可选字段只在有值时写入：GameState 必须是可 JSON 往返的纯数据，
+ * 显式 undefined 属性会让 cloneGameState 抛 CloneError（存档会静默丢字段导致内存/存档不一致）。
+ */
 export function appendAutomationLog(state: GameState, decision: AutoHireDecision): void {
-  state.automationLogs.push({
+  const entry: AutomationLogEntry = {
     logId: newId('alog', state.runId, state.automationLogs.length + 1),
     year: state.gameYear,
     month: state.gameMonth,
     kind: decision.hired ? 'AUTO_HIRE' : 'AUTO_SKIP',
     deptType: decision.deptType ?? null,
-    candidateId: decision.candidate?.candidateId,
-    projectedBenefitYuan: decision.projectedBenefitYuan,
-    projectedCostYuan: decision.projectedCostYuan,
     reason: decision.reason,
-  });
+  };
+  if (decision.candidate) entry.candidateId = decision.candidate.candidateId;
+  if (decision.projectedBenefitYuan !== undefined) {
+    entry.projectedBenefitYuan = decision.projectedBenefitYuan;
+  }
+  if (decision.projectedCostYuan !== undefined) {
+    entry.projectedCostYuan = decision.projectedCostYuan;
+  }
+  state.automationLogs.push(entry);
   if (state.automationLogs.length > 50) {
     state.automationLogs = state.automationLogs.slice(-50);
   }

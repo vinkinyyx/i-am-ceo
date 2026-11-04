@@ -1,0 +1,81 @@
+{
+  "url": "http://127.0.0.1:8154/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "R33-settings-panel-opened-by-real-click",
+      "status": "PASS",
+      "detail": {
+        "candidates": 5
+      }
+    },
+    {
+      "id": "R33-audio-setting-persisted",
+      "status": "PASS",
+      "detail": {
+        "masterEnabled": false,
+        "musicEnabled": true,
+        "sfxEnabled": true
+      }
+    },
+    {
+      "id": "R33-audio-setting-does-not-mutate-company",
+      "status": "PASS",
+      "detail": {
+        "before": 11,
+        "after": 11
+      }
+    },
+    {
+      "id": "R33-audio-write-failure-reverts-and-reports",
+      "status": "PASS",
+      "detail": {
+        "settings": {
+          "masterEnabled": false,
+          "musicEnabled": true,
+          "sfxEnabled": true
+        },
+        "toast": [
+          {
+            "text": "声音设置保存失败，已恢复原设置",
+            "x": 187.5,
+            "y": 106.00000000000006,
+            "width": 284,
+            "height": 23.939999999999998
+          }
+        ]
+      }
+    },
+    {
+      "id": "R33-audio-write-failure-preserves-save",
+      "status": "PASS",
+      "detail": {
+        "before": 11,
+        "after": 11
+      }
+    },
+    {
+      "id": "R33-tutorial-replay-does-not-restart-company",
+      "status": "PASS",
+      "detail": {
+        "beforeRunId": "run_134cdm7000000",
+        "afterRunId": "run_134cdm7000000",
+        "beforeRevision": 11,
+        "afterRevision": 11
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 6,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

@@ -1,0 +1,24 @@
+{
+  "ok": true,
+  "protectedChangedOnlyForAuthorizedDocumentation": [
+    "docs\\我是CEO_项目总览.md"
+  ],
+  "readmeLinksValid": true,
+  "expectedNewGitDeletions": [
+    " D build/TapBuild/game.zip"
+  ],
+  "releaseDirectories": [
+    "build\\release\\m3-20261104-cloud-rank-r1"
+  ],
+  "npmCheck": {
+    "exitCode": 0,
+    "passed": 477,
+    "skipped": 1,
+    "testFilesPassed": 62,
+    "testFilesSkipped": 1
+  },
+  "packageRecheck": "VERIFY_OK",
+  "productionCodeChanged": false,
+  "browserAndDeviceRetest": "NOT_RUN",
+  "gitCommitOrPush": false
+}

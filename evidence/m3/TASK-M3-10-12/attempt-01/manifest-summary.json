@@ -1,0 +1,22 @@
+{
+  "releaseId": "m3-20261103-adlocal-final-r3",
+  "gameVersion": "1.0.0",
+  "sizeBytes": 5160461,
+  "sha256": "5b535767431ebd1772ae0716883f03264d214a06196fa9111ecb4a801f2eae55",
+  "entryCount": 458,
+  "purpose": "diagnostic",
+  "creatorVersion": "3.8.8",
+  "tapPluginVersion": "1.2.2",
+  "buildExitCode": 36,
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": []
+  }
+}

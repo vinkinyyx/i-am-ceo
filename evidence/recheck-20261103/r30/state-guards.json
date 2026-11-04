@@ -1,0 +1,474 @@
+{
+  "s0": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 1000000,
+    "phase": "RUNNING",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "policy": "STEADY",
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_hr_0001",
+        "type": "HR",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_proc_0001",
+        "type": "PROCUREMENT",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_mkt_0001",
+        "type": "MARKETING",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_cs_0001",
+        "type": "CUSTOMER_SERVICE",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_fin_0001",
+        "type": "FINANCE",
+        "enabled": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_base_1",
+        "name": "梁思远",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_base_2",
+        "name": "宋刚",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_hr_1",
+        "name": "人事员戊",
+        "deptId": "dp_hr_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_proc_1",
+        "name": "采购员甲",
+        "deptId": "dp_proc_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_mkt_1",
+        "name": "市场员丙",
+        "deptId": "dp_mkt_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_cs_1",
+        "name": "客服员乙",
+        "deptId": "dp_cs_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      }
+    ],
+    "ledgers": [],
+    "pendingEntries": [
+      {
+        "category": "RECRUITMENT",
+        "amount": -7645,
+        "refId": "hire_mvzc3y7q_2"
+      },
+      {
+        "category": "RECRUITMENT",
+        "amount": -5328,
+        "refId": "hire_mvzc44qi_1"
+      }
+    ],
+    "automationLogs": [],
+    "executedCommandCount": 4
+  },
+  "sExpired": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 1000000,
+    "phase": "RUNNING",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "policy": "STEADY",
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_hr_0001",
+        "type": "HR",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_proc_0001",
+        "type": "PROCUREMENT",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_mkt_0001",
+        "type": "MARKETING",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_cs_0001",
+        "type": "CUSTOMER_SERVICE",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_fin_0001",
+        "type": "FINANCE",
+        "enabled": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_base_1",
+        "name": "梁思远",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_base_2",
+        "name": "宋刚",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_hr_1",
+        "name": "人事员戊",
+        "deptId": "dp_hr_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_proc_1",
+        "name": "采购员甲",
+        "deptId": "dp_proc_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_mkt_1",
+        "name": "市场员丙",
+        "deptId": "dp_mkt_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_cs_1",
+        "name": "客服员乙",
+        "deptId": "dp_cs_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      }
+    ],
+    "ledgers": [],
+    "pendingEntries": [
+      {
+        "category": "RECRUITMENT",
+        "amount": -7645,
+        "refId": "hire_mvzc3y7q_2"
+      },
+      {
+        "category": "RECRUITMENT",
+        "amount": -5328,
+        "refId": "hire_mvzc44qi_1"
+      }
+    ],
+    "automationLogs": [],
+    "executedCommandCount": 4
+  },
+  "sp": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 3000,
+    "phase": "RUNNING",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "policy": "STEADY",
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_hr_0001",
+        "type": "HR",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_proc_0001",
+        "type": "PROCUREMENT",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_mkt_0001",
+        "type": "MARKETING",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_cs_0001",
+        "type": "CUSTOMER_SERVICE",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_fin_0001",
+        "type": "FINANCE",
+        "enabled": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_base_1",
+        "name": "梁思远",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_base_2",
+        "name": "宋刚",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_hr_1",
+        "name": "人事员戊",
+        "deptId": "dp_hr_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_proc_1",
+        "name": "采购员甲",
+        "deptId": "dp_proc_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_mkt_1",
+        "name": "市场员丙",
+        "deptId": "dp_mkt_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_cs_1",
+        "name": "客服员乙",
+        "deptId": "dp_cs_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      }
+    ],
+    "ledgers": [],
+    "pendingEntries": [
+      {
+        "category": "RECRUITMENT",
+        "amount": -7645,
+        "refId": "hire_mvzc3y7q_2"
+      },
+      {
+        "category": "RECRUITMENT",
+        "amount": -5328,
+        "refId": "hire_mvzc44qi_1"
+      }
+    ],
+    "automationLogs": [],
+    "executedCommandCount": 4
+  },
+  "sPoorAfter": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 3000,
+    "phase": "RUNNING",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "policy": "STEADY",
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_hr_0001",
+        "type": "HR",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_proc_0001",
+        "type": "PROCUREMENT",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_mkt_0001",
+        "type": "MARKETING",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_cs_0001",
+        "type": "CUSTOMER_SERVICE",
+        "enabled": true
+      },
+      {
+        "deptId": "dp_fin_0001",
+        "type": "FINANCE",
+        "enabled": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_base_1",
+        "name": "梁思远",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_base_2",
+        "name": "宋刚",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_hr_1",
+        "name": "人事员戊",
+        "deptId": "dp_hr_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_proc_1",
+        "name": "采购员甲",
+        "deptId": "dp_proc_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_mkt_1",
+        "name": "市场员丙",
+        "deptId": "dp_mkt_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      },
+      {
+        "id": "emp_cs_1",
+        "name": "客服员乙",
+        "deptId": "dp_cs_0001",
+        "salary": 5000,
+        "status": "ACTIVE",
+        "pending": null,
+        "pendingFrom": null,
+        "dismissedAt": null
+      }
+    ],
+    "ledgers": [],
+    "pendingEntries": [
+      {
+        "category": "RECRUITMENT",
+        "amount": -7645,
+        "refId": "hire_mvzc3y7q_2"
+      },
+      {
+        "category": "RECRUITMENT",
+        "amount": -5328,
+        "refId": "hire_mvzc44qi_1"
+      }
+    ],
+    "automationLogs": [],
+    "executedCommandCount": 4
+  }
+}

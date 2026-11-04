@@ -1,0 +1,23 @@
+{
+  "packageVerifyFindings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": []
+  },
+  "creatorVersion": "3.8.8",
+  "tapPluginVersion": "1.2.2",
+  "purpose": "diagnostic",
+  "gameVersion": "1.0.0",
+  "sizeBytes": 5159712,
+  "entryCount": 458,
+  "buildExitCode": 36,
+  "releaseId": "m3-20261103-adlocal-partial",
+  "sha256": "139fb1f7f228b5beb25bc25ff3d7442b4302d24423fd42ab50da38e7c2167c88",
+  "zipPath": "build\\release\\m3-20261103-adlocal-partial\\01\\game.zip"
+}

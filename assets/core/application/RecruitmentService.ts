@@ -5,16 +5,37 @@ import { ensureRunId, hasCommand, recordCommand } from './MutationContext';
 import { isOfferCurrent } from './OfferService';
 import { activeStaffInDept, hrRecruitmentDiscountBps } from '../simulation/departments';
 import { monthIndexOf, addPendingEntry } from './monthEntry';
+import { consumeAdCoupon, isAdCouponAvailable } from './AdRewardService';
 import type {
   Candidate,
   Employee,
   GameState,
 } from '../domain/types';
 
+export interface HirePreview {
+  candidateId: string;
+  candidateName: string;
+  deptId: string;
+  /** 本次实际招聘费（HR 折扣后）。 */
+  feeYuan: number;
+  nominalFeeYuan: number;
+  couponEligible: boolean;
+  salaryMonthlyYuan: number;
+  cashBeforeYuan: number;
+  cashAfterYuan: number;
+  affordable: boolean;
+  /** 录用后第几个月索引生效（首聘当月=0，运营期次月）。 */
+  effectiveFromMonthIndex: number;
+  firstHire: boolean;
+}
+
 export interface HireInput {
   offerId: string;
   candidateId: string;
   departmentId: string;
+  couponId?: string;
+  expectedRevision?: number;
+  nowMs?: number;
 }
 
 export interface HireResult {
@@ -22,6 +43,54 @@ export interface HireResult {
   feePaidYuan: number;
   cashAfterYuan: number;
   firstHire: boolean;
+}
+
+/**
+ * R26：只读招聘预览（不修改状态）。UI 确认弹窗必须用本查询显示费用，
+ * 禁止在 UI 侧自行猜测招聘费公式。
+ */
+export function previewHire(
+  state: GameState,
+  cfg: EconomyConfig,
+  input: HireInput,
+): HirePreview {
+  if (!state.company) throw new Error(GameErrorCode.NOT_READY);
+  const isInitialHiring = state.phase === 'HIRING_INITIAL';
+  if (!isInitialHiring && state.phase !== 'RUNNING' && state.phase !== 'DISTRESS') {
+    throw new Error(GameErrorCode.NOT_READY);
+  }
+  const dept = state.departments.find((d) => d.deptId === input.departmentId);
+  if (!dept) throw new Error(GameErrorCode.DEPT_NOT_FOUND);
+  if (!isOfferCurrent(state, input.offerId)) throw new Error(GameErrorCode.OFFER_EXPIRED);
+  const offer = state.offers.find((o) => o.offerId === input.offerId);
+  if (!offer || offer.deptId !== input.departmentId) throw new Error(GameErrorCode.OFFER_EXPIRED);
+  const candidate = offer.candidates.find((c) => c.candidateId === input.candidateId);
+  if (!candidate) throw new Error(GameErrorCode.OFFER_EXPIRED);
+  if (state.employees.some((e) => e.candidateId === candidate.candidateId)) {
+    throw new Error(GameErrorCode.OFFER_EXPIRED);
+  }
+
+  const mIndex = monthIndexOf(state);
+  const hrDiscount = hrRecruitmentDiscountBps(cfg, activeStaffInDept(state, 'HR', mIndex));
+  const nominalFee = recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
+  const couponValid = !isInitialHiring && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now());
+  if (input.couponId && !couponValid) throw new Error(GameErrorCode.ALREADY_USED);
+  const fee = couponValid ? 0 : nominalFee;
+  const cashBefore = state.company.cashYuan;
+  return {
+    candidateId: candidate.candidateId,
+    candidateName: candidate.name,
+    deptId: input.departmentId,
+    feeYuan: fee,
+    nominalFeeYuan: nominalFee,
+    couponEligible: couponValid,
+    salaryMonthlyYuan: candidate.salaryMonthlyYuan,
+    cashBeforeYuan: cashBefore,
+    cashAfterYuan: cashBefore - fee,
+    affordable: cashBefore >= fee,
+    effectiveFromMonthIndex: isInitialHiring ? 0 : mIndex + 1,
+    firstHire: isInitialHiring && state.onboarding.initialHiresCompleted === 0,
+  };
 }
 
 /**
@@ -92,10 +161,14 @@ export function hireEmployee(
     cfg,
     activeStaffInDept(state, 'HR', mIndex),
   );
-  const fee = recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
+  const useCoupon = !isInitialHiring && !!input.couponId && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now());
+  if (input.couponId && !useCoupon) throw new Error(GameErrorCode.ALREADY_USED);
+  const fee = useCoupon ? 0 : recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
   if (state.company.cashYuan < fee) {
     throw new Error(GameErrorCode.INSUFFICIENT_CASH);
   }
+
+  if (useCoupon) consumeAdCoupon(state, input.couponId, input.nowMs ?? Date.now(), ctx.expectedRunId);
 
   const employeeId = candidateToEmployeeId(state, candidate.candidateId);
   const employee: Employee = {

@@ -1,0 +1,5 @@
+VERIFY_FAIL [
+  "application.js",
+  "assets/main/index.a4e34.js: EditorMockPlatform in package",
+  "game.js -> application.js"
+]

@@ -1,0 +1,86 @@
+{
+  "task": "R28",
+  "name": "公司首页与时间/经营操作",
+  "status": "DONE",
+  "generatedAt": "2026-11-02T15:11:22Z",
+  "executor": "本地执行 Agent",
+  "scope": ["T01", "T02", "T03", "T04", "T05"],
+  "result": {
+    "T01": "PASS：20 字长名在首页单行裁切（CLAMP+省略），公司名与「设置」为两个独立热区；完整名称在只读公司档案弹窗内完整展示；现金 123.4567 万与负利润 -32.5 万均不压设置。",
+    "T02": "PASS：5× 在 4.8s 内实际月结（month 1→2、ledger 0→1）；暂停后两次读取 progressMsInMonth 完全一致（683）；1×/2×/5× 依次写入存档；重载后仍为 5×；360×640 滚到底后切 5×，正文滚动位置 BodyContent.y=109 保持不变。",
+    "T03": "PASS：扩产二次确认取消后现金/资产/总资产/累计投资零变化（289081/0/289081/0）；确认 1 万后现金 −10000、业务资产 +10000、总资产当时不变、累计产能投资 +10000；同一 commandId 连点只扣一次（单测）。",
+    "T04": "PASS：扩产弹窗三档金额均显示真实「产能加成、现金前后、资产前后、月产能前后、月需求」及闲置风险文案（数值来自 previewInvest）。",
+    "T05": "PASS：连续三年盈利目标达成（target3YearsAchieved=true，consecutiveProfitableYears=3）后首页显示目标达成，且重载后仍可继续经营、可切换倍速。"
+  },
+  "vmFields": [
+    { "ui": "当前可用现金", "source": "CompanyOverview.cashYuan ← company.cashYuan", "evidence": "375-01-home-top" },
+    { "ui": "本年累计收入（已结算）", "source": "CompanyOverview.ytdRevenueYuan ← Σ monthlyLedgersRolling(当年).revenueYuan", "evidence": "375-01-home-top / state-375.json paused.ytdRevenue=120000" },
+    { "ui": "本年累计利润（已结算）", "source": "CompanyOverview.ytdProfitYuan ← Σ monthlyLedgersRolling(当年).profitYuan", "evidence": "375-01-home-top / state-375.json paused.ytdProfit=-10919" },
+    { "ui": "业务资产", "source": "CompanyOverview.businessAssetBookYuan ← company.businessAssetBookYuan", "evidence": "375-10-invest-after" },
+    { "ui": "产能加成 +x%", "source": "CompanyOverview.capacityCoeffBps ← businessAssetCoeffBps(cfg, businessCapacityInvestmentYuan)", "evidence": "375-10-invest-after" },
+    { "ui": "当月产能", "source": "CompanyOverview.monthlyCapacityYuan ← monthlyCapacity(...)（与月结同一口径，含业务部员工/CEO/部门加成）", "evidence": "375-06-invest-dialog-375" },
+    { "ui": "当月需求", "source": "CompanyOverview.monthlyPotentialOrderYuan ← monthlyPotentialOrder(...)（含市场部提升）", "evidence": "375-06-invest-dialog-375" },
+    { "ui": "需求不足/闲置风险", "source": "CompanyOverview.idleRisk = 当月产能 > 当月需求；扩产用 previewInvest.idleRiskAfter", "evidence": "15-stress-invest-idle-risk" },
+    { "ui": "现金风险（可覆盖 6 个月刚性费用）", "source": "CompanyOverview.risk ← assessRisk(state, cfg)", "evidence": "375-01-home-top" },
+    { "ui": "连续盈利目标 0/3 年", "source": "CompanyOverview.target3YearsAchieved / consecutiveProfitableYears", "evidence": "375-stress-12-home-large-negative-longname" },
+    { "ui": "扩产确认弹窗（现金/资产/总资产/产能/需求）", "source": "previewInvest(amount) 只读预览；确认才 invest(commandId) 落账", "evidence": "375-07-invest-confirm-375" },
+    { "ui": "时间区（暂停/1×/2×/5×）", "source": "state.speed，经 GameClock.setSpeed 持久化；UI 就地重绘不重建页面", "evidence": "375-04-speed-2x / 375-05-speed-5x-after-reload" }
+  ],
+  "finance": {
+    "before": { "cash": 289081, "asset": 0, "total": 289081, "capacityInvestment": 0 },
+    "after": { "cash": 279081, "asset": 10000, "total": 289081, "capacityInvestment": 10000 },
+    "diff": { "cashDelta": -10000, "assetDelta": 10000, "totalDelta": 0, "capacityInvestmentDelta": 10000 },
+    "files": ["finance-before.json", "finance-after.json", "finance-diff.json"]
+  },
+  "checks": [
+    { "id": "T01-detail-readonly", "pass": true },
+    { "id": "T01-long-name-does-not-cover-settings", "pass": true },
+    { "id": "T02-5x-actually-advances", "pass": true },
+    { "id": "T02-pause-freezes-clock", "pass": true },
+    { "id": "T02-speed-persisted-live", "pass": true },
+    { "id": "T02-speed-survives-reload", "pass": true },
+    { "id": "T02-speed-switch-keeps-scroll", "pass": true },
+    { "id": "T02-small-screen-speed-pause", "pass": true },
+    { "id": "T03-cancel-no-deduction", "pass": true },
+    { "id": "T03-confirm-transfers-cash-to-asset", "pass": true },
+    { "id": "T01-large-cash-and-negative-profit-rendered", "pass": true },
+    { "id": "T05-three-year-goal-achieved", "pass": true },
+    { "id": "T01-stress-settings-still-clickable", "pass": true },
+    { "id": "T01-stress-full-name-in-detail", "pass": true },
+    { "id": "T05-keeps-operating-after-goal", "pass": true },
+    { "id": "C-third-viewport-stable", "pass": true }
+  ],
+  "browserEvidence": {
+    "script": "tools/shot-r28.cjs",
+    "report": "r28-report.json",
+    "screenshots": "shots/（25 张：375×812 实机流程 11 张、375 压力档 4 张、360×640 小屏 5 张、390×844 第三尺寸 5 张）",
+    "states": ["state-375.json", "state-375-stress.json", "state-360.json", "state-390.json"],
+    "seeds": ["seed-live.json", "seed-stress.json", "seed-base-crc-verified.json"],
+    "pageErrors": [],
+    "note": "G007/G008 对应证据：375-04/05（倍速与重载保速）、360-17/18（小屏滚动保持）、375-06—10（扩产预览/取消/确认与财务 diff）。"
+  },
+  "tests": {
+    "unit": ["tests/unit/companyOverview.test.ts（6 例：YTD 只统计已结算、需求/产能、闲置风险、现金风险、投资金额校验）"],
+    "integration": ["tests/integration/companyDashboardFacade.test.ts（5 例：倍速持久化、月结后命令可继续回归、首页 VM 一致、取消零变更、确认守恒、幂等、闲置风险）"],
+    "regression": "月结写自动化日志曾把 candidateId/projectedBenefit/projectedCost 写成 undefined，cloneGameState 抛 CloneError 被映射为 NOT_READY，导致 5× 首月结后所有命令失效（重载才恢复）。已改为可选字段有值才写入，并补「月结后 setSpeed/advanceRealTime 仍成功」回归用例；annualEvent 的 employeeId 同类问题一并修复。",
+    "gate": { "typecheck": "PASS", "typecheckUi": "PASS", "lint": "PASS", "vitest": "388/388 PASS（47 files）" }
+  },
+  "changedFiles": [
+    "assets/core/application/CompanyOverviewService.ts（新增：首页只读 VM）",
+    "assets/core/application/InvestmentService.ts（预览含真实产能/需求/闲置 + 幂等重放）",
+    "assets/core/application/GameFacade.ts（invest 传 ctx、getCompanyOverview、未知异常兜底）",
+    "assets/core/application/AutoHireService.ts（可选字段 undefined 修复）",
+    "assets/core/simulation/annualEvent.ts（可选字段 undefined 修复）",
+    "assets/scripts/ui/AppView.ts（首页/档案/时间区/扩产确认/年报入口/长名热区）",
+    "tools/shot-r28.cjs（三视口证据脚本）"
+  ],
+  "assumptions": [
+    "压力档用派生存档（派生自 R27 真实存档并重算 CRC32）：现金 123.4567 万、注入 1 条负利润 ledger、连续盈利 3 年，仅用于展示抗压，不改经济基线。",
+    "扩产证据取第一档 1 万；三档均由 previewInvest 提供数值，单测覆盖金额边界。",
+    "暂停不清零月内进度（DEC-014：改速度保留 progressMsInMonth），因此暂停校验以「两次读取完全相同」为准。"
+  ],
+  "limitations": [
+    "真机录屏与触点验收归 R35—R39（U05），本轮为 Chromium 三视口 + Cocos 节点位置读数。",
+    "浏览器证据以 canvas 点击驱动；扩产行点击位置经场景节点探针标定（1万/5万/10万 行中心 dy=80/-34/-148，375×812 原点居中）。"
+  ]
+}

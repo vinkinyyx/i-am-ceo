@@ -1,0 +1,1 @@
+Usage: node tools/patch-splash.cjs [buildRoot]  # buildRoot contains web-mobile/wechatgame/TapBuild; default: <project>/build

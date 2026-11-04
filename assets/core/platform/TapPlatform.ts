@@ -56,6 +56,9 @@ export interface TapRuntime {
   offShow(callback?: (res: unknown) => void): void;
   onHide(callback: () => void): void;
   offHide(callback?: () => void): void;
+  /** 窗口尺寸变化（R24）；旧运行时可能缺失，故为可选，不进 REQUIRED_METHODS。 */
+  onWindowResize?(callback: (res: { windowWidth: number; windowHeight: number }) => void): void;
+  offWindowResize?(callback?: (res: { windowWidth: number; windowHeight: number }) => void): void;
   getStorage(params: { key: string } & TapSuccessFailCallback<{ data: unknown }>): void;
   setStorage(params: { key: string; data: unknown } & TapSuccessFailCallback): void;
   removeStorage(params: { key: string } & TapSuccessFailCallback): void;
@@ -174,10 +177,32 @@ function saveError(api: string, key: string, cause: unknown): GameError {
   });
 }
 
+/** R10：读取类 IO/超时失败使用 SAVE_UNAVAILABLE，区别于已确认 missing（null）。 */
+function saveUnavailable(
+  api: string,
+  key: string,
+  reason: 'timeout' | 'io' | 'permission',
+  cause: unknown,
+): GameError {
+  return new GameError(GameErrorCode.SAVE_UNAVAILABLE, {
+    api,
+    key,
+    reason,
+    cause: describeCause(cause),
+  });
+}
+
 /** 各端对“key 不存在”的 fail 文案不统一，按子串容忍识别（缺失≠失败，读作 null）。 */
 function isMissingKeyFailure(res: TapCallbackResult): boolean {
   const msg = res.errMsg ?? '';
   return msg.includes('data not found') || msg.includes('not exist') || msg.includes('not found');
+}
+
+/** R17/T06：诊断原因不得回显一次性 code/secret/token（这些只属于请求参数，不应出现在错误详情）。 */
+function redactSecrets(text: string): string {
+  return text
+    .replace(/\bcode\s*[:=]\s*[^\s,}&]+/gi, 'code=***')
+    .replace(/\b(secret|token|session[_-]?key|authorization|password)\s*[:=]\s*[^\s,}&]+/gi, '$1=***');
 }
 
 function mapNetworkType(networkType: unknown): NetworkState {
@@ -193,6 +218,7 @@ export class TapPlatform implements ITapPlatform {
   private readonly loginTimeoutMs?: number;
   private readonly opTimeoutMs: number;
   private readonly loginCallbackTimeoutMs: number;
+  private unsettledNativeWrites = 0;
 
   /**
    * @param tap 注入的 tap 运行时（测试可注入假对象）；缺省探测 globalThis.tap。
@@ -215,6 +241,10 @@ export class TapPlatform implements ITapPlatform {
 
   getEnvironment(): 'TAPTAP' {
     return 'TAPTAP';
+  }
+
+  hasUnsettledNativeWrites(): boolean {
+    return this.unsettledNativeWrites > 0;
   }
 
   getWindowInfo(): WindowInfo {
@@ -260,6 +290,28 @@ export class TapPlatform implements ITapPlatform {
     };
   }
 
+  /**
+   * R24：窗口/安全区变化 → 重新取完整 WindowInfo 通知 UI 重排。
+   * 旧运行时无 onWindowResize 时退化为 no-op（UI 层有 view 级 canvas-resize 兜底）。
+   */
+  onWindowResize(callback: (info: WindowInfo) => void): Unsubscribe {
+    if (typeof this.tap.onWindowResize !== 'function') return () => undefined;
+    const handler = () => {
+      try {
+        callback(this.getWindowInfo());
+      } catch {
+        // 布局数据瞬时不可得不阻断平台回调；下一帧 view 级事件仍会兜底
+      }
+    };
+    this.tap.onWindowResize(handler);
+    let active = true;
+    return () => {
+      if (!active) return;
+      active = false;
+      this.tap.offWindowResize?.(handler);
+    };
+  }
+
   login(): Promise<LoginResult> {
     return new Promise((resolve, reject) => {
       const guard = new CallbackGuard(this.loginCallbackTimeoutMs, () =>
@@ -289,7 +341,7 @@ export class TapPlatform implements ITapPlatform {
             reject(
               new GameError(GameErrorCode.AUTH_REQUIRED, {
                 api: 'login',
-                cause: describeCause(res),
+                cause: redactSecrets(describeCause(res)),
               }),
             ),
           ),
@@ -327,15 +379,38 @@ export class TapPlatform implements ITapPlatform {
 
   get<T>(key: string): Promise<T | null> {
     return new Promise((resolve, reject) => {
-      // 超时按"无存档"降级：启动装载绝不被挂死（鸿蒙运行时不回调的真实案例）
-      const guard = new CallbackGuard(this.opTimeoutMs, () => resolve(null));
+      // R10/REL-04：超时/无回调必须 reject SAVE_UNAVAILABLE(timeout)，
+      // 绝不能 resolve(null) 把“暂时不可读”冒充成“确认无档”，
+      // 否则启动层会误入首建并把活动档切到新 run（§14.5 复现事故）。
+      const guard = new CallbackGuard(this.opTimeoutMs, () =>
+        reject(
+          new GameError(GameErrorCode.SAVE_UNAVAILABLE, {
+            api: 'getStorage',
+            key,
+            reason: 'timeout',
+            cause: 'getStorage callback timeout (runtime did not respond)',
+          }),
+        ),
+      );
       try {
         this.tap.getStorage({
           key,
           success: (res) =>
             guard.fire(() => {
-              const data = res ? res.data : undefined;
-              // 缺失 key 的另一端表现：成功回调但空值，统一读作 null
+              if (res === undefined || res === null) {
+                // R10：success 但载荷结构非法，按错误处理，不任意判空
+                reject(
+                  new GameError(GameErrorCode.SAVE_UNAVAILABLE, {
+                    api: 'getStorage',
+                    key,
+                    reason: 'io',
+                    cause: 'success callback without response envelope',
+                  }),
+                );
+                return;
+              }
+              const data = res.data;
+              // 缺失 key 的平台表现之一：成功回调但空值，统一读作 null（已确认不存在）
               if (data === undefined || data === null || data === '') {
                 resolve(null);
               } else {
@@ -347,12 +422,12 @@ export class TapPlatform implements ITapPlatform {
               if (isMissingKeyFailure(res)) {
                 resolve(null);
               } else {
-                reject(saveError('getStorage', key, res));
+                reject(saveUnavailable('getStorage', key, 'io', res));
               }
             }),
         });
       } catch (err) {
-        guard.fire(() => reject(saveError('getStorage', key, err)));
+        guard.fire(() => reject(saveUnavailable('getStorage', key, 'io', err)));
       }
     });
   }
@@ -383,41 +458,55 @@ export class TapPlatform implements ITapPlatform {
         }),
       );
     }
-    return new Promise((resolve, reject) => {
-      const guard = new CallbackGuard(this.opTimeoutMs, () =>
-        reject(
-          new GameError(GameErrorCode.SAVE_FAILED, {
-            api: 'setStorage',
-            key,
-            cause: 'setStorage callback timeout (runtime did not respond)',
-          }),
-        ),
-      );
-      try {
-        this.tap.setStorage({
-          key,
-          data,
-          success: () => guard.fire(() => resolve()),
-          fail: (res) => guard.fire(() => reject(saveError('setStorage', key, res))),
-        });
-      } catch (err) {
-        guard.fire(() => reject(saveError('setStorage', key, err)));
-      }
+    return this.trackedNativeWrite('setStorage', key, (callbacks) => {
+      this.tap.setStorage({ key, data, ...callbacks });
     });
   }
 
   remove(key: string): Promise<void> {
+    // Cleanup keeps its best-effort timeout result, while the write fence
+    // remains raised until the host confirms the native remove has settled.
+    return this.trackedNativeWrite('removeStorage', key, (callbacks) => {
+      this.tap.removeStorage({ key, ...callbacks });
+    }, true);
+  }
+
+  private trackedNativeWrite(
+    api: 'setStorage' | 'removeStorage',
+    key: string,
+    start: (callbacks: TapSuccessFailCallback) => void,
+    timeoutIsSuccess = false,
+  ): Promise<void> {
+    this.unsettledNativeWrites += 1;
+    let nativeSettled = false;
+    const settleNative = (): void => {
+      if (nativeSettled) return;
+      nativeSettled = true;
+      this.unsettledNativeWrites = Math.max(0, this.unsettledNativeWrites - 1);
+    };
     return new Promise((resolve, reject) => {
-      // 清理型操作超时按成功处理（墓碑/清槽 best-effort，不阻塞流程）；明确失败仍报错
-      const guard = new CallbackGuard(this.opTimeoutMs, () => resolve());
-      try {
-        this.tap.removeStorage({
+      const guard = new CallbackGuard(this.opTimeoutMs, () => {
+        if (timeoutIsSuccess) resolve();
+        else reject(new GameError(GameErrorCode.SAVE_FAILED, {
+          api,
           key,
-          success: () => guard.fire(() => resolve()),
-          fail: (res) => guard.fire(() => reject(saveError('removeStorage', key, res))),
+          cause: `${api} callback timeout (native operation may still be pending)`,
+        }));
+      });
+      try {
+        start({
+          success: () => {
+            settleNative();
+            guard.fire(() => resolve());
+          },
+          fail: (res) => {
+            settleNative();
+            guard.fire(() => reject(saveError(api, key, res)));
+          },
         });
       } catch (err) {
-        guard.fire(() => reject(saveError('removeStorage', key, err)));
+        settleNative();
+        guard.fire(() => reject(saveError(api, key, err)));
       }
     });
   }

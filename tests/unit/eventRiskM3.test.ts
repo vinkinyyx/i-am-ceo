@@ -164,4 +164,18 @@ describe('M3-04 本地模拟榜（A14）', () => {
     state.company!.cashYuan = 100_000;
     expect(playerAssets(state)).toBe(112_000);
   });
+
+  it('排行榜查询不写初始化副作用；年限不受100年年报保留上限影响', () => {
+    const state = runningCompany();
+    state.gameYear = 121;
+    state.annualReports = [];
+    state.botCompanies = [];
+    const before = JSON.stringify(state);
+    const player = assetsLeaderboard(state, cfg).find((r) => r.isPlayer);
+    const years = yearsLeaderboard(state, cfg).find((r) => r.isPlayer);
+    expect(player?.yearsOperated).toBe(120);
+    expect(years?.yearsOperated).toBe(120);
+    expect(state.botCompanies).toEqual([]);
+    expect(JSON.stringify(state)).toBe(before);
+  });
 });

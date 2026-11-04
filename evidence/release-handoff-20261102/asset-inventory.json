@@ -1,0 +1,755 @@
+{
+  "date": "2026-11-02",
+  "scope": "Read-only file existence, audio SHA256, PNG headers and registry dimensions; no game execution, audio decoding/listening, image visual approval, or legal rights verification",
+  "audio": {
+    "count": 16,
+    "missing": [],
+    "hashMismatch": [],
+    "items": [
+      {
+        "assetId": "BGM_01",
+        "path": "assets/resources/audio/bgm/BGM_01_StartupLoop.mp3",
+        "exists": true,
+        "bytes": 960931,
+        "sha256": "4082844819d2a4cf63aec3f7a80fd49a4157a8426b5a0c4d23ebc1af4f8ca7f1",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "BGM_02",
+        "path": "assets/resources/audio/bgm/BGM_02_OfficeLoop.mp3",
+        "exists": true,
+        "bytes": 1536878,
+        "sha256": "fb4550a3b5ae0090153d580794373a0666d9caf1eb9941917f6ca038823db824",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "JNG_01",
+        "path": "assets/resources/audio/jingles/JNG_01_YearProfit.mp3",
+        "exists": true,
+        "bytes": 30764,
+        "sha256": "862135f9248df64e17bfb48feffd056e93508d822d75c45a86a8d899eb567897",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "JNG_02",
+        "path": "assets/resources/audio/jingles/JNG_02_YearLoss.mp3",
+        "exists": true,
+        "bytes": 30764,
+        "sha256": "081e73c1e7e2b6c6f35f395ebbadf021e14a3ab8ca8e373b7a671d3280b73cfa",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "JNG_03",
+        "path": "assets/resources/audio/jingles/JNG_03_ThreeYearGoal.mp3",
+        "exists": true,
+        "bytes": 48945,
+        "sha256": "231aaa04637626221b8c50afba6fc2f069f0b16989eab34e30d90a8ec7a794da",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_01",
+        "path": "assets/resources/audio/sfx/SFX_01_UITap.mp3",
+        "exists": true,
+        "bytes": 2238,
+        "sha256": "b9e3feeb5e16861311be14c80b1a81a97be7eabc032c81ce87639b838e173d93",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_02",
+        "path": "assets/resources/audio/sfx/SFX_02_Select.mp3",
+        "exists": true,
+        "bytes": 3178,
+        "sha256": "551caa1cf8924ad36d6794d45cb159b7d9ff0987a2ab931ef4f85eed32d5595c",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_03",
+        "path": "assets/resources/audio/sfx/SFX_03_Confirm.mp3",
+        "exists": true,
+        "bytes": 4432,
+        "sha256": "af122589066c859aad3f4e182b854a39ddf715cd5c258e8c7c3f4cb5289de496",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_04",
+        "path": "assets/resources/audio/sfx/SFX_04_Back.mp3",
+        "exists": true,
+        "bytes": 2865,
+        "sha256": "ba11167625b3a3285bae53c74aa73f3c21b07060ba510fdbf975c2d9ebf1e441",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_05",
+        "path": "assets/resources/audio/sfx/SFX_05_Invalid.mp3",
+        "exists": true,
+        "bytes": 4119,
+        "sha256": "dd209f02fc2a15985d0e3e18c418b72173da4c7ec158b4cff7b4ac2f71261f8f",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_06",
+        "path": "assets/resources/audio/sfx/SFX_06_RerollName.mp3",
+        "exists": true,
+        "bytes": 5686,
+        "sha256": "3fc2a096f7036b45caff293ab781a0664b0bdd4eaac54f9b03ef150ea949cc77",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_07",
+        "path": "assets/resources/audio/sfx/SFX_07_Recruit.mp3",
+        "exists": true,
+        "bytes": 9761,
+        "sha256": "db2eb15d58463c51d95b7a6267962983523cf696a02b359fcbf3da748c6f498b",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_08",
+        "path": "assets/resources/audio/sfx/SFX_08_CreateDepartment.mp3",
+        "exists": true,
+        "bytes": 11015,
+        "sha256": "37673172bbcfa1bb73e09341b0a28a8512441b19897a2381d9ff9a1758183e9e",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_09",
+        "path": "assets/resources/audio/sfx/SFX_09_Layoff.mp3",
+        "exists": true,
+        "bytes": 6313,
+        "sha256": "1dcc2feccf5794c8d4f911896194bed0cc2e7cb64427946a527b60f05ff74b21",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_10",
+        "path": "assets/resources/audio/sfx/SFX_10_SpeedChange.mp3",
+        "exists": true,
+        "bytes": 4432,
+        "sha256": "2aaacc7eef586d7990898aad37d692997324e9275d0f6ae3a98b5450a16f6d69",
+        "manifestHashMatches": true
+      },
+      {
+        "assetId": "SFX_11",
+        "path": "assets/resources/audio/sfx/SFX_11_CashWarning.mp3",
+        "exists": true,
+        "bytes": 8507,
+        "sha256": "4efb1caafdd09dfca006d05ab58de683941afd2604e9e51e3eabea00643ae887",
+        "manifestHashMatches": true
+      }
+    ]
+  },
+  "ui": {
+    "count": 67,
+    "missing": [],
+    "invalidPng": [],
+    "dimensionMismatch": [],
+    "items": [
+      {
+        "assetId": "EmployeeAvatar_01_Male_ShortHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_01_Male_ShortHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_01_Male_ShortHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_02_Female_ShoulderHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_02_Female_ShoulderHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_02_Female_ShoulderHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_03_Male_CurlyHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_03_Male_CurlyHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_03_Male_CurlyHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_04_Female_ShortHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_04_Female_ShortHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_04_Female_ShortHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_05_Male_Glasses_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_05_Male_Glasses_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_05_Male_Glasses_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_05_Male_Glasses_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_06_Female_Ponytail_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_06_Female_Ponytail_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_06_Female_Ponytail_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_07_Male_SlickedHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_07_Male_SlickedHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_07_Male_SlickedHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_08_Female_LongHair_Color1",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color1.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_08_Female_LongHair_Color2",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color2.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "EmployeeAvatar_08_Female_LongHair_Color3",
+        "path": "assets/resources/ui/avatars/EmployeeAvatar_08_Female_LongHair_Color3.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 256,
+        "height": 256,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Industry_BusinessServices",
+        "path": "assets/resources/ui/industries/Industry_BusinessServices.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Industry_Ecommerce",
+        "path": "assets/resources/ui/industries/Industry_Ecommerce.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Industry_Software",
+        "path": "assets/resources/ui/industries/Industry_Software.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_CustomerService",
+        "path": "assets/resources/ui/departments/Department_CustomerService.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_Finance",
+        "path": "assets/resources/ui/departments/Department_Finance.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_HumanResources",
+        "path": "assets/resources/ui/departments/Department_HumanResources.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_MainBusiness",
+        "path": "assets/resources/ui/departments/Department_MainBusiness.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_Marketing",
+        "path": "assets/resources/ui/departments/Department_Marketing.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Department_Procurement",
+        "path": "assets/resources/ui/departments/Department_Procurement.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Company",
+        "path": "assets/resources/ui/navigation/Nav_Company.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Company_Inactive",
+        "path": "assets/resources/ui/navigation/Nav_Company_Inactive.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Department",
+        "path": "assets/resources/ui/navigation/Nav_Department.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Department_Inactive",
+        "path": "assets/resources/ui/navigation/Nav_Department_Inactive.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Leaderboard",
+        "path": "assets/resources/ui/navigation/Nav_Leaderboard.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Leaderboard_Inactive",
+        "path": "assets/resources/ui/navigation/Nav_Leaderboard_Inactive.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Settings",
+        "path": "assets/resources/ui/navigation/Nav_Settings.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Settings_Inactive",
+        "path": "assets/resources/ui/navigation/Nav_Settings_Inactive.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Talent",
+        "path": "assets/resources/ui/navigation/Nav_Talent.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Nav_Talent_Inactive",
+        "path": "assets/resources/ui/navigation/Nav_Talent_Inactive.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Action_Help",
+        "path": "assets/resources/ui/status/Action_Help.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Action_Layoff",
+        "path": "assets/resources/ui/status/Action_Layoff.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Action_Recruit",
+        "path": "assets/resources/ui/status/Action_Recruit.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Action_Refresh",
+        "path": "assets/resources/ui/status/Action_Refresh.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Action_Save",
+        "path": "assets/resources/ui/status/Action_Save.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Finance_Cash",
+        "path": "assets/resources/ui/status/Finance_Cash.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Finance_Profit",
+        "path": "assets/resources/ui/status/Finance_Profit.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Finance_Revenue",
+        "path": "assets/resources/ui/status/Finance_Revenue.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Finance_TotalAssets",
+        "path": "assets/resources/ui/status/Finance_TotalAssets.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Status_Error",
+        "path": "assets/resources/ui/status/Status_Error.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Status_Success",
+        "path": "assets/resources/ui/status/Status_Success.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Status_Warning",
+        "path": "assets/resources/ui/status/Status_Warning.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Time_Offline",
+        "path": "assets/resources/ui/time/Time_Offline.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Time_Pause",
+        "path": "assets/resources/ui/time/Time_Pause.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Time_Play",
+        "path": "assets/resources/ui/time/Time_Play.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Time_Resume",
+        "path": "assets/resources/ui/time/Time_Resume.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Time_SpeedUp",
+        "path": "assets/resources/ui/time/Time_SpeedUp.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 192,
+        "height": 192,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_DangerButton",
+        "path": "assets/resources/ui/components/Component_DangerButton.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_InfoCard",
+        "path": "assets/resources/ui/components/Component_InfoCard.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_PrimaryButton",
+        "path": "assets/resources/ui/components/Component_PrimaryButton.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_SecondaryButton",
+        "path": "assets/resources/ui/components/Component_SecondaryButton.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_SelectedCard",
+        "path": "assets/resources/ui/components/Component_SelectedCard.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_SuccessCard",
+        "path": "assets/resources/ui/components/Component_SuccessCard.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      },
+      {
+        "assetId": "Component_WarningCard",
+        "path": "assets/resources/ui/components/Component_WarningCard.png",
+        "exists": true,
+        "pngHeaderValid": true,
+        "width": 640,
+        "height": 156,
+        "registryDimensionsMatch": true
+      }
+    ]
+  },
+  "runtimeConfig": {
+    "authEndpointPopulated": false,
+    "privacyPolicyUrlPopulated": false
+  },
+  "credentials": "No credential values read into this report."
+}

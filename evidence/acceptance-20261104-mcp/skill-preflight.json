@@ -1,0 +1,50 @@
+{
+  "tool": "taptap-mini-game-publisher/preflight",
+  "version": "1.0.0",
+  "checked_at_utc": "2026-11-04T13:54:11.505170+00:00",
+  "project": "D:\\Workspace\\TapTap\\我是CEO",
+  "target": "tap-mini",
+  "counts": {
+    "PASS": 3,
+    "FAIL": 0,
+    "WARN": 1,
+    "INFO": 3
+  },
+  "checks": [
+    {
+      "status": "INFO",
+      "code": "FLAVOR",
+      "message": "项目线索: npm web/frontend (needs confirmation)"
+    },
+    {
+      "status": "INFO",
+      "code": "ROUTING",
+      "message": "用户指定类型：tap-mini（仍需与实际后台判断依据一致）"
+    },
+    {
+      "status": "PASS",
+      "code": "VERSION",
+      "message": "版本号符合 Vx.y.z 格式：V1.0.1；未与后台版本历史比对"
+    },
+    {
+      "status": "PASS",
+      "code": "PACKAGE",
+      "message": "ZIP 文件结构可读取（458 个条目）；但无法验证是否由官方 TapTap 打包工具生成"
+    },
+    {
+      "status": "PASS",
+      "code": "SIZE_CONSERVATIVE",
+      "message": "包体 4.39 MiB 小于保守的 20MiB 本地提示线；这不是平台审核结论"
+    },
+    {
+      "status": "WARN",
+      "code": "ASSETS",
+      "message": "未提供 --asset-manifest，未检查宣传物料"
+    },
+    {
+      "status": "INFO",
+      "code": "BOUNDARY",
+      "message": "只做本地静态预检；不替代游戏真机运行、平台格式/资质/隐私/审核结果"
+    }
+  ]
+}

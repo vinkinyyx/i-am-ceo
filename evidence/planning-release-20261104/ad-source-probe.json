@@ -1,0 +1,14 @@
+{
+  "queryMutatesLegacyState": true,
+  "rollbackAllowsThirdClaim": true,
+  "provider": {
+    "first": {
+      "kind": "failed",
+      "reason": "show-failed"
+    },
+    "showCalls": 1,
+    "availableAfterRejectedShow": false,
+    "recoversAfterTerminalClose": true
+  },
+  "caveat": "Source-level Node probe; no Tap SDK, live ad, browser, or device verification."
+}

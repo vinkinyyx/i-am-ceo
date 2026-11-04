@@ -291,21 +291,22 @@ describe('存储读写删', () => {
     await expect(platform.get('missing')).resolves.toBeNull();
   });
 
-  it('getStorage 真实失败映射 SAVE_FAILED，details 带 key 与原因', async () => {
+  it('getStorage 真实失败映射 SAVE_UNAVAILABLE，details 带 key/reason 与原因', async () => {
     fake.getMode = 'fail';
     const err = await platform.get('k1').catch((e: unknown) => e);
     expect(err).toBeInstanceOf(GameError);
     const ge = err as GameError;
-    expect(ge.code).toBe(GameErrorCode.SAVE_FAILED);
+    expect(ge.code).toBe(GameErrorCode.SAVE_UNAVAILABLE);
     expect(ge.details?.key).toBe('k1');
+    expect(ge.details?.reason).toBe('io');
     expect(ge.details?.cause).toContain('io error');
-    expect(ge.message).toBe(errorMessage(GameErrorCode.SAVE_FAILED));
+    expect(ge.message).toBe(errorMessage(GameErrorCode.SAVE_UNAVAILABLE));
   });
 
-  it('getStorage 同步抛异常映射 SAVE_FAILED', async () => {
+  it('getStorage 同步抛异常映射 SAVE_UNAVAILABLE', async () => {
     fake.getMode = 'throw';
     const err = await platform.get('k1').catch((e: unknown) => e);
-    expect((err as GameError).code).toBe(GameErrorCode.SAVE_FAILED);
+    expect((err as GameError).code).toBe(GameErrorCode.SAVE_UNAVAILABLE);
   });
 
   it('setStorage 失败映射 SAVE_FAILED', async () => {
@@ -427,9 +428,13 @@ describe('回调防挂死（silent 运行时：鸿蒙场景）', () => {
     return new TapPlatform(fake, { opTimeoutMs: 20, loginCallbackTimeoutMs: 20 });
   }
 
-  it('get 不回调时超时读作 null（启动装载不被挂死）', async () => {
+  it('get 不回调时超时 reject SAVE_UNAVAILABLE(timeout)，不冒充无档', async () => {
     fake.getMode = 'silent';
-    await expect(silentPlatform().get('k1')).resolves.toBeNull();
+    const err = await silentPlatform().get('k1').catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(GameError);
+    const ge = err as GameError;
+    expect(ge.code).toBe(GameErrorCode.SAVE_UNAVAILABLE);
+    expect(ge.details?.reason).toBe('timeout');
   });
 
   it('set 不回调时超时抛 SAVE_FAILED（不落盘、可诊断）', async () => {
@@ -458,9 +463,10 @@ describe('回调防挂死（silent 运行时：鸿蒙场景）', () => {
     await expect(silentPlatform().getNetworkState()).resolves.toBe('unknown');
   });
 
-  it('超时先 settle 后，迟到回调被丢弃（get 仍为 null）', async () => {
+  it('超时先 settle 后，迟到回调被丢弃（get 仍为 SAVE_UNAVAILABLE）', async () => {
     fake.getMode = 'silent';
     const p = silentPlatform();
-    await expect(p.get('k1')).resolves.toBeNull();
+    const err = await p.get('k1').catch((e: unknown) => e);
+    expect((err as GameError).code).toBe(GameErrorCode.SAVE_UNAVAILABLE);
   });
 });

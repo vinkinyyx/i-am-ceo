@@ -52,6 +52,7 @@ export class AudioManager {
   private unlocked = false;
   private currentBgm: 'startup' | 'operation' | null = null;
   private loadingPaths = new Set<string>();
+  private pauseReasons = new Set<string>();
 
   /** 读取持久化设置（localStorage，失败用默认）。 */
   loadSettings(): AudioSettings {
@@ -66,11 +67,12 @@ export class AudioManager {
     return this.settings;
   }
 
-  private persist(): void {
+  private persist(): boolean {
     try {
       sys.localStorage?.setItem(STORAGE_KEY, JSON.stringify(this.settings));
+      return true;
     } catch {
-      /* 忽略持久化失败 */
+      return false;
     }
   }
 
@@ -79,22 +81,27 @@ export class AudioManager {
   }
 
   /** 更新一个或多个开关；总开关关闭立即静音 BGM。 */
-  updateSettings(patch: Partial<AudioSettings>): void {
+  updateSettings(patch: Partial<AudioSettings>): boolean {
+    const previous = this.settings;
     this.settings = { ...this.settings, ...patch };
-    this.persist();
+    if (!this.persist()) {
+      this.settings = previous;
+      return false;
+    }
     if (!this.canPlayMusic()) {
       this.source?.pause();
     } else if (this.currentBgm) {
       this.playBgm(this.currentBgm);
     }
+    return true;
   }
 
   private canPlayMusic(): boolean {
-    return this.unlocked && this.settings.masterEnabled && this.settings.musicEnabled;
+    return this.unlocked && this.settings.masterEnabled && this.settings.musicEnabled && this.pauseReasons.size === 0;
   }
 
   private canPlaySfx(): boolean {
-    return this.unlocked && this.settings.masterEnabled && this.settings.sfxEnabled;
+    return this.unlocked && this.settings.masterEnabled && this.settings.sfxEnabled && this.pauseReasons.size === 0;
   }
 
   /** 首次用户手势时调用：创建 AudioSource 并解锁。 */
@@ -120,7 +127,7 @@ export class AudioManager {
     if (this.loadingPaths.has(path)) return Promise.resolve(null);
     this.loadingPaths.add(path);
     return new Promise((resolve) => {
-      resources.load(path, AudioClip, (err, clip) => {
+      resources.load(path, AudioClip, (err: Error | null, clip: AudioClip | null) => {
         this.loadingPaths.delete(path);
         if (err || !clip) {
           resolve(null);
@@ -182,12 +189,22 @@ export class AudioManager {
 
   /** 切后台：暂停 BGM（离线不逐条播短乐）。 */
   onAppHide(): void {
-    this.source?.pause();
+    this.pauseForReason('BACKGROUND');
   }
 
   /** 回前台：按开关恢复。 */
   onAppShow(): void {
-    if (this.canPlayMusic()) this.source?.play();
+    this.resumeForReason('BACKGROUND');
+  }
+
+  pauseForReason(reason: string): void {
+    this.pauseReasons.add(reason);
+    this.source?.pause();
+  }
+
+  resumeForReason(reason: string): void {
+    this.pauseReasons.delete(reason);
+    if (this.pauseReasons.size === 0 && this.canPlayMusic()) this.source?.play();
   }
 }
 

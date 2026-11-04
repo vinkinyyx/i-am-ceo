@@ -1,0 +1,89 @@
+{
+  "url": "http://127.0.0.1:8153/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "R31-years-rank-uses-operating-years",
+      "status": "PASS",
+      "detail": {
+        "row": [
+          {
+            "text": "超长测试公司名称用于换行验证是否不缩字体（你）",
+            "x": 135.5,
+            "y": 220.00000000000006,
+            "width": 145,
+            "height": 38.420000000000016
+          }
+        ],
+        "yearsLabels": [
+          "年限榜",
+          "我方 第 8/13 名｜资产 ¥1,000,000｜经营 2 年",
+          "8 年",
+          "8 年",
+          "7 年",
+          "6 年",
+          "6 年",
+          "4 年",
+          "3 年",
+          "2 年",
+          "2 年",
+          "2 年",
+          "2 年",
+          "0 年",
+          "0 年"
+        ]
+      }
+    },
+    {
+      "id": "R31-player-detail-has-name-years-assets",
+      "status": "PASS",
+      "detail": [
+        "企业：超长测试公司名称用于换行验证是否不缩字体",
+        "总资产：¥1,000,000（现金 + 未折旧业务资产）",
+        "经营年限：2 年"
+      ]
+    },
+    {
+      "id": "R31-rank-query-is-read-only",
+      "status": "PASS",
+      "detail": {
+        "beforeRevision": 11,
+        "afterRevision": 11
+      }
+    },
+    {
+      "id": "R32-old-report-explicitly-marks-bridge-unavailable",
+      "status": "PASS",
+      "detail": [
+        {
+          "text": "历史现金流明细未记录；仅保留期初/期末余额，不能从当前存档反推旧年投资或救助。",
+          "x": 187.5,
+          "y": 29.979999999999905,
+          "width": 284,
+          "height": 40.67999999999999
+        }
+      ]
+    },
+    {
+      "id": "R32-year-navigation-does-not-rewrite-save",
+      "status": "PASS",
+      "detail": {
+        "beforeRevision": 11,
+        "afterRevision": 11
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 5,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

@@ -60,7 +60,19 @@ export function planAnnualEvent(state: GameState, cfg: EconomyConfig, year: numb
     employeeId = active[idx]?.employeeId;
   }
 
-  return { key, year, happened: true, type, month, effectBps, amountYuan: 0, employeeId, applied: false };
+  const event: AnnualEvent = {
+    key,
+    year,
+    happened: true,
+    type,
+    month,
+    effectBps,
+    amountYuan: 0,
+    applied: false,
+  };
+  // 可选字段只在有值时写入：显式 undefined 会让 cloneGameState 抛错、存档却静默丢字段
+  if (employeeId !== undefined) event.employeeId = employeeId;
+  return event;
 }
 
 /** 确保某年事件已生成并缓存到 state（月结首月调用）。 */
@@ -134,9 +146,9 @@ export function makeEventForTest(
     month,
     effectBps,
     amountYuan: 0,
-    employeeId: employee?.employeeId,
     applied: false,
   };
+  if (employee) ev.employeeId = employee.employeeId;
   state.annualEvents = state.annualEvents.filter((e) => e.key !== ev.key);
   state.annualEvents.push(ev);
   return ev;

@@ -1,0 +1,166 @@
+[
+  {
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "card": {
+      "left": 16,
+      "right": 359,
+      "bottom": 506,
+      "top": 614
+    },
+    "filters": [
+      {
+        "text": "市场 1",
+        "left": 21.5,
+        "right": 101.5,
+        "bottom": 622,
+        "top": 666
+      },
+      {
+        "text": "客服 1",
+        "left": 105.5,
+        "right": 185.5,
+        "bottom": 622,
+        "top": 666
+      },
+      {
+        "text": "财务 0",
+        "left": 189.5,
+        "right": 269.5,
+        "bottom": 622,
+        "top": 666
+      }
+    ],
+    "minGap": 8,
+    "backgroundLoaded": true,
+    "detailAction": true,
+    "detailReadOnly": true,
+    "errors": [],
+    "pass": true
+  },
+  {
+    "viewport": {
+      "width": 375,
+      "height": 834
+    },
+    "card": {
+      "left": 16,
+      "right": 359,
+      "bottom": 528,
+      "top": 636
+    },
+    "filters": [
+      {
+        "text": "市场 1",
+        "left": 21.5,
+        "right": 101.5,
+        "bottom": 644,
+        "top": 688
+      },
+      {
+        "text": "客服 1",
+        "left": 105.5,
+        "right": 185.5,
+        "bottom": 644,
+        "top": 688
+      },
+      {
+        "text": "财务 0",
+        "left": 189.5,
+        "right": 269.5,
+        "bottom": 644,
+        "top": 688
+      }
+    ],
+    "minGap": 8,
+    "backgroundLoaded": true,
+    "detailAction": true,
+    "detailReadOnly": true,
+    "errors": [],
+    "pass": true
+  },
+  {
+    "viewport": {
+      "width": 360,
+      "height": 640
+    },
+    "card": {
+      "left": 16,
+      "right": 359,
+      "bottom": 360.6666666666668,
+      "top": 468.6666666666668
+    },
+    "filters": [
+      {
+        "text": "市场 1",
+        "left": 21.5,
+        "right": 101.5,
+        "bottom": 476.6666666666668,
+        "top": 520.6666666666667
+      },
+      {
+        "text": "客服 1",
+        "left": 105.5,
+        "right": 185.5,
+        "bottom": 476.6666666666668,
+        "top": 520.6666666666667
+      },
+      {
+        "text": "财务 0",
+        "left": 189.5,
+        "right": 269.5,
+        "bottom": 476.6666666666668,
+        "top": 520.6666666666667
+      }
+    ],
+    "minGap": 8,
+    "backgroundLoaded": true,
+    "detailAction": true,
+    "detailReadOnly": true,
+    "errors": [],
+    "pass": true
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "card": {
+      "left": 16,
+      "right": 359,
+      "bottom": 505.53846153846155,
+      "top": 613.5384615384615
+    },
+    "filters": [
+      {
+        "text": "市场 1",
+        "left": 21.5,
+        "right": 101.5,
+        "bottom": 621.5384615384615,
+        "top": 665.5384615384615
+      },
+      {
+        "text": "客服 1",
+        "left": 105.5,
+        "right": 185.5,
+        "bottom": 621.5384615384615,
+        "top": 665.5384615384615
+      },
+      {
+        "text": "财务 0",
+        "left": 189.5,
+        "right": 269.5,
+        "bottom": 621.5384615384615,
+        "top": 665.5384615384615
+      }
+    ],
+    "minGap": 8,
+    "backgroundLoaded": true,
+    "detailAction": true,
+    "detailReadOnly": true,
+    "errors": [],
+    "pass": true
+  }
+]

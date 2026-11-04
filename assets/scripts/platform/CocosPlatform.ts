@@ -1,4 +1,4 @@
-import { game, screen, sys, view } from 'cc';
+import { Game, game, screen, sys, view } from 'cc';
 import type {
   ITapPlatform,
   LoginResult,
@@ -39,13 +39,13 @@ export class CocosPlatform implements ITapPlatform {
   }
 
   onShow(callback: () => void): Unsubscribe {
-    game.on(game.EVENT_SHOW, callback);
-    return () => game.off(game.EVENT_SHOW, callback);
+    game.on(Game.EVENT_SHOW, callback);
+    return () => game.off(Game.EVENT_SHOW, callback);
   }
 
   onHide(callback: () => void): Unsubscribe {
-    game.on(game.EVENT_HIDE, callback);
-    return () => game.off(game.EVENT_HIDE, callback);
+    game.on(Game.EVENT_HIDE, callback);
+    return () => game.off(Game.EVENT_HIDE, callback);
   }
 
   async login(): Promise<LoginResult> {

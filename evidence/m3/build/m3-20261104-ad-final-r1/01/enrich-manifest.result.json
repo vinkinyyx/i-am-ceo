@@ -1,0 +1,17 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\enrich-manifest.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-ad-final-r1\\01",
+    "m3-20261104-ad-final-r1",
+    "01",
+    "diagnostic",
+    "36"
+  ],
+  "startedAt": "2026-11-03T18:30:34.594Z",
+  "finishedAt": "2026-11-03T18:30:36.167Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-ad-final-r1\\01\\enrich-manifest.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-ad-final-r1\\01\\enrich-manifest.err.log"
+}

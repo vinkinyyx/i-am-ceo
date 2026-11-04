@@ -1,0 +1,13 @@
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ✓ tests/unit/saveRepository.test.ts (10 tests) 13ms
+ ✓ tests/integration/resetRecovery.test.ts (5 tests) 11ms
+ ✓ tests/integration/transactionRecoveryMatrix.test.ts (6 tests) 34ms
+ ✓ tests/unit/tapPlatform.test.ts (35 tests) 200ms
+
+ Test Files  4 passed (4)
+      Tests  56 passed (56)
+   Start at  22:12:12
+   Duration  810ms (transform 292ms, setup 0ms, collect 690ms, tests 258ms, environment 1ms, prepare 650ms)
+

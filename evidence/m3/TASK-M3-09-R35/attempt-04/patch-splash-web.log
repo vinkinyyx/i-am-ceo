@@ -1,0 +1,20 @@
+{
+  "copied": [
+    "web-mobile"
+  ],
+  "firstScreen": [],
+  "gameJs": [],
+  "checkVersion": [],
+  "webSettings": {
+    "file": "D:\\Workspace\\TapTap\\我是CEO\\build\\e2e-web-m3-20261103-r3\\web-mobile\\src\\settings.json",
+    "base64Chars": 260786
+  },
+  "webIndex": {
+    "file": "D:\\Workspace\\TapTap\\我是CEO\\build\\e2e-web-m3-20261103-r3\\web-mobile\\index.html",
+    "changed": true
+  },
+  "missing": [
+    "wechatgame",
+    "tap"
+  ]
+}

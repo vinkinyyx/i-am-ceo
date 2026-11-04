@@ -1,0 +1,21 @@
+{
+  "taskId": "TASK-M3-09-R07",
+  "title": "资源和配置加载可超时、可重试",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T01:53:00+08:00",
+  "delivered": [
+    { "file": "assets/core/platform/loadGuard.ts", "note": "guardResourceLoad：必需/可选分级；超时/404/非法JSON/失败错误码分类(RESOURCE_TIMEOUT/NOT_FOUND/INVALID/FAILED)；attemptId、一次 settle、迟到回调忽略、cancel、可选回落+onRecoverable" },
+    { "file": "assets/scripts/platform/loadConfig.ts", "note": "必需 economy.v1 经 loadGuard（8s），校验失败 RESOURCE_INVALID 阻断" },
+    { "file": "assets/scripts/platform/loadRuntimeConfig.ts", "note": "可选 runtime.config（3s）：缺失/超时/非法回落空配置并记录，不伪造登录/隐私" },
+    { "file": "assets/scripts/ui/AppView.ts", "note": "start 失败渲染启动错误页（错误编号+阶段+重试+退出），重试重建 start 一次" },
+    { "file": "tests/unit/loadGuard.test.ts", "note": "8 例" }
+  ],
+  "cases": [
+    { "id": "R07-T01", "result": "PASS（模型层）", "note": "404→NOT_FOUND、回调丢失→TIMEOUT、非法 JSON→INVALID 均产生确定错误码；UI 错误页在新 web 构建由 R35 E2E 截图复核" },
+    { "id": "R07-T02", "result": "PASS", "note": "重试走 start()；迟到结果受 loadGuard 一次 settle 与 attemptId 控制，不复活旧弹窗（cancel 用例）" },
+    { "id": "R07-T03", "result": "PASS（模型层）", "note": "取消后迟到回调不 settle；写档闸门由 R13 在装载层保证" },
+    { "id": "R07-T04", "result": "PASS", "note": "runtime.config 存在与否不影响登录/隐私状态：回落不调用登录、不写同意" }
+  ],
+  "commands": [{ "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 32 files / 291 tests" }],
+  "remaining": "引擎前模块加载链（SystemJS import 超时）在 R20 注入片段统一处理；失败页真机截图与 web E2E 由 R35/R39 补；READY_FOR_QA 不声称真机通过。"
+}

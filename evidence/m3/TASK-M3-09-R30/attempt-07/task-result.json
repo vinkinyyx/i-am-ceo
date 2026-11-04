@@ -1,0 +1,15 @@
+{
+  "taskId": "TASK-M3-09-R30",
+  "reviewId": "REVIEW-20261103-02",
+  "status": "DONE",
+  "summary": "当前源码 Web 构建上的 R30 回归通过；调岗/离岗状态与薪资不重叠且位于卡片内，虚拟列表在100人复用后绑定正确。",
+  "checks": 45,
+  "failed": 0,
+  "pageErrors": 0,
+  "screenshots": 27,
+  "coverage": ["375x812 / 360x640 / 390x844", "0/2/10/30/100员工和部门筛选", "真实详情、调岗、跨月、裁员、取消、重复点击", "62秒token过期、余额不足点击", "100人末屏员工薪资配对、末项详情和回顶"],
+  "geometry": {"statusPayOverlap": 0,"statusWithinCard": true,"exampleStatus": "下月调岗→客服"},
+  "visualReview": ["shots/375-07-after-transfer.png：薪资与状态分行且有间距", "shots/360-big-17-100-bottom.png：员工097-100卡片完整可读，末项底部留白", "shots/360-big-18-100-last-detail.png：实际末项详情显示员工100及月薪¥3,000", "shots/375-guard-22-expired-rejected.png：过期确认提示可见，员工状态未变"],
+  "report": "r30-report.json",
+  "risk": "本地 Web 验收通过；设备字体/触控待 U05/U06/U10 条件齐备后用同包复核。"
+}

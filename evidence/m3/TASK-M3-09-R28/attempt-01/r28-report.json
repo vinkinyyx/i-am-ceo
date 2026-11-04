@@ -1,0 +1,314 @@
+{
+  "url": "http://localhost:8123/",
+  "generatedAt": "2026-11-02T15:11:22.942Z",
+  "checks": [
+    {
+      "id": "T01-detail-readonly",
+      "pass": true,
+      "detail": {
+        "cash": 287027,
+        "revision": 11
+      }
+    },
+    {
+      "id": "T01-long-name-does-not-cover-settings",
+      "pass": true,
+      "detail": {
+        "opened": true,
+        "cash": 287027
+      }
+    },
+    {
+      "id": "T02-5x-actually-advances",
+      "pass": true,
+      "detail": {
+        "from": {
+          "month": 1,
+          "ledgers": 0
+        },
+        "to": {
+          "month": 2,
+          "ledgers": 1
+        }
+      }
+    },
+    {
+      "id": "T02-pause-freezes-clock",
+      "pass": true,
+      "detail": {
+        "speed": 0,
+        "month": 2,
+        "progress": 683
+      }
+    },
+    {
+      "id": "T02-speed-persisted-live",
+      "pass": true,
+      "detail": {
+        "speeds": [
+          1,
+          2,
+          5
+        ]
+      }
+    },
+    {
+      "id": "T02-speed-survives-reload",
+      "pass": true,
+      "detail": {
+        "speedAfterReload": 5
+      }
+    },
+    {
+      "id": "T03-cancel-no-deduction",
+      "pass": true,
+      "detail": {
+        "before": {
+          "cash": 289081,
+          "asset": 0,
+          "total": 289081
+        },
+        "after": {
+          "cash": 289081,
+          "asset": 0,
+          "total": 289081
+        }
+      }
+    },
+    {
+      "id": "T03-confirm-transfers-cash-to-asset",
+      "pass": true,
+      "detail": {
+        "cashDelta": -10000,
+        "assetDelta": 10000,
+        "totalDelta": 0,
+        "capacityInvestmentDelta": 10000
+      }
+    },
+    {
+      "id": "T01-large-cash-and-negative-profit-rendered",
+      "pass": true,
+      "detail": {
+        "cash": 1234567,
+        "ytdProfit": -325000,
+        "nameLength": 20
+      }
+    },
+    {
+      "id": "T05-three-year-goal-achieved",
+      "pass": true,
+      "detail": {
+        "target": true,
+        "years": 3
+      }
+    },
+    {
+      "id": "T01-stress-settings-still-clickable",
+      "pass": true,
+      "detail": {
+        "clicked": true
+      }
+    },
+    {
+      "id": "T01-stress-full-name-in-detail",
+      "pass": true,
+      "detail": {
+        "revision": 11
+      }
+    },
+    {
+      "id": "T05-keeps-operating-after-goal",
+      "pass": true,
+      "detail": {
+        "target": true,
+        "cash": 1234567
+      }
+    },
+    {
+      "id": "T02-speed-switch-keeps-scroll",
+      "pass": true,
+      "detail": {
+        "speed": 5,
+        "scrollBefore": 109,
+        "scrollAfter": 109
+      }
+    },
+    {
+      "id": "T02-small-screen-speed-pause",
+      "pass": true,
+      "detail": {
+        "speed": 0
+      }
+    },
+    {
+      "id": "C-third-viewport-stable",
+      "pass": true,
+      "detail": {
+        "cash": 287027,
+        "speed5": 5,
+        "pause": 0
+      }
+    }
+  ],
+  "states": {
+    "liveInitial": {
+      "runId": "run_134cdm7000000",
+      "revision": 11,
+      "phase": "RUNNING",
+      "speed": 0,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "progressMsInMonth": 0,
+      "cash": 287027,
+      "asset": 0,
+      "capacityInvestment": 0,
+      "total": 287027,
+      "ytdRevenue": 0,
+      "ytdProfit": 0,
+      "ledgerCount": 0,
+      "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+      "target3YearsAchieved": false,
+      "consecutiveProfitableYears": 0,
+      "cashRisk": "NORMAL",
+      "employees": 2,
+      "executedCommandCount": 4
+    },
+    "pausedBeforeInvest": {
+      "runId": "run_134cdm7000000",
+      "revision": 67,
+      "phase": "RUNNING",
+      "speed": 0,
+      "gameYear": 1,
+      "gameMonth": 3,
+      "progressMsInMonth": 514,
+      "cash": 289081,
+      "asset": 0,
+      "capacityInvestment": 0,
+      "total": 289081,
+      "ytdRevenue": 120000,
+      "ytdProfit": -10919,
+      "ledgerCount": 2,
+      "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+      "target3YearsAchieved": false,
+      "consecutiveProfitableYears": 0,
+      "cashRisk": "NORMAL",
+      "employees": 2,
+      "executedCommandCount": 4
+    },
+    "liveFinal": {
+      "runId": "run_134cdm7000000",
+      "revision": 68,
+      "phase": "RUNNING",
+      "speed": 0,
+      "gameYear": 1,
+      "gameMonth": 3,
+      "progressMsInMonth": 514,
+      "cash": 279081,
+      "asset": 10000,
+      "capacityInvestment": 10000,
+      "total": 289081,
+      "ytdRevenue": 120000,
+      "ytdProfit": -10919,
+      "ledgerCount": 2,
+      "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+      "target3YearsAchieved": false,
+      "consecutiveProfitableYears": 0,
+      "cashRisk": "NORMAL",
+      "employees": 2,
+      "executedCommandCount": 5
+    },
+    "stress": {
+      "runId": "run_134cdm7000000",
+      "revision": 11,
+      "phase": "RUNNING",
+      "speed": 0,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "progressMsInMonth": 0,
+      "cash": 1234567,
+      "asset": 0,
+      "capacityInvestment": 0,
+      "total": 1234567,
+      "ytdRevenue": 950000,
+      "ytdProfit": -325000,
+      "ledgerCount": 1,
+      "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+      "target3YearsAchieved": true,
+      "consecutiveProfitableYears": 3,
+      "cashRisk": "NORMAL",
+      "employees": 2,
+      "executedCommandCount": 4
+    },
+    "smallInitial": {
+      "runId": "run_134cdm7000000",
+      "revision": 11,
+      "phase": "RUNNING",
+      "speed": 0,
+      "gameYear": 1,
+      "gameMonth": 1,
+      "progressMsInMonth": 0,
+      "cash": 287027,
+      "asset": 0,
+      "capacityInvestment": 0,
+      "total": 287027,
+      "ytdRevenue": 0,
+      "ytdProfit": 0,
+      "ledgerCount": 0,
+      "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+      "target3YearsAchieved": false,
+      "consecutiveProfitableYears": 0,
+      "cashRisk": "NORMAL",
+      "employees": 2,
+      "executedCommandCount": 4
+    }
+  },
+  "finance": {
+    "before": {
+      "cash": 289081,
+      "asset": 0,
+      "total": 289081,
+      "capacityInvestment": 0
+    },
+    "after": {
+      "cash": 279081,
+      "asset": 10000,
+      "total": 289081,
+      "capacityInvestment": 10000
+    },
+    "diff": {
+      "cashDelta": -10000,
+      "assetDelta": 10000,
+      "totalDelta": 0,
+      "capacityInvestmentDelta": 10000
+    }
+  },
+  "screenshots": [
+    "375-01-home-top.png",
+    "375-02-company-detail.png",
+    "375-03-settings-independent.png",
+    "375-04-speed-2x.png",
+    "375-05-speed-5x-after-reload.png",
+    "375-06-invest-dialog-375.png",
+    "375-07-invest-confirm-375.png",
+    "375-08-invest-cancelled.png",
+    "375-09-invest-confirm-before.png",
+    "375-10-invest-after.png",
+    "375-11-annual-report-entry.png",
+    "375-stress-12-home-large-negative-longname.png",
+    "375-stress-13-stress-settings.png",
+    "375-stress-14-stress-full-name-detail.png",
+    "375-stress-15-stress-invest-idle-risk.png",
+    "360-16-small-home-top.png",
+    "360-17-small-scrolled-bottom.png",
+    "360-18-small-speed-5x-after-scroll.png",
+    "360-19-small-invest-dialog.png",
+    "360-20-small-invest-dialog-scrolled.png",
+    "390-21-390-home-top.png",
+    "390-22-390-company-detail.png",
+    "390-23-390-speed-5x.png",
+    "390-24-390-invest-dialog.png",
+    "390-25-390-invest-confirm.png"
+  ],
+  "errors": [],
+  "ok": true
+}

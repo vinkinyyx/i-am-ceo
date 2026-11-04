@@ -1,0 +1,20 @@
+{
+  "releaseId": "m3-20261104-ad-final-r2",
+  "gameVersion": "1.0.1",
+  "purpose": "diagnostic",
+  "recommendedPackage": "build/release/m3-20261104-ad-final-r2/01/game.zip",
+  "sha256": "13d355812caac237b41fd56ed0847c1aad809d532762a581639c42246baebda6",
+  "sizeBytes": 4605080,
+  "adsEnvironment": "disabled",
+  "adUnitId": "",
+  "privacyPolicyVersion": 2,
+  "tiers": {
+    "localQuality": { "status": "PASS", "evidence": "npm-check.log: 56 test files passed, 1 skipped; 464 tests passed, 1 skipped" },
+    "packageStatic": { "status": "PASS", "evidence": ["Creator 3.8.8 build completed with doneMarker=true and exitCode=36", "pipeline verification and independent package-check.json passed; 458 entries; no releaseConfigErrors", "skill-preflight.json: PASS=3 FAIL=0 WARN=1"] },
+    "platformRuntime": { "status": "NOT_RUN", "reason": "No same-hash package upload, TapTap device runtime, platform login, or real ad playback/close evidence" },
+    "reviewReadiness": { "status": "BLOCKED", "reason": ["Backend version uniqueness/history not verified", "U14-U16 and actual account/platform qualification status absent", "Public privacy URL/SDK disclosure and same-package platform verification incomplete", "Advertising is disabled and no real ad unit ID is configured"] }
+  },
+  "visualAcceptance": { "status": "PARTIAL_PASS", "evidence": "evidence/m3/TASK-M3-09-R39/attempt-14/matrix/visual-matrix-report.json", "scope": "4 browser viewports, 5 primary tabs, 28 checks; dialogs, all error states and native safe-area/device acceptance not covered" },
+  "faultMatrix": { "status": "PARTIAL_PASS", "evidence": "evidence/m3/TASK-M3-09-R12/attempt-05/fault-matrix.json", "scope": "19 integration tests pass; A-08 through A-10 have partial semantic coverage; physical kill/device callbacks not run" },
+  "uploadOrSubmission": "NOT_AUTHORIZED_AND_NOT_PERFORMED"
+}

@@ -10,7 +10,7 @@ const { ccclass } = _decorator;
  */
 @ccclass('Bootstrap')
 export class Bootstrap extends Component {
-  onLoad(): void {
+  override onLoad(): void {
     view.setDesignResolutionSize(375, 812, ResolutionPolicy.FIXED_WIDTH);
     if (this.getComponent(AppView)) return;
     this.addComponent(AppView);

@@ -34,6 +34,19 @@ describe('B16 生产包平台卫生', () => {
     expect(src).not.toMatch(/require\([^)]*EditorMockPlatform/);
   });
 
+  it('EditorMockPlatform 与 MemoryStorage 只存在于测试夹具，不作为 Cocos 资产', () => {
+    for (const file of [
+      'assets/core/platform/EditorMockPlatform.ts',
+      'assets/core/platform/EditorMockPlatform.ts.meta',
+      'assets/core/platform/MemoryStorage.ts',
+      'assets/core/platform/MemoryStorage.ts.meta',
+    ]) {
+      expect(fs.existsSync(path.resolve(ROOT, file)), file).toBe(false);
+    }
+    expect(fs.existsSync(path.resolve(ROOT, 'tests/helpers/EditorMockPlatform.ts'))).toBe(true);
+    expect(fs.existsSync(path.resolve(ROOT, 'tests/helpers/MemoryStorage.ts'))).toBe(true);
+  });
+
   it('TapPlatform 不引用 EditorMock / MemoryStorage', () => {
     const src = read('assets/core/platform/TapPlatform.ts');
     expect(src).not.toMatch(/EditorMockPlatform/);

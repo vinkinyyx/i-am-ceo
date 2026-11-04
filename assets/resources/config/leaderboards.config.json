@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "environment": "disabled",
+  "appId": "",
+  "policyVersion": 3,
+  "assetsBoardId": "",
+  "yearsBoardId": "",
+  "calculation": "latest"
+}

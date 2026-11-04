@@ -1,0 +1,78 @@
+{
+  "status": "PARTIAL",
+  "profile": "Chrome headless, WebGL canvas, 375x812, local 6-employee test fixture",
+  "initialCompanyActionAvailableMs": 81509,
+  "sampleWindowEachMs": 20000,
+  "metrics": [
+    {
+      "frameCount": 1198,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.82499999999891,
+        "max": 33.42499999999927
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 45597951,
+      "speed": "1×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 285
+    },
+    {
+      "frameCount": 1197,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.830000000001746,
+        "max": 33.35499999999956
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 35381338,
+      "speed": "2×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 288
+    },
+    {
+      "frameCount": 1197,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.82499999999709,
+        "max": 33.38500000000204
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 41201226,
+      "speed": "5×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 285
+    },
+    {
+      "frameCount": 1199,
+      "frameMs": {
+        "p50": 16.669999999998254,
+        "p95": 16.79000000000815,
+        "max": 33.38500000000931
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 33514221,
+      "speed": "暂停",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 0
+    }
+  ],
+  "browserErrors": [],
+  "caveats": [
+    "This is browser diagnostic data, not Tap process FPS or memory.",
+    "No pre-remediation build was preserved for an apples-to-apples before/after comparison.",
+    "The project 30-minute soak and device performance thresholds remain unverified."
+  ]
+}

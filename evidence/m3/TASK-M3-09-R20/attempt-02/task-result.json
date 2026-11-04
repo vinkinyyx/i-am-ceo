@@ -1,0 +1,11 @@
+{
+  "taskId":"TASK-M3-09-R20",
+  "status":"DONE",
+  "releaseId":"m3-20261103-diag-e",
+  "attempt":"01",
+  "conversion":"exit 0; CONVERT_OK",
+  "patch":"PATCH_OK; required anchor counts fetch-guard/init-once/boot-diag/account-guard/isdevelop each 1; four splash assets copied; no warnings",
+  "repack":"REPACK_OK; 5152130 bytes; one final ZIP created after patch",
+  "logs":"evidence/m3/build/m3-20261103-diag-e/01/convert-tap-v2.log; patch-release.log; repack-release.log",
+  "limitation":"R21 then rejected the resulting ZIP; not a candidate."
+}

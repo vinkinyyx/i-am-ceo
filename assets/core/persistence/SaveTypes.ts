@@ -34,7 +34,23 @@ export const SAVE_KEYS = {
   slotB: 'ceo/save/b',
   active: 'ceo/save/active',
   tombstone: 'ceo/reset/tombstone',
+  /** R12：有界事务日志，只存元数据，不存业务状态。 */
+  transaction: 'ceo/save/transaction',
 } as const;
+
+/**
+ * R12 事务日志（§15.3.2）：写非活动槽前先落 journal，
+ * 用于断电/回调未知时判断“未提交 / 实际已提交”。不保存整份业务状态。
+ */
+export interface SaveTransactionJournal {
+  protocolVersion: 1;
+  transactionId: string;
+  kind: 'commit' | 'replace-run';
+  basePointer: SavePointer | null;
+  targetPointer: SavePointer;
+  targetChecksum: string;
+  createdAtMs: number;
+}
 
 export const CURRENT_SCHEMA_VERSION = 1 as const;
 export const CURRENT_CONFIG_VERSION = 'economy-v1.0.0';

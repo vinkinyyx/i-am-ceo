@@ -48,6 +48,13 @@ export function annualSettlement(
 
   const cashClose = state.company.cashYuan;
   // cashOpen 由 advanceMonth 传入（该年第1月结算前现金，M1 即 30 万注资口径）
+  const monthlyLedgerNetCashDeltaYuan = sum(ledgers.map((l) => l.cashDeltaYuan));
+  const annualCashFlows = state.cashFlowsByYear?.[year];
+  const investmentOutYuan = annualCashFlows?.investmentOutYuan ?? 0;
+  const investmentCashFlowYuan = investmentOutYuan === 0 ? 0 : -investmentOutYuan;
+  const rescueCapitalYuan = annualCashFlows?.rescueInYuan ?? 0;
+  const unattributedCashFlowYuan = cashClose - cashOpen - monthlyLedgerNetCashDeltaYuan -
+    investmentCashFlowYuan - rescueCapitalYuan;
 
   // 连续盈利
   if (annualProfit > 0) {
@@ -96,6 +103,15 @@ export function annualSettlement(
     assetCloseYuan: cashClose + state.company.businessAssetBookYuan,
     headcountClose,
     settled: true,
+    cashBridge: {
+      monthlyLedgerNetCashDeltaYuan,
+      investmentCashFlowYuan,
+      rescueCapitalYuan,
+      unattributedCashFlowYuan,
+      attributionComplete: (state.cashFlowTrackingStartYear ?? Number.POSITIVE_INFINITY) <= year,
+      balanced: cashOpen + monthlyLedgerNetCashDeltaYuan + investmentCashFlowYuan + rescueCapitalYuan +
+        unattributedCashFlowYuan === cashClose,
+    },
   };
 
   state.annualReports.push(report);

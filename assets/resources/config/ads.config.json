@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "enabled": false,
+  "environment": "disabled",
+  "policyVersion": 3,
+  "rewardedAdUnitId": "",
+  "dailyGrantLimit": 1,
+  "privacyReviewed": false
+}

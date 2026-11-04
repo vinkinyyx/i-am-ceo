@@ -1,0 +1,136 @@
+
+> im-ceo@0.1.0 check
+> npm run typecheck && npm run typecheck:ui && npm run lint && npm run test
+
+
+> im-ceo@0.1.0 typecheck
+> tsc -p tsconfig.core.json --noEmit
+
+
+> im-ceo@0.1.0 typecheck:ui
+> tsc -p tsconfig.ui.json --noEmit
+
+
+> im-ceo@0.1.0 lint
+> eslint "assets/core/**/*.ts" "assets/scripts/**/*.ts" "tests/**/*.ts"
+
+
+> im-ceo@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ✓ tests/unit/transactionCommit.test.ts (8 tests) 22ms
+ ✓ tests/unit/tapPlatform.test.ts (35 tests) 205ms
+ ✓ tests/integration/transactionRecoveryMatrix.test.ts (13 tests) 64ms
+ ✓ tests/unit/initialHiring.test.ts (9 tests) 15ms
+ ✓ tests/unit/departmentsM2.test.ts (8 tests) 16ms
+ ✓ tests/unit/staffingM2.test.ts (15 tests) 27ms
+ ✓ tests/unit/releaseGaps.test.ts (7 tests) 20ms
+ ✓ tests/unit/departmentOverview.test.ts (15 tests) 36ms
+ ✓ tests/integration/resetCompany.test.ts (11 tests) 58ms
+ ✓ tests/integration/transactionRecovery.test.ts (6 tests) 72ms
+PATCH_FAIL fetch-guard: anchor not found (0 matches)
+ ✓ tests/unit/saveRecovery.test.ts (14 tests) 35ms
+ ✓ tests/unit/talentOverview.test.ts (9 tests) 30ms
+ ✓ tests/integration/companyDashboardFacade.test.ts (6 tests) 66ms
+ ✓ tests/unit/eventRiskM3.test.ts (14 tests) 22ms
+ ✓ tests/golden/goldenYear1.test.ts (6 tests) 15ms
+PATCH_FAIL boot-diag: existing patch does not match this releaseId/version or is incomplete
+ ✓ tests/unit/saveRepository.test.ts (10 tests) 25ms
+ ✓ tests/unit/authService.test.ts (11 tests) 12ms
+ ✓ tests/unit/rewardedAdProvider.test.ts (7 tests) 10ms
+ ✓ tests/unit/hirePreview.test.ts (6 tests) 28ms
+ ✓ tests/unit/robustnessM3.test.ts (11 tests) 110ms
+ ✓ tests/unit/createFlow.test.mjs (15 tests) 34ms
+ ✓ tests/unit/dialogModel.test.mjs (16 tests) 9ms
+ ✓ tests/unit/adRewardState.test.ts (6 tests) 12ms
+ ✓ tests/integration/createFlowFacade.test.ts (4 tests) 26ms
+ ✓ tests/unit/companyCreate.test.ts (8 tests) 11ms
+ ✓ tests/integration/resetRecovery.test.ts (5 tests) 15ms
+ ✓ tests/unit/investment.test.ts (7 tests) 15ms
+ ✓ tests/integration/releaseFaults.test.ts (7 tests) 183ms
+ ✓ tests/unit/shellLayout.test.mjs (9 tests) 8ms
+ ✓ tests/integration/bootstrapGate.test.ts (5 tests) 13ms
+ ✓ tests/unit/annualGoal.test.ts (7 tests) 19ms
+ ✓ tests/unit/loadGuard.test.ts (8 tests) 8ms
+REPACK_FAIL 目标已存在，禁止原地覆盖： C:\Users\vinki\AppData\Local\Temp\ceo-zip-nOddxU\a\game.zip
+ ✓ tests/unit/packageHygiene.test.ts (7 tests) 15ms
+ ✓ tests/unit/cloneLock.test.ts (9 tests) 18ms
+ ✓ tests/unit/offlineM3.test.ts (6 tests) 14ms
+ ✓ tests/unit/companyOverview.test.ts (6 tests) 9ms
+ ✓ tests/integration/cloudSync.test.ts (2 tests) 8ms
+ ✓ tests/unit/bootDiagnostics.test.ts (7 tests) 9ms
+ ✓ tests/integration/faultFixtures.test.ts (7 tests) 15ms
+ ✓ tests/unit/clock.test.ts (8 tests) 15ms
+ ✓ tests/unit/onceInit.test.ts (6 tests) 8ms
+ ✓ tests/unit/capacityMarket.test.ts (7 tests) 7ms
+ ✓ tests/unit/utf8crc.test.ts (19 tests) 140ms
+VERIFY_FAIL [
+  "splash.d49ca.jpg: baked-progress splash artwork"
+]
+ ✓ tests/unit/authCheckSession.test.ts (4 tests) 66ms
+ ✓ tests/unit/foregroundClock.test.ts (8 tests) 5ms
+ ✓ tests/integration/cloudImport.test.ts (3 tests) 13ms
+ ✓ tests/unit/safeArea.test.ts (6 tests) 6ms
+ ✓ tests/integration/adCoordinator.test.ts (2 tests) 29ms
+ ✓ tests/unit/config.test.ts (5 tests) 7ms
+ ✓ tests/unit/smoke.test.ts (4 tests) 7ms
+ ✓ tests/integration/leaderboardSync.test.ts (1 test) 7ms
+ ✓ tests/unit/cloudSaveCodec.test.ts (2 tests) 11ms
+ ✓ tests/unit/privacyConsent.test.ts (4 tests) 5ms
+ ✓ tests/tools/canvasDriver.test.mjs (6 tests) 24ms
+ ✓ tests/unit/privacyPolicyText.test.ts (4 tests) 5ms
+ ✓ tests/unit/platformSelection.test.ts (4 tests) 5ms
+ ✓ tests/unit/textTokens.test.mjs (3 tests) 6ms
+ ✓ tests/unit/leaderboardScores.test.ts (1 test) 4ms
+ ✓ tests/unit/cloudConflict.test.ts (1 test) 3ms
+ ↓ tests/simulation/exportEvidence.test.mjs (1 test | 1 skipped)
+VERIFY_FAIL [
+  "packaged ads configuration is malformed or policyVersion differs from packaged privacy policy"
+]
+ ✓ tests/simulation/simulate5year.test.ts (3 tests) 1441ms
+   ✓ 百种子 × 三行业 × 三策略 5 年模拟 > 全部 900 个 run 财务守恒、现金不为负、无重复救助、每年≤3自动招聘 996ms
+   ✓ 百种子 × 三行业 × 三策略 5 年模拟 > CSV 可生成（首列为表头字段） 440ms
+VERIFY_FAIL [
+  "enabled ads require a non-empty real adUnitId and privacyReviewed=true"
+]
+ ✓ tests/simulation/longRun120.test.ts (1 test) 3042ms
+   ✓ R40 120-year persistence boundary > retains the last 100 annual reports while preserving 120 operated years through save/reload 3041ms
+VERIFY_FAIL [
+  "assets/main/index.hash.js: EditorMockPlatform in package"
+]
+VERIFY_FAIL [
+  "first-screen.js",
+  "logo.png",
+  "slogan.png",
+  "splash-art.png",
+  "marker CEO-PATCH:boot-diag count=0",
+  "marker CEO-PATCH:init-once count=0",
+  "marker CEO-PATCH:fetch-guard count=0",
+  "game.js: fetch throw remains",
+  "productVersion 1.0.0 != 9.9.9",
+  "production profile mismatch",
+  "first-screen splash BG_NAME"
+]
+VERIFY_FAIL [
+  "application.js: development test hook in package"
+]
+ ✓ tests/tools/releasePipeline.test.mjs (13 tests) 7153ms
+   ✓ release manifest source paths > preserves UTF-8 paths from Git NUL-delimited output 333ms
+   ✓ R20 patch-release.cjs > T02 重复应用幂等（不出现多份诊断） 380ms
+   ✓ R20 patch-release.cjs > 重复 required 锚点与不匹配 releaseId 均拒绝 321ms
+   ✓ R20 repack + R21 verify > 打包后校验通过；重复 zip 拒绝覆盖；分隔符为 / 1544ms
+   ✓ R20 repack + R21 verify > 拒绝改名成哈希 JPG 的烘焙进度启动稿 1069ms
+   ✓ R20 repack + R21 verify > 按 game.js 解析 Creator 哈希应用入口，不假定 application.js 固定名 964ms
+   ✓ R20 repack + R21 verify > 从ZIP内的Cocos JsonAsset拒绝广告与隐私版本不一致 759ms
+   ✓ R20 repack + R21 verify > 拒绝启用但没有真实广告位ID的ZIP配置 425ms
+   ✓ R20 repack + R21 verify > 拒绝任意嵌套脚本中的 EditorMockPlatform 399ms
+   ✓ R20 repack + R21 verify > 校验拒绝生产包里的开发写状态入口 371ms
+
+ Test Files  62 passed | 1 skipped (63)
+      Tests  477 passed | 1 skipped (478)
+   Start at  07:41:21
+   Duration  8.24s (transform 3.74s, setup 0ms, collect 13.80s, tests 13.34s, environment 16ms, prepare 19.24s)
+

@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 // 纯领域层测试配置：不依赖 Cocos / DOM / 平台 SDK
 export default defineConfig({
   test: {
-    include: ['tests/**/*.test.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.mjs'],
     environment: 'node',
     globals: false,
     reporters: ['default'],

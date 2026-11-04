@@ -208,7 +208,9 @@ export function applyDueTransfers(state: Pick<GameState, 'employees'>, settledMo
       settledMonthIndex + 1 >= emp.transferFromMonthIndex
     ) {
       emp.departmentId = emp.pendingDepartmentId;
-      emp.pendingDepartmentId = undefined;
+      // 必须删除而不是赋 undefined：存档深拷贝不接受 undefined 字段值，
+      // 否则调岗生效后整局状态不可再提交，时间推进会被静默卡死。
+      delete emp.pendingDepartmentId;
       emp.transferFromMonthIndex = null;
     }
   }

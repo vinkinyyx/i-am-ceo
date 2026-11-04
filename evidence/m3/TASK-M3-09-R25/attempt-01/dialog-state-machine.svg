@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="720" viewBox="0 0 1180 720" font-family="'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5c78"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1180" height="720" fill="#f6f8fb"/>
+  <text x="40" y="52" font-size="24" font-weight="700" fill="#1b2a41">R25 弹窗/输入/确认通用件状态机（ConfirmGuard + DialogHandle）</text>
+  <text x="40" y="82" font-size="13" fill="#6b7a90">一次开框 = 一个意图（commandId 由调用方在开框时生成并由闭包持有）；状态只允许下表迁移，其余调用一律忽略。</text>
+
+  <!-- 状态 -->
+  <g>
+    <rect x="60" y="140" width="180" height="72" rx="12" fill="#ffffff" stroke="#7f93b2" stroke-width="2"/>
+    <text x="150" y="172" text-anchor="middle" font-size="17" font-weight="700" fill="#1b2a41">IDLE</text>
+    <text x="150" y="195" text-anchor="middle" font-size="12" fill="#6b7a90">等待玩家确认</text>
+  </g>
+  <g>
+    <rect x="400" y="140" width="180" height="72" rx="12" fill="#eaf1ff" stroke="#2f6fe4" stroke-width="2"/>
+    <text x="490" y="172" text-anchor="middle" font-size="17" font-weight="700" fill="#1b4fa2">SUBMITTING</text>
+    <text x="490" y="195" text-anchor="middle" font-size="12" fill="#3c5f9e">忙碌：按钮置灰</text>
+  </g>
+  <g>
+    <rect x="760" y="140" width="180" height="72" rx="12" fill="#eef7ef" stroke="#2f8f4e" stroke-width="2"/>
+    <text x="850" y="172" text-anchor="middle" font-size="17" font-weight="700" fill="#1f6b3a">CLOSED</text>
+    <text x="850" y="195" text-anchor="middle" font-size="12" fill="#3d7b55">已销毁遮罩并解绑</text>
+  </g>
+  <g>
+    <rect x="400" y="330" width="180" height="72" rx="12" fill="#fff5e6" stroke="#d98a17" stroke-width="2"/>
+    <text x="490" y="362" text-anchor="middle" font-size="17" font-weight="700" fill="#9a5c05">FAILED</text>
+    <text x="490" y="385" text-anchor="middle" font-size="12" fill="#9a6a2a">明确失败：可同意图重试</text>
+  </g>
+  <g>
+    <rect x="760" y="330" width="180" height="72" rx="12" fill="#fdeceb" stroke="#c0392b" stroke-width="2"/>
+    <text x="850" y="362" text-anchor="middle" font-size="17" font-weight="700" fill="#8f241a">UNCERTAIN</text>
+    <text x="850" y="385" text-anchor="middle" font-size="12" fill="#a4443a">结果未知：锁定，不可关闭</text>
+  </g>
+
+  <!-- 迁移 -->
+  <line x1="240" y1="176" x2="394" y2="176" stroke="#4b5c78" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="318" y="160" text-anchor="middle" font-size="12" fill="#33445c">begin()</text>
+  <text x="318" y="198" text-anchor="middle" font-size="11" fill="#6b7a90">连点仅首次生效</text>
+
+  <line x1="580" y1="176" x2="754" y2="176" stroke="#2f8f4e" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="667" y="160" text-anchor="middle" font-size="12" fill="#1f6b3a">succeed()</text>
+  <text x="667" y="198" text-anchor="middle" font-size="11" fill="#6b7a90">命令已提交</text>
+
+  <line x1="490" y1="212" x2="490" y2="324" stroke="#d98a17" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="502" y="268" font-size="12" fill="#9a5c05">fail(msg)：可重试</text>
+
+  <path d="M 430 330 C 330 300, 330 240, 430 214" fill="none" stroke="#d98a17" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="300" y="300" text-anchor="middle" font-size="12" fill="#9a5c05">begin() 复用同一 commandId</text>
+
+  <line x1="580" y1="196" x2="754" y2="352" stroke="#c0392b" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="700" y="300" text-anchor="middle" font-size="12" fill="#8f241a">结果未知（超时/回调挂死）</text>
+
+  <path d="M 150 140 C 150 96, 850 96, 850 134" fill="none" stroke="#7f93b2" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="500" y="88" text-anchor="middle" font-size="12" fill="#33445c">cancel() / close()：取消不提交</text>
+
+  <path d="M 580 366 C 700 366, 730 330, 754 310" fill="none" stroke="#7f93b2" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="690" y="398" text-anchor="middle" font-size="12" fill="#33445c">取消（仅 FAILED 可关闭）</text>
+
+  <!-- 规则面板 -->
+  <rect x="40" y="452" width="1100" height="238" rx="12" fill="#ffffff" stroke="#d7dfec" stroke-width="1.5"/>
+  <text x="64" y="482" font-size="16" font-weight="700" fill="#1b2a41">通用件契约（可核对实现：assets/scripts/ui/dialogs.ts / dialogModel.ts）</text>
+  <g font-size="13" fill="#33445c">
+    <text x="64" y="512">1. 遮罩带 BlockInputEvents：点遮罩空白处不关闭、不穿透到底层按钮；弹窗内容由 BlockInputEvents 隔离。</text>
+    <text x="64" y="538">2. 结构固定：标题与底部操作区固定；正文 ScrollView（隐私全文/年报/赔偿/关司摘要）自适应高度，小屏压缩到可视高。</text>
+    <text x="64" y="564">3. 提交中 SUBMITTING 与 UNCERTAIN：canClose()=false；取消按钮置灰；返回键/ESC 只调用 requestCancel()，绝不触发确认。</text>
+    <text x="64" y="590">4. 明确失败 FAILED：内联红色错误文案 + 恢复确认按钮；重试沿用同一 commandId（命令层幂等，不产生第二次扣费）。</text>
+    <text x="64" y="616">5. 成功 succeed() 才关闭；关闭即销毁遮罩、清空关闭回调，旧 run 的异步回调不得重开已关闭的弹窗。</text>
+    <text x="64" y="642">6. 输入弹窗：基础校验（空值/最少/最多字数，emoji 计 1 个字）+ 业务校验（公司名规则），内联错误 + 实时字数。</text>
+    <text x="64" y="668">7. 输入卡片固定在上半区（computeInputCardY）：键盘弹出时输入框与底部按钮不被遮挡；失焦后内容与按钮保留（不重建节点）。</text>
+  </g>
+  <text x="64" y="694" font-size="11" fill="#7b8aa0">证据：tests/unit/dialogModel.test.mjs（16 例）+ shots/（长内容滚动、遮罩、连点、输入失焦）+ r25-report.json（连点后存档仅一次录用）。</text>
+</svg>

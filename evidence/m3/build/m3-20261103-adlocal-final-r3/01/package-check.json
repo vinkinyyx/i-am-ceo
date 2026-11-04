@@ -1,0 +1,44 @@
+{
+  "releaseId": "m3-20261103-adlocal-final-r3",
+  "gameVersion": "1.0.0",
+  "builtAt": "2026-11-03T14:15:25.645Z",
+  "zipPath": "build\\release\\m3-20261103-adlocal-final-r3\\01\\game.zip",
+  "sizeBytes": 5160461,
+  "sizeMib": 4.921,
+  "sha256": "5b535767431ebd1772ae0716883f03264d214a06196fa9111ecb4a801f2eae55",
+  "entryCount": 458,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "applicationEntry": "application.4de15.js",
+  "gameJsRelativeReferences": [
+    "./application.4de15.js",
+    "./engine-adapter.e45dd.js",
+    "./first-screen",
+    "./web-adapter.898ec.js"
+  ],
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "m3-20261103-adlocal-final-r3",
+    "gameVersion": "1.0.0"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": []
+  }
+}

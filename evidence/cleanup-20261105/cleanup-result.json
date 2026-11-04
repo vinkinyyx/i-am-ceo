@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "archive": "D:\\Workspace\\TapTap\\_archives\\我是CEO\\cleanup-20261105-073714",
+  "movedTargets": 49,
+  "movedFiles": 15164,
+  "movedBytes": 598669501,
+  "protectedFilesChecked": 6424,
+  "archiveHashesVerified": true,
+  "protectedInputsUnchanged": true,
+  "permanentDeletion": false,
+  "remainingRelease": "build/release/m3-20261104-cloud-rank-r1/05",
+  "movedMiB": 570.94
+}

@@ -1,0 +1,27 @@
+{
+  "taskId": "TASK-M3-09-R00",
+  "title": "登记可重现工作基线",
+  "status": "DONE",
+  "attempt": "attempt-01",
+  "finishedAt": "2026-11-02T01:00:00+08:00",
+  "sourceBaseline": {
+    "gitHead": "0a682864277048df905fcfc411bee7361b521693",
+    "dirtyTracked": ["AGENT.md", "README.md", "docs/我是CEO_项目总览.md"],
+    "untrackedEvidence": ["evidence/release-audit-20261102/", "evidence/release-handoff-20261102/"]
+  },
+  "commands": [
+    { "cmd": "git rev-parse --abbrev-ref HEAD / HEAD / status --porcelain / log -3", "exitCode": 0 },
+    { "cmd": "node --version; npm --version; python --version; Creator 3.8.8 存在性", "exitCode": 0 },
+    { "cmd": "Get-FileHash build/TapBuild/game.zip -Algorithm SHA256（连续两次采样）", "exitCode": 0 },
+    { "cmd": "npm run typecheck", "exitCode": 0 },
+    { "cmd": "npx vitest run", "exitCode": 0, "files": 23, "tests": 205 }
+  ],
+  "cases": [
+    { "id": "R00-T01", "title": "重复采样 zip SHA256 一致", "result": "PASS", "evidence": "两次采样均为 05e94666...c43730，见 baseline.json existingTapPackage" },
+    { "id": "R00-T02", "title": "其他聊天/用户改动完整保留", "result": "PASS", "evidence": "3 个修改文件与 2 个未跟踪证据目录原样存在，本轮不触碰其内容、不提交" },
+    { "id": "R00-T03", "title": "账本区分 HEAD/未提交/旧web/旧zip，不混称版本", "result": "PASS", "evidence": "baseline.json 分字段记录 gitHead、dirty、web-mobile 时间(23:13)、zip 时间(23:17)与 productVersion=1.0.0" }
+  ],
+  "artifacts": ["evidence/m3/TASK-M3-09-R00/attempt-01/baseline.json", "evidence/m3/TASK-M3-09-R00/attempt-01/task-result.json"],
+  "secrets": "无凭据值",
+  "notes": "releaseId 命名约定 m3-09-rXX-attempt-NN；后续任务引用本基线，发现并发改动时重新采样，不以旧摘要覆盖新修改。"
+}

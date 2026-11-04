@@ -1,0 +1,34 @@
+PATCH_OK
+{
+  "releaseId": "m3-20261103-r30fix-diag",
+  "gameVersion": "1.0.0",
+  "copied": [
+    "logo.png",
+    "slogan.png",
+    "splash.jpg",
+    "first-screen.js"
+  ],
+  "patches": [
+    {
+      "label": "fetch-guard",
+      "matches": 1
+    },
+    {
+      "label": "init-once",
+      "matches": 1
+    },
+    {
+      "label": "boot-diag",
+      "matches": 1
+    },
+    {
+      "label": "account-guard",
+      "matches": 1
+    },
+    {
+      "label": "isdevelop",
+      "matches": 1
+    }
+  ],
+  "warnings": []
+}

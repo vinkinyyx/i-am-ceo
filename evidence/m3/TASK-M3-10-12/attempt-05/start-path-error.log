@@ -1,0 +1,1 @@
+2026-11-03: focused releasePipeline test did not start because attempt-05 evidence directory was absent. No test result was produced by this invocation.

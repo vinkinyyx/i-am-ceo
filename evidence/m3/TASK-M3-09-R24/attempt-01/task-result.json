@@ -1,0 +1,29 @@
+{
+  "taskId": "TASK-M3-09-R24",
+  "title": "固定头尾、滚动主体与安全区（PageShell/SafeArea/AppView.buildRoot/fullPanel/renderMainShell）",
+  "status": "DONE",
+  "finishedAt": "2026-11-02T08:20:00+08:00",
+  "changes": [
+    { "file": "assets/scripts/ui/shellLayout.ts", "action": "新增纯函数 computeShellLayout + SHELL_METRICS：逻辑像素→设计单位换算（unit=375/windowWidth），safeArea 矩形约定转四边 inset，输出 bodyHeight/bodyCenterY/footerY/footerBgY/footerTotal/contentWidth/footerShiftX；无窗口信息/非法尺寸兜底；极端 inset 收敛 minBodyHeight=320" },
+    { "file": "assets/core/platform/ITapPlatform.ts", "action": "新增可选 onWindowResize(cb):Unsubscribe（未实现的平台由 UI 层 view 级 canvas-resize 兜底）" },
+    { "file": "assets/core/platform/EditorMockPlatform.ts", "action": "实现 onWindowResize（setWindowInfo 时触发）；默认 safeArea 修正为平台矩形约定 {top:44,bottom:778,left:0,right:375}（原 inset 语义与矩形约定混用，实际永不生效）" },
+    { "file": "assets/core/platform/TapPlatform.ts", "action": "TapRuntime 增补可选 onWindowResize/offWindowResize（不进 REQUIRED_METHODS）；实现 onWindowResize：resize 后重取完整 WindowInfo 通知，旧运行时无 API 时 no-op 兜底，退订幂等" },
+    { "file": "assets/scripts/ui/AppView.ts", "action": "buildRoot 移除整屏缩放（安全区等比缩放 + BUG-002 的 812→640 fit 兜底）与禁用 Widget；renderMainShell 改为 BodyScroll(ScrollView+Mask+BlockInputEvents) 包 BodyContent（authored 坐标交给各 Tab，渲染后按实际下探扩展内容高并顶部对齐）+ Footer 锚定可视区底部（含底部 inset 抬升、BlockInputEvents 挡残余热区）；新增 shellLayout/measureContentBottom/applyShellLayout/relayout/bindLayoutListeners/onDestroy：热 resize 只重算几何并恢复滚动位置，不重建内容（保 Tab/滚动/输入），平台 onWindowResize + view canvas-resize 双通道，onDestroy 注销；modalOverlay 覆盖整个可视高并加 BlockInputEvents 吞噬触摸（弹窗打开时正文滚动/底层按钮不响应）；renderBottomTabs 返回壳引用供几何重算" },
+    { "file": "tests/unit/shellLayout.test.mjs", "action": "新增 9 用例：三尺寸几何（812 基线/640 短屏/393×852 宽屏换算）、无窗口信息兜底、横向 inset、极端 inset 收敛、非法尺寸、Mock 默认安全区矩形约定、onWindowResize 触发与退订" },
+    { "file": "tools/shot-r24.cjs", "action": "新增三尺寸（375×812/360×640/393×852）证据脚本：向导→主壳四 Tab 逐个点击截图、热 resize（高度×0.82）后切 Tab、设置弹窗遮罩+底层 Tab 防穿透" },
+    { "file": "tools/shot-small-screen.cjs", "action": "移除已失效的 BUG-002 fit 缩放换算（R24 后无整屏缩放），页脚点击 y 改为按可视设计高计算，补 R26 收费确认弹窗的确认点击" }
+  ],
+  "commands": [
+    { "cmd": "npm run typecheck", "exitCode": 0 },
+    { "cmd": "npm run typecheck:ui", "exitCode": 0 },
+    { "cmd": "npm run lint", "exitCode": 0 },
+    { "cmd": "npx vitest run tests/unit/shellLayout.test.mjs", "exitCode": 0, "result": "PASS 9 tests" },
+    { "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 42 files / 342 tests（333→342，无回归）" },
+    { "cmd": "node tools/shot-r24.cjs http://localhost:8123/ evidence/m3/TASK-M3-09-R24/attempt-01/shots", "exitCode": 0, "result": "三尺寸各 12 张截图，pageerror=0；r24-report.json ok=true" }
+  ],
+  "notes": "T01 三尺寸头尾/内容可达：截图 tab-company/talent/department/rank（375×812、360×640、393×852）；T02 顶部缺口/底部手势区由 inset 换算 + Footer 抬升覆盖（shellLayout 单测 44/34 与 59/34 机型）；T03 热 resize 后 resized-talent 截图证明导航可点（视口高×0.82）；T04 Footer/ScrollRoot BlockInputEvents + Mask 裁切，残余热区被底栏吞噬；T05 settings-mask-no-passthrough 截图：连点遮罩空白与底层『排行』坐标后弹窗仍开、Tab 未切换（另新手提示透明遮罩意外佐证防穿透）。真机录屏（含手势区/刘海真机）归 R35—R39 设备验收，依赖 U05。创建/CEO/首聘三页仍是 812 绝对布局、未接壳滚动，短屏下底部按钮需滚动能力由 R27 统一重构时处理（本任务卡范围仅 PageShell/buildRoot/fullPanel/renderMainShell）。",
+  "evidence": [
+    "evidence/m3/TASK-M3-09-R24/attempt-01/shots/ （三尺寸×12 张 + r24-report.json）",
+    "tests/unit/shellLayout.test.mjs （9 用例）"
+  ]
+}

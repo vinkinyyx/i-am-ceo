@@ -1,0 +1,44 @@
+{
+  "releaseId": "m3-20261103-r30fix-diag",
+  "gameVersion": "1.0.0",
+  "builtAt": "2026-11-03T13:19:36.729Z",
+  "zipPath": "build\\release\\m3-20261103-r30fix-diag\\01\\game.zip",
+  "sizeBytes": 5153557,
+  "sizeMib": 4.915,
+  "sha256": "8a97692b220ccc1c70423f8279a248ad7a037498814349c3edd9599bdc5fea23",
+  "entryCount": 457,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "applicationEntry": "application.2c7b4.js",
+  "gameJsRelativeReferences": [
+    "./application.2c7b4.js",
+    "./engine-adapter.e45dd.js",
+    "./first-screen",
+    "./web-adapter.898ec.js"
+  ],
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "m3-20261103-r30fix-diag",
+    "gameVersion": "1.0.0"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": []
+  }
+}

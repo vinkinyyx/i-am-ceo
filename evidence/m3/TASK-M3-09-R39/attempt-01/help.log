@@ -1,0 +1,1 @@
+Usage: node tools/e2e/visual-viewports.cjs --url <URL> --out <new-directory> [--seed <json>]

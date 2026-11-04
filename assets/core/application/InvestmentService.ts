@@ -2,6 +2,8 @@ import type { EconomyConfig } from '../config/EconomyConfig';
 import { GameErrorCode } from '../domain/errors';
 import type { GameState } from '../domain/types';
 import { businessAssetCoeffBps } from '../simulation/capacity';
+import { monthlyCapacityAt, monthlyPotentialOrderAt } from './CompanyOverviewService';
+import { ensureRunId, hasCommand, recordCommand } from './MutationContext';
 
 /**
  * 主营业务扩产（设计 03.6 / G007 / 12.5）。
@@ -15,7 +17,13 @@ export interface InvestPreview {
   assetBookAfter: number;
   capacityCoeffBeforeBps: number;
   capacityCoeffAfterBps: number;
-  /** 预计新增月产能（元，按当前团队结构估算） */
+  /** 当前团队结构下的当月产能（投资前/投资后） */
+  monthlyCapacityBeforeYuan: number;
+  monthlyCapacityAfterYuan: number;
+  /** 当月潜在订单（需求上限）；产能超过它即可能闲置 */
+  monthlyPotentialOrderYuan: number;
+  /** 投资后产能已超过当月需求 */
+  idleRiskAfter: boolean;
   valid: boolean;
   reason?: string;
 }
@@ -26,18 +34,35 @@ export function previewInvest(
   amount: number,
 ): InvestPreview {
   const company = state.company;
-  const before = businessAssetCoeffBps(cfg, company?.businessCapacityInvestmentYuan ?? 0);
-  const after = businessAssetCoeffBps(
-    cfg,
-    (company?.businessCapacityInvestmentYuan ?? 0) + amount,
-  );
+  const investmentBefore = company?.businessCapacityInvestmentYuan ?? 0;
+  const before = businessAssetCoeffBps(cfg, investmentBefore);
+  const after = businessAssetCoeffBps(cfg, investmentBefore + amount);
+  const capacityBefore = monthlyCapacityAt(state, cfg, investmentBefore);
+  const capacityAfter = monthlyCapacityAt(state, cfg, investmentBefore + amount);
+  const monthlyPotentialOrderYuan = monthlyPotentialOrderAt(state, cfg);
+  const monthlyCapacityAfterYuan = capacityAfter?.monthlyCapacityYuan ?? 0;
+
+  let valid = true;
+  let reason: string | undefined;
+  try {
+    validateInvestAmount(state, cfg, amount);
+  } catch (err) {
+    valid = false;
+    reason = err instanceof Error ? err.message : GameErrorCode.INVALID_AMOUNT;
+  }
+
   return {
     amount,
     cashAfter: (company?.cashYuan ?? 0) - amount,
     assetBookAfter: (company?.businessAssetBookYuan ?? 0) + amount,
     capacityCoeffBeforeBps: before,
     capacityCoeffAfterBps: after,
-    valid: true,
+    monthlyCapacityBeforeYuan: capacityBefore?.monthlyCapacityYuan ?? 0,
+    monthlyCapacityAfterYuan,
+    monthlyPotentialOrderYuan,
+    idleRiskAfter: monthlyCapacityAfterYuan > monthlyPotentialOrderYuan,
+    valid,
+    reason,
   };
 }
 
@@ -56,22 +81,56 @@ export function validateInvestAmount(state: GameState, cfg: EconomyConfig, amoun
   }
 }
 
-/** 执行扩产（命令层负责幂等/持久化）。 */
-export function investInBusiness(state: GameState, cfg: EconomyConfig, amount: number): InvestPreview {
+/**
+ * 执行扩产（命令层负责幂等/持久化）。
+ * 传入 ctx 时：先校验 runId，同一 commandId 重放不再扣款/加资产，返回当前账面快照。
+ */
+export function investInBusiness(
+  state: GameState,
+  cfg: EconomyConfig,
+  amount: number,
+  ctx?: { commandId: string; expectedRunId: string },
+): InvestPreview {
+  if (ctx) {
+    ensureRunId(state, ctx.expectedRunId);
+    if (hasCommand(state, ctx.commandId)) {
+      const company = state.company!;
+      const coeff = businessAssetCoeffBps(cfg, company.businessCapacityInvestmentYuan);
+      const monthlyCapacityYuan =
+        monthlyCapacityAt(state, cfg, company.businessCapacityInvestmentYuan)?.monthlyCapacityYuan ?? 0;
+      return {
+        amount,
+        cashAfter: company.cashYuan,
+        assetBookAfter: company.businessAssetBookYuan,
+        capacityCoeffBeforeBps: coeff,
+        capacityCoeffAfterBps: coeff,
+        monthlyCapacityBeforeYuan: monthlyCapacityYuan,
+        monthlyCapacityAfterYuan: monthlyCapacityYuan,
+        monthlyPotentialOrderYuan: monthlyPotentialOrderAt(state, cfg),
+        idleRiskAfter: false,
+        valid: true,
+      };
+    }
+  }
+  // 先按投资前状态取预览（含产能/需求/闲置风险），再落账，避免重复计算口径不一致
+  const preview = previewInvest(state, cfg, amount);
   validateInvestAmount(state, cfg, amount);
   const company = state.company!;
-  const coeffBefore = businessAssetCoeffBps(cfg, company.businessCapacityInvestmentYuan);
   company.cashYuan -= amount;
   company.businessAssetBookYuan += amount;
   company.businessCapacityInvestmentYuan += amount;
-  const coeffAfter = businessAssetCoeffBps(cfg, company.businessCapacityInvestmentYuan);
+  if (ctx) {
+    if (state.cashFlowTrackingStartYear === undefined) state.cashFlowTrackingStartYear = state.gameYear + 1;
+    state.cashFlowsByYear ??= {};
+    const yearFlow = (state.cashFlowsByYear[state.gameYear] ??= { investmentOutYuan: 0, rescueInYuan: 0 });
+    yearFlow.investmentOutYuan += amount;
+  }
+  if (ctx) recordCommand(state, ctx.commandId);
   return {
-    amount,
+    ...preview,
     cashAfter: company.cashYuan,
     assetBookAfter: company.businessAssetBookYuan,
-    capacityCoeffBeforeBps: coeffBefore,
-    capacityCoeffAfterBps: coeffAfter,
-    valid: true,
+    capacityCoeffAfterBps: businessAssetCoeffBps(cfg, company.businessCapacityInvestmentYuan),
   };
 }
 

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "environment": "disabled",
+  "appId": "",
+  "policyVersion": 3,
+  "minUploadIntervalMs": 65000,
+  "autoBackupIntervalMs": 120000,
+  "retainedCheckpoints": 3
+}

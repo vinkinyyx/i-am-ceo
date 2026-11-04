@@ -15,12 +15,49 @@ import {
   Graphics,
   Mask,
   Overflow,
+  Sprite,
+  SpriteFrame,
+  resources,
+  isValid,
 } from 'cc';
-import { THEME, MIN_TOUCH } from './theme';
+import { THEME } from './theme';
+import { ensureTouchSize, TEXT_TOKENS } from './textTokens';
+import { moneyText } from './money';
+
+export { moneyText };
+
+/** Decorative background only; real controls/text remain independent Cocos nodes. */
+export function attachCoverBackground(parent: Node, resourceKey: string): void {
+  const image = new Node('BackgroundImage');
+  image.parent = parent;
+  const transform = image.addComponent(UITransform);
+  const sprite = image.addComponent(Sprite);
+  sprite.sizeMode = Sprite.SizeMode.CUSTOM;
+  const resize = (): void => {
+    const target = parent.getComponent(UITransform);
+    const source = sprite.spriteFrame?.originalSize;
+    if (!target || !source || source.width <= 0 || source.height <= 0) return;
+    const scale = Math.max(target.width / source.width, target.height / source.height);
+    transform.setContentSize(source.width * scale, source.height * scale);
+  };
+  parent.on(Node.EventType.SIZE_CHANGED, resize);
+  resources.load(resourceKey, SpriteFrame, (error, frame) => {
+    if (!isValid(parent, true) || !isValid(image, true)) return;
+    if (error || !frame) {
+      console.warn('[background] image unavailable; keeping theme color');
+      return;
+    }
+    sprite.spriteFrame = frame;
+    resize();
+    // Keep the solid-color fallback until the optional texture is ready.
+    const fallback = parent.getComponent(Graphics);
+    if (fallback) fallback.enabled = false;
+  });
+}
 
 /**
  * 代码驱动 UI 工厂（设计文档 07 / 13.4）。
- * 全部使用引擎原生 Graphics 矩形/Label/Button，不依赖美术图片；动态文字由 Label 渲染。
+ * 控件使用引擎原生 Graphics/Label/Button，装饰底图可选加载；动态文字由 Label 渲染。
  */
 
 export interface RectOptions {
@@ -64,11 +101,14 @@ export function createLabel(opts: LabelOptions): Node {
   const node = new Node(opts.name ?? 'Label');
   if (opts.parent) node.parent = opts.parent;
   const tr = node.addComponent(UITransform);
-  tr.setContentSize(new Size(opts.width ?? 200, opts.height ?? opts.fontSize ?? 20));
+  // R23：字号下限 12；默认行高取语义令牌近似（body），禁止靠缩字塞内容
+  const fontSize = Math.max(opts.fontSize ?? TEXT_TOKENS.body.fontSize, TEXT_TOKENS.caption.fontSize);
+  const lineHeight = opts.lineHeight ?? Math.round(fontSize * 1.45);
+  tr.setContentSize(new Size(opts.width ?? 200, opts.height ?? lineHeight));
   const label = node.addComponent(Label);
   label.string = opts.text;
-  label.fontSize = opts.fontSize ?? 14;
-  label.lineHeight = opts.lineHeight ?? (opts.fontSize ?? 14) + 4;
+  label.fontSize = fontSize;
+  label.lineHeight = lineHeight;
   label.color = opts.color ?? THEME.text;
   label.isBold = opts.bold ?? false;
   label.horizontalAlign =
@@ -77,13 +117,10 @@ export function createLabel(opts: LabelOptions): Node {
       : opts.align === 'right'
         ? HorizontalTextAlignment.RIGHT
         : HorizontalTextAlignment.CENTER;
-  label.verticalAlign = VerticalTextAlignment.CENTER;
-  if (opts.width) {
-    // 含换行的多行文本：保持字号、按宽度排版（SHRINK 会把整段缩成一行）
-    label.overflow = opts.text.includes('\n') ? Overflow.RESIZE_HEIGHT : Overflow.SHRINK;
-  } else {
-    label.overflow = Overflow.RESIZE_HEIGHT;
-  }
+  label.verticalAlign = VerticalTextAlignment.TOP;
+  // R23：有宽度时按宽度换行并向下撑高；单行无宽度时自适应；不再默认 SHRINK 缩字
+  label.overflow = opts.width ? Overflow.RESIZE_HEIGHT : Overflow.NONE;
+  if (opts.width) label.enableWrapText = true;
   return node;
 }
 
@@ -101,10 +138,12 @@ export interface ButtonOptions {
 }
 
 export function createButton(opts: ButtonOptions): Node {
-  const height = opts.height ?? MIN_TOUCH;
+  // R23：有效热区 ≥44×44（视觉矩形可小于热区时由调用方外扩触摸节点，这里先守底线）
+  const touch = ensureTouchSize(opts.width, opts.height ?? 44);
+  const height = touch.height;
   const node = createRect({
     name: opts.name ?? 'Button',
-    width: opts.width,
+    width: touch.width,
     height,
     color: opts.disabled ? THEME.disabled : (opts.color ?? THEME.primary),
     radius: 8,
@@ -188,12 +227,7 @@ export function createScrollContainer(parent: Node, width: number, height: numbe
   const layout = addVerticalLayout(content, 8, 8);
   layout.constraint = Layout.Constraint.NONE;
 
-  sv.content = content.getComponent(UITransform);
+  const contentTransform = content.getComponent(UITransform);
+  if (contentTransform) sv.content = contentTransform as unknown as Node;
   return { root, content };
-}
-
-export function moneyText(yuan: number): string {
-  const sign = yuan < 0 ? '-' : '';
-  const abs = Math.abs(yuan);
-  return `${sign}¥${abs.toLocaleString('zh-CN')}`;
 }

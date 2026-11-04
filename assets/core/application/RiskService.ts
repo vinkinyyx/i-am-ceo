@@ -114,6 +114,10 @@ export function injectRescueCapital(
   state.company.paidInCapitalYuan += amount;
   // 资本注入：现金增加但不计入任何费用/利润；登记分录供追溯（isCash 但不进利润表）
   addPendingEntry(state, 'CAPITAL_INJECTION', amount, ctx.commandId);
+  if (state.cashFlowTrackingStartYear === undefined) state.cashFlowTrackingStartYear = state.gameYear + 1;
+  state.cashFlowsByYear ??= {};
+  const yearFlow = (state.cashFlowsByYear[state.gameYear] ??= { investmentOutYuan: 0, rescueInYuan: 0 });
+  yearFlow.rescueInYuan += amount;
   state.rescueCapitalUsed = true;
   recordCommand(state, ctx.commandId);
 

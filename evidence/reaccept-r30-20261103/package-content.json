@@ -1,0 +1,11 @@
+{
+  "backgroundHash": "02f519c14fe2b42a062d070579ca47833768969c0838a67ee527c48dc9488c17",
+  "matchingBackgroundEntries": [
+    "assets/resources/native/d8/d857264b-ceed-4ff1-8d0b-e4e3ea00cec4.bc7fe.png"
+  ],
+  "layoutFormulaEntries": [
+    "assets/main/index.c35d1.js"
+  ],
+  "adImplementationEntries": [],
+  "note": "Creator renames local variables; named filterBottom/filterRows text search was inconclusive. Actual compiled function was inspected and its row-dependent calculation is present."
+}

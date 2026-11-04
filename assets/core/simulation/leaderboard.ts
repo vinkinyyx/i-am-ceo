@@ -79,13 +79,17 @@ export function playerAssets(state: GameState): number {
   return state.company.cashYuan + state.company.businessAssetBookYuan;
 }
 
-/** 玩家已完成经营年数（= 已入册年报数）。 */
+/** Completed years are monotonic in gameYear; annualReports is intentionally pruned. */
 export function playerYears(state: GameState): number {
-  return state.annualReports.filter((r) => r.settled).length;
+  return Math.max(0, state.gameYear - 1);
 }
 
 function assemble(state: GameState, cfg: EconomyConfig): LeaderboardRow[] {
-  const bots = ensureBots(state, cfg);
+  // Leaderboard queries are read-only. If this is a legacy/new snapshot without
+  // initialized bots, derive the same deterministic rows without mutating it.
+  const bots = state.botCompanies.length === cfg.localBots.count
+    ? state.botCompanies
+    : generateBots(cfg);
   const rows: LeaderboardRow[] = bots.map((b) => ({
     id: b.botId,
     name: b.name,

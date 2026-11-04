@@ -1,0 +1,21 @@
+{
+  "taskId": "TASK-M3-09-R15",
+  "title": "在线真实时间/前后台/离线去重",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T02:08:00+08:00",
+  "changes": [
+    { "file": "assets/core/platform/foregroundClock.ts", "action": "新增前台水位服务：enterBackground/enterForeground 真实 elapsed、settledUpToMs 去重、回拨/乱序/重复 onShow 返回 0、noteOnlineProgress 同步在线推进" },
+    { "file": "assets/scripts/ui/AppView.ts", "action": "onHide 改记 fgClock 水位并移除无条件『已自动保存』toast；onReturnForeground 加 settlingForeground 单 attempt 锁，按真实 elapsed 调 settleOffline，markSettled 去重；clockTick 用真实帧间隔 dt 替代固定 200ms，在线推进 noteOnlineProgress" },
+    { "file": "tests/unit/foregroundClock.test.ts", "action": "新增 7 例 T01—T03 等" }
+  ],
+  "commands": [{ "cmd": "npm run typecheck", "exitCode": 0 }, { "cmd": "npm run lint", "exitCode": 0 }, { "cmd": "npx vitest run", "exitCode": 0, "result": "PASS 35 files / 308 tests（含既有 offlineM3 6 例：8h/40h 封顶/回拨/暂停/余量/快速前后台核心语义）" }],
+  "cases": [
+    { "id": "R15-T01", "result": "PASS（模型）", "note": "前台 elapsed=now-leftAt，clockTick 用真实帧 dt；浏览器真实切后台 8h 场景由 R38 E2E 复核" },
+    { "id": "R15-T02", "result": "PASS", "note": "1×/5×/暂停/回拨由既有 offlineM3 + foregroundClock 覆盖；onHide 不再无条件 toast" },
+    { "id": "R15-T03", "result": "PASS", "note": "连续两次/十次 onShow 仅计一次真实区间；settlingForeground 阻止并发结算" },
+    { "id": "R15-T04", "result": "PASS（核心层）", "note": "0 月也 markSettled 消耗时长；在线 noteOnlineProgress 防重复；新 run 不消费旧水位（facade runId 校验）" },
+    { "id": "R15-T05", "result": "PASS（核心层）", "note": "写失败 toast 跟随命令结果（既有命令失败路径不 toast）；保存频率 0.2s 心跳保持；持久化频率优化列 R34" },
+    { "id": "R15-T06", "result": "PASS（核心层）", "note": "settlingForeground finally 释放；新 run/旧回调由 expectedRunId 屏蔽；浏览器旧 attempt 弹窗复核待 R38" }
+  ],
+  "remaining": "真实切后台→回前台浏览器录屏在 R38；真机后台冻结语义在 R41。"
+}

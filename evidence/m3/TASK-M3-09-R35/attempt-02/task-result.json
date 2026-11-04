@@ -1,0 +1,15 @@
+{
+  "taskId": "TASK-M3-09-R35",
+  "attempt": "attempt-02",
+  "date": "2026-11-03",
+  "result": "PASS_PARTIAL",
+  "command": "npx vitest run tests/tools/canvasDriver.test.mjs",
+  "evidence": [
+    "tests/tools/canvasDriver.test.mjs",
+    "evidence/m3/TASK-M3-09-R33/attempt-10/e2e-report.json"
+  ],
+  "passed": 6,
+  "failed": 0,
+  "browserErrors": 0,
+  "limitations": "covered/disabled/missing-resource/overlap detectors and production hook isolation not complete"
+}

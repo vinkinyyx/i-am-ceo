@@ -1,0 +1,442 @@
+{
+  "url": "http://localhost:8123/",
+  "generatedAt": "2026-11-02T15:59:25.789Z",
+  "checks": [
+    {
+      "id": "T01-dept-entry-reachable",
+      "pass": true,
+      "detail": {
+        "deptCount": 1,
+        "hasAutoBudget": true
+      }
+    },
+    {
+      "id": "T05-no-fake-history-claim",
+      "pass": true,
+      "detail": {
+        "text": "贡献为「按当前团队 + 当月预计收入」的估算；月账只存净费用、未按部门留存归因，故不展示历史“已实现收益”。"
+      }
+    },
+    {
+      "id": "T03-create-shows-fee-and-balance",
+      "pass": true,
+      "detail": {
+        "texts": [
+          "提升业务产能、降低招聘费｜设立费 ¥10,000｜建后余额 ¥27.7万",
+          "降低可适用的直接采购成本｜设立费 ¥10,000｜建后余额 ¥27.7万",
+          "提升潜在订单（受产能上限）｜设立费 ¥10,000｜建后余额 ¥27.7万",
+          "降低售后费用｜设立费 ¥10,000｜建后余额 ¥27.7万",
+          "降低固定管理费用｜设立费 ¥10,000｜建后余额 ¥27.7万",
+          "降低可适用的直接采购成本\n设立费：¥10,000（确认即扣现金）\n现金：¥287,027 → ¥277,027\n创建后默认手动编制，不自动招人；0 员工无部门效益。"
+        ]
+      }
+    },
+    {
+      "id": "T02-cancel-no-charge",
+      "pass": true,
+      "detail": {
+        "cash": 287027,
+        "depts": 1
+      }
+    },
+    {
+      "id": "T02-double-tap-charges-once",
+      "pass": true,
+      "detail": {
+        "cashBefore": 287027,
+        "cashAfter": 277027,
+        "deptCount": 2
+      }
+    },
+    {
+      "id": "T03-new-dept-default-locked-zero-staff",
+      "pass": true,
+      "detail": {
+        "staffingMode": "LOCKED",
+        "employees": 2
+      }
+    },
+    {
+      "id": "T03-zero-staff-shows-zero",
+      "pass": true,
+      "detail": {
+        "texts": [
+          "当月主营毛利 ¥2.4万｜净贡献 ¥1.1万",
+          "尚未配置人员：无部门效益",
+          "估算无效益 ¥0｜净贡献 ¥0"
+        ]
+      }
+    },
+    {
+      "id": "T01-five-support-depts-created",
+      "pass": true,
+      "detail": {
+        "created": [
+          {
+            "name": "客服部",
+            "cash": 267027,
+            "depts": 3
+          },
+          {
+            "name": "市场部",
+            "cash": 257027,
+            "depts": 4
+          },
+          {
+            "name": "财务部",
+            "cash": 247027,
+            "depts": 5
+          },
+          {
+            "name": "人力资源部",
+            "cash": 237027,
+            "depts": 6
+          }
+        ],
+        "cash": 237027,
+        "expectedCash": 237027,
+        "supportCount": 5
+      }
+    },
+    {
+      "id": "T01-no-uncreated-entries-left",
+      "pass": true,
+      "detail": {
+        "remaining": 0
+      }
+    },
+    {
+      "id": "T01-long-list-scrollable",
+      "pass": true,
+      "detail": {
+        "scrollY": 271
+      }
+    },
+    {
+      "id": "T02-detail-shows-attribution-limit",
+      "pass": true,
+      "detail": {
+        "texts": [
+          "贡献为「按当前团队 + 当月预计收入」的估算；月账只存净费用、未按部门留存归因，故不展示历史“已实现收益”。",
+          "在岗 0 人｜月薪合计 ¥0",
+          "在岗 0 人｜月薪合计 ¥0",
+          "在岗 0 人｜月薪合计 ¥0",
+          "在岗 0 人｜月薪合计 ¥0",
+          "在岗 0 人｜月薪合计 ¥0",
+          "职责：降低固定管理费用。当前 0 人，效益严格为 0。",
+          "在岗：0 人｜月薪合计 ¥0",
+          "归因限制：月账只保存净费用，未按部门留存“历史节省”；所以本页数字均为当月估算，不代表历史已实现收益，也不会重复计入利润。",
+          "建议编制人数：0 人（仅建议，不自动裁员）"
+        ]
+      }
+    },
+    {
+      "id": "T02-target-count-recorded-no-cost",
+      "pass": true,
+      "detail": {
+        "targetCount": 1,
+        "cash": 237027
+      }
+    },
+    {
+      "id": "T06-policy-staffing-does-not-rewrite-ledgers",
+      "pass": true,
+      "detail": {
+        "ledgerEqual": true,
+        "staffingMode": "AUTO",
+        "cash": 237027,
+        "modePolicy": "STEADY"
+      }
+    },
+    {
+      "id": "T01-auto-budget-preview-real-values",
+      "pass": true,
+      "detail": {
+        "reserve": 101838,
+        "spendable": 135189,
+        "budgetLabels": [
+          "自动预算｜稳健：ROI≥1.0｜保留 6 个月刚性费用｜可支配 ¥13.5万",
+          "可支配余量：¥135,189",
+          "AUTO 编制部门：2 个（手动锁定部门不参与自动招聘）",
+          "硬性约束：系统不会自动裁员、不会自动建部门、不会自动扩产；自动录用仅发生在 AUTO 编制部门，且受 ROI 与现金安全线双重限制。"
+        ]
+      }
+    },
+    {
+      "id": "T04-staffed-cards-render",
+      "pass": true,
+      "detail": {
+        "headcountTexts": [
+          "在岗 2 人｜月薪合计 ¥1.3万",
+          "在岗 1 人｜月薪合计 ¥5,000",
+          "在岗 1 人｜月薪合计 ¥5,000",
+          "在岗 1 人｜月薪合计 ¥5,000",
+          "在岗 1 人｜月薪合计 ¥5,000",
+          "在岗 1 人｜月薪合计 ¥5,000"
+        ]
+      }
+    },
+    {
+      "id": "T04-business-detail-revenue-exact",
+      "pass": true,
+      "detail": {
+        "line": "职责：交付主营产能。当月产能 ¥81,434，当月需求 ¥67,200，预计收入 ¥67,200。",
+        "revenue": 67200
+      }
+    },
+    {
+      "id": "T04-procurement-matches-monthly-formula",
+      "pass": true,
+      "detail": {
+        "deptName": "采购部",
+        "value": 3830,
+        "coeff": "部门系数：10.0%（对可适用直接采购成本的节省）",
+        "line": "当月估算效益：¥3,830（成本节省）",
+        "expected": 3830
+      }
+    },
+    {
+      "id": "T04-customer-service-matches-monthly-formula",
+      "pass": true,
+      "detail": {
+        "deptName": "客服部",
+        "value": 470,
+        "coeff": "部门系数：35.0%（对售后费用的节省）",
+        "line": "当月估算效益：¥470（成本节省）",
+        "expected": 470
+      }
+    },
+    {
+      "id": "T04-finance-matches-monthly-formula",
+      "pass": true,
+      "detail": {
+        "deptName": "财务部",
+        "value": 1875,
+        "coeff": "部门系数：20.0%（对固定管理费与其他可控运营费的节省）",
+        "line": "当月估算效益：¥1,875（成本节省）",
+        "expected": 1875
+      }
+    },
+    {
+      "id": "T04-marketing-hr-nonnegative-and-labeled",
+      "pass": true,
+      "detail": {
+        "marketing": {
+          "deptName": "市场部",
+          "value": 2880,
+          "coeff": "部门系数：12.0%（提升潜在订单（收入仍取 min(订单, 产能)））",
+          "line": "当月估算效益：¥2,880（需求增量）"
+        },
+        "hr": {
+          "deptName": "人力资源部",
+          "value": 0,
+          "coeff": "部门系数：6.0%（提升主营交付产能；招聘费折扣另计）",
+          "line": "当月估算效益：¥0（产能增量）"
+        }
+      }
+    },
+    {
+      "id": "T01-auto-budget-flags-below-safety-line",
+      "pass": true,
+      "detail": {
+        "texts": [
+          "自动预算｜稳健：ROI≥1.0｜保留 6 个月刚性费用｜可支配 -¥1.5万",
+          "可支配余量：-¥14,811（低于安全线，自动招聘将被冻结）",
+          "AUTO 编制部门：1 个（手动锁定部门不参与自动招聘）",
+          "硬性约束：系统不会自动裁员、不会自动建部门、不会自动扩产；自动录用仅发生在 AUTO 编制部门，且受 ROI 与现金安全线双重限制。"
+        ]
+      }
+    },
+    {
+      "id": "T01-small-screen-list-reaches-hr-or-finance",
+      "pass": true,
+      "detail": {
+        "names": [
+          "主营业务部",
+          "采购部",
+          "客服部",
+          "市场部",
+          "财务部",
+          "人力资源部"
+        ]
+      }
+    },
+    {
+      "id": "D-third-viewport-dept-stable",
+      "pass": true,
+      "detail": {
+        "topHasBusiness": true,
+        "budgetOpen": true
+      }
+    }
+  ],
+  "states": {
+    "liveInitial": {
+      "runId": "run_134cdm7000000",
+      "revision": 11,
+      "cash": 287027,
+      "policy": "STEADY",
+      "gameYear": 1,
+      "gameMonth": 1,
+      "departments": [
+        {
+          "deptId": "dp_1h6ho9p000000",
+          "type": "BUSINESS",
+          "staffingMode": "AUTO",
+          "targetCount": 0,
+          "setupPaid": true
+        }
+      ],
+      "employees": [
+        {
+          "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+          "deptId": "dp_1h6ho9p000000",
+          "salary": 7645,
+          "skill": 87,
+          "status": "ACTIVE"
+        },
+        {
+          "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+          "deptId": "dp_1h6ho9p000000",
+          "salary": 5328,
+          "skill": 72,
+          "status": "ACTIVE"
+        }
+      ],
+      "ledgers": [],
+      "executedCommandCount": 4
+    },
+    "liveCreated": {
+      "cash": 237027,
+      "departments": [
+        {
+          "deptId": "dp_1h6ho9p000000",
+          "type": "BUSINESS",
+          "staffingMode": "AUTO",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_92fy87000001",
+          "type": "PROCUREMENT",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_ds83jc000002",
+          "type": "CUSTOMER_SERVICE",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_rdphwr000003",
+          "type": "MARKETING",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_l79tdt000004",
+          "type": "FINANCE",
+          "staffingMode": "AUTO",
+          "targetCount": 1,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_ite4zc000005",
+          "type": "HR",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        }
+      ]
+    },
+    "staffed": {
+      "cash": 237027,
+      "departments": [
+        {
+          "deptId": "dp_1h6ho9p000000",
+          "type": "BUSINESS",
+          "staffingMode": "AUTO",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_proc_0001",
+          "type": "PROCUREMENT",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_cs_0001",
+          "type": "CUSTOMER_SERVICE",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_mkt_0001",
+          "type": "MARKETING",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_fin_0001",
+          "type": "FINANCE",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        },
+        {
+          "deptId": "dp_hr_0001",
+          "type": "HR",
+          "staffingMode": "LOCKED",
+          "targetCount": 0,
+          "setupPaid": true
+        }
+      ],
+      "employees": 7
+    }
+  },
+  "screenshots": [
+    "375-01-dept-page-from-zero.png",
+    "375-02-create-confirm-cancel.png",
+    "375-03-cancelled.png",
+    "375-04-zero-staff-card.png",
+    "375-05-long-list-bottom.png",
+    "375-06-finance-detail-zero.png",
+    "375-07-auto-budget-preview.png",
+    "375-staffed-08-staffed-dept-top.png",
+    "375-staffed-09-business-detail.png",
+    "375-staffed-10-procurement-detail.png",
+    "375-staffed-11-customer-service-detail.png",
+    "375-staffed-12-finance-detail-staffed.png",
+    "375-staffed-13-marketing-detail.png",
+    "375-staffed-14-hr-detail.png",
+    "375-staffed-15-auto-budget-frozen.png",
+    "360-16-small-dept-top.png",
+    "360-17-small-dept-bottom.png",
+    "360-18-small-detail-top.png",
+    "360-19-small-detail-scrolled.png",
+    "360-20-small-closed.png",
+    "390-21-390-dept-top.png",
+    "390-22-390-auto-budget.png"
+  ],
+  "errors": [],
+  "finance": {
+    "revenue": 67200,
+    "procurement": 3830,
+    "customerService": 470,
+    "finance": 1875,
+    "expected": {
+      "procurement": 3830,
+      "customerService": 470,
+      "finance": 1875
+    }
+  },
+  "ok": true
+}

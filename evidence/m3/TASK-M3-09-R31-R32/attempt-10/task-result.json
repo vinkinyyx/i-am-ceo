@@ -1,0 +1,22 @@
+{
+  "taskIds": ["TASK-M3-09-R31", "TASK-M3-09-R32"],
+  "status": "DONE",
+  "sourceBuild": "Cocos Creator 3.8.8 web-mobile, index.js mtime 2026-11-03 08:01:37 local (R31/R32 browser test).",
+  "checks": 5,
+  "failed": 0,
+  "browserErrors": 0,
+  "evidence": "e2e-report.json, fixture-readback.json; R31 screenshot r31-player-detail.png; R32 screenshots r32-year-2-bridge-visible.png and r32-year-1-legacy-bridge-visible.png.",
+  "R31": [
+    "Actual click into local rank, switch to years, player shows 2 years based on gameYear despite no historical retention count substitution.",
+    "Actual locate-my-row and player detail click show full company name, total assets and 2 years.",
+    "Before/after saved envelope remained byte-equivalent at revision 11; query is read-only."
+  ],
+  "R32": [
+    "Actual click into annual report and switch from year 2 to legacy year 1.",
+    "New report cash bridge shows ledger net cash +9000, investment 0, rescue 0, other 0, and balanced difference 0.",
+    "Legacy report explicitly says prior cash-flow detail was not recorded; no values are reconstructed from current state.",
+    "Before/after report navigation saved envelope stayed at revision 11. Integration test reads active pointer, slot envelope, 12 monthly ledgers, report, cleared transaction journal, then reloads and verifies closing cash/report."
+  ],
+  "fixtureNote": "UI history used two explicit sealed test annual reports (year 2 bridge / year 1 legacy) on a local test save; the actual current-year cash bridge is separately produced and verified by the R32 facade integration test.",
+  "risk": "Year selector is in the scrollable report body; when the body is at its end the user returns to top before switching year."
+}

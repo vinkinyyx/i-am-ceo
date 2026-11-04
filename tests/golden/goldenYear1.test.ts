@@ -121,6 +121,11 @@ describe.each([
     expect(startingCash).toBe(300_000 - salary * 2);
     expect(report.cashCloseYuan).toBe(g.endingCashYuan);
     expect(state.company!.cashYuan).toBe(g.endingCashYuan);
+    expect(report.cashBridge?.attributionComplete).toBe(true);
+    expect(report.cashBridge?.balanced).toBe(true);
+    expect(report.cashBridge?.investmentCashFlowYuan).toBe(0);
+    expect(report.cashBridge?.rescueCapitalYuan).toBe(0);
+    expect(report.cashOpenYuan + report.cashBridge!.monthlyLedgerNetCashDeltaYuan).toBe(report.cashCloseYuan);
 
     // 年结后进入第2年第1月
     expect(state.gameYear).toBe(2);

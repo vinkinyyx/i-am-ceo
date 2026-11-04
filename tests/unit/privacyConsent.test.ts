@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EditorMockPlatform } from '@core/platform/EditorMockPlatform';
+import { EditorMockPlatform } from '../helpers/EditorMockPlatform';
 import {
   acceptPrivacy,
   hasAcceptedPrivacy,

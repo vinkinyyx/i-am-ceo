@@ -9,11 +9,17 @@
   "private": true,
   "scripts": {
     "typecheck": "tsc -p tsconfig.core.json --noEmit",
-    "lint": "eslint \"assets/core/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck:ui": "tsc -p tsconfig.ui.json --noEmit",
+    "check": "npm run typecheck && npm run typecheck:ui && npm run lint && npm run test",
+    "lint": "eslint \"assets/core/**/*.ts\" \"assets/scripts/**/*.ts\" \"tests/**/*.ts\"",
     "test:unit": "vitest run --dir tests/unit",
     "test:integration": "vitest run --dir tests/integration",
     "test:golden": "vitest run --dir tests/golden",
-    "test": "vitest run"
+    "test": "vitest run",
+    "web-build": "powershell -ExecutionPolicy Bypass -File tools/build-web.ps1",
+    "tap-build": "powershell -ExecutionPolicy Bypass -File tools/build-tap.ps1",
+    "release-build": "powershell -ExecutionPolicy Bypass -File tools/build-tap-v2.ps1",
+    "static-server": "node tools/static-server.cjs build/web-mobile 8123"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

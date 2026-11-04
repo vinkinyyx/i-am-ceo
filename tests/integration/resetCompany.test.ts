@@ -1,6 +1,6 @@
-﻿import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
-import { EditorMockPlatform } from '@core/platform/EditorMockPlatform';
-import { MemoryStorage } from '@core/platform/MemoryStorage';
+import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
+import { EditorMockPlatform } from '../helpers/EditorMockPlatform';
+import { MemoryStorage } from '../helpers/MemoryStorage';
 import { GameFacade } from '@core/application/GameFacade';
 import { createInitialState } from '@core/domain/gameStateFactory';
 import { createCompany } from '@core/application/CompanyService';
@@ -182,6 +182,15 @@ describe('关闭公司重开事务（A16/A17/A18/B03/A25）', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.code).toBe('CONFIRMATION_EXPIRED');
     expect(facade.getState().company).not.toBeNull();
+  });
+
+  it('close preview uses monotonic completed years after annual report pruning', async () => {
+    const { facade } = await freshFacade();
+    await completeOnboarding(facade);
+    const state = facade.getState();
+    state.gameYear = 121;
+    state.annualReports = [];
+    expect(facade.beginCloseCompany(50_000).summary.yearsOperated).toBe(120);
   });
 });
 

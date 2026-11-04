@@ -49,11 +49,19 @@ export interface IStorageBackend {
   get<T>(key: string): Promise<T | null>;
   set<T>(key: string, data: T): Promise<void>;
   remove(key: string): Promise<void>;
+  /** True while a timed-out native mutation may still change durable storage. */
+  hasUnsettledNativeWrites?(): boolean;
 }
 
 export interface ITapPlatform extends IStorageBackend {
   getEnvironment(): PlatformKind;
   getWindowInfo(): WindowInfo;
+  /**
+   * 窗口尺寸/安全区变化订阅（R24：热 resize 时页面壳只重算几何，不重建内容）。
+   * 真机映射 tap.onWindowResize；编辑器 Mock 在 setWindowInfo 时触发。
+   * 可选：未实现的平台由 UI 层 view 级 canvas-resize 兜底。
+   */
+  onWindowResize?(callback: (info: WindowInfo) => void): Unsubscribe;
   onShow(callback: () => void): Unsubscribe;
   onHide(callback: () => void): Unsubscribe;
   login(): Promise<LoginResult>;

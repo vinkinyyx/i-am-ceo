@@ -1,0 +1,26 @@
+
+> im-ceo@0.1.0 check
+> npm run typecheck && npm run typecheck:ui && npm run lint && npm run test
+
+
+> im-ceo@0.1.0 typecheck
+> tsc -p tsconfig.core.json --noEmit
+
+assets/core/platform/TapRewardedAdProvider.ts(37,15): error TS2322: Type '{ settle: (result: RewardedAdResult) => void; allowReward: boolean; onClose: () => undefined; onError: () => undefined; timeout: ReturnType<typeof setTimeout>; }' is not assignable to type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(49,32): error TS2339: Property 'timeout' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(50,31): error TS2339: Property 'onClose' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(51,31): error TS2339: Property 'onError' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(54,17): error TS2339: Property 'onClose' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(54,28): error TS7006: Parameter 'result' implicitly has an 'any' type.
+assets/core/platform/TapRewardedAdProvider.ts(55,33): error TS2339: Property 'settle' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(55,48): error TS2339: Property 'allowReward' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(57,50): error TS2339: Property 'allowReward' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(60,17): error TS2339: Property 'onError' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(61,33): error TS2339: Property 'settle' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(64,17): error TS2339: Property 'timeout' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(65,19): error TS2339: Property 'allowReward' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(66,19): error TS2339: Property 'settle' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(72,28): error TS2339: Property 'onClose' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(73,28): error TS2339: Property 'onError' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(75,19): error TS2339: Property 'allowReward' does not exist on type 'never'.
+assets/core/platform/TapRewardedAdProvider.ts(76,19): error TS2339: Property 'settle' does not exist on type 'never'.

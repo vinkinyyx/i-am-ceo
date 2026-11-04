@@ -17,11 +17,24 @@ import { runMonthlyAutoHire } from '../assets/core/application/AutoHireService';
 import type { GameState, IndustryId, Policy } from '../assets/core/domain/types';
 
 const cfg = registerConfig(rawEconomy as never) as EconomyConfig;
+function fnv1a64(text: string): string {
+  let hash = 0xcbf29ce484222325n;
+  for (const byte of new TextEncoder().encode(text)) {
+    hash ^= BigInt(byte);
+    hash = BigInt.asUintN(64, hash * 0x100000001b3n);
+  }
+  return hash.toString(16).padStart(16, '0');
+}
+const CONFIG_HASH = fnv1a64(JSON.stringify(rawEconomy));
 
 export interface SimRow {
   seed: number;
+  configHash: string;
   industry: IndustryId;
   policy: Policy;
+  monthsSimulated: number;
+  complete60Months: boolean;
+  stopReason: string;
   years: number;
   finalProfitYear: number;
   cashEnd: number;
@@ -30,9 +43,16 @@ export interface SimRow {
   deptCount: number;
   events: number;
   autoHires: number;
+  autoHiresByYear: Record<string, number>;
+  maxAutoHiresInMonth: number;
+  annualCashBridgeIssue: { year: number; balanced: boolean; attributionComplete: boolean; unattributedCashFlowYuan: number } | null;
   rescueUsed: boolean;
   cashNeverNegative: boolean;
   conservationHeld: boolean;
+  cashDeltaHeld: boolean;
+  cashDeltaFailureCount: number;
+  firstCashDeltaMismatch: { year: number; month: number; cashBefore: number; ledgerDelta: number; cashAfter: number } | null;
+  annualCashBridgeHeld: boolean;
 }
 
 function freshRun(seed: number, industry: IndustryId, policy: Policy): GameState {
@@ -58,26 +78,59 @@ export function simulate(seed: number, industry: IndustryId, policy: Policy): Si
   const state = freshRun(seed, industry, policy);
   let cashNeverNegative = true;
   let conservationHeld = true;
+  let cashDeltaHeld = true;
+  let cashDeltaFailureCount = 0;
+  let firstCashDeltaMismatch: SimRow['firstCashDeltaMismatch'] = null;
+  let annualCashBridgeHeld = true;
+  let annualCashBridgeIssue: SimRow['annualCashBridgeIssue'] = null;
+  let monthsSimulated = 0;
+  const hiresByMonth = new Map<string, number>();
 
   for (let m = 0; m < 60; m++) {
+    if (state.phase !== 'RUNNING') break;
+    const cashBeforeMonth = state.company!.cashYuan;
+    const hireTotalBefore = Object.values(state.autoHireCountByYear).reduce((s, v) => s + v, 0);
+    const yearBefore = state.gameYear;
+    const monthBefore = state.gameMonth;
+    const currentMonthKey = `${state.runId}:${yearBefore}:${monthBefore}`;
+    const prepaidBeforeMonthStart = state.pendingEntries
+      .filter((entry) => entry.monthKey === currentMonthKey && entry.isCash && entry.alreadyPaid)
+      .reduce((total, entry) => total + Math.abs(entry.amountYuan), 0);
     // 每月先做自动招聘决策（与 GameClock.beforeMonthSettle 一致）
     runMonthlyAutoHire(state, cfg);
-    const cashBefore = state.company!.cashYuan;
-    const yearBefore = state.gameYear;
     advanceMonth(state, cfg);
+    monthsSimulated += 1;
     if (state.company!.cashYuan < 0) cashNeverNegative = false;
+    const lastLedger = state.monthlyLedgersRolling[state.monthlyLedgersRolling.length - 1];
+    if (!lastLedger || lastLedger.runId !== state.runId || lastLedger.year !== yearBefore || lastLedger.month !== monthBefore ||
+        cashBeforeMonth + lastLedger.cashDeltaYuan + prepaidBeforeMonthStart !== state.company!.cashYuan) {
+      cashDeltaHeld = false;
+      cashDeltaFailureCount += 1;
+      firstCashDeltaMismatch ??= {
+        year: yearBefore, month: monthBefore, cashBefore: cashBeforeMonth,
+        ledgerDelta: lastLedger?.cashDeltaYuan ?? NaN, cashAfter: state.company!.cashYuan,
+      };
+    }
+    const hireTotalAfter = Object.values(state.autoHireCountByYear).reduce((s, v) => s + v, 0);
+    hiresByMonth.set(`${yearBefore}:${monthBefore}`, hireTotalAfter - hireTotalBefore);
 
-    // 财务守恒抽查：年末 年利润 = 12 个月利润之和（rolling 仅留24月，只校验最近可取年）
+    // 每年冻结报表与12个月利润、现金桥逐项对账。
     if (state.gameYear > yearBefore) {
       const y = yearBefore;
       const ledgers = state.monthlyLedgersRolling.filter((l) => l.runId === state.runId && l.year === y);
-      if (ledgers.length === 12) {
-        const sumProfit = ledgers.reduce((s, l) => s + l.profitYuan, 0);
-        const report = state.annualReports.find((r) => r.year === y);
-        if (report && sumProfit !== report.profitYuan) conservationHeld = false;
+      const sumProfit = ledgers.reduce((s, l) => s + l.profitYuan, 0);
+      const report = state.annualReports.find((r) => r.year === y);
+      if (ledgers.length !== 12 || !report || sumProfit !== report.profitYuan) conservationHeld = false;
+      if (!report?.cashBridge?.balanced || !report.cashBridge.attributionComplete || report.cashBridge.unattributedCashFlowYuan !== 0) {
+        annualCashBridgeHeld = false;
+        annualCashBridgeIssue ??= {
+          year: y,
+          balanced: report?.cashBridge?.balanced ?? false,
+          attributionComplete: report?.cashBridge?.attributionComplete ?? false,
+          unattributedCashFlowYuan: report?.cashBridge?.unattributedCashFlowYuan ?? NaN,
+        };
       }
     }
-    void cashBefore;
   }
 
   const lastReport = state.annualReports[state.annualReports.length - 1];
@@ -85,8 +138,12 @@ export function simulate(seed: number, industry: IndustryId, policy: Policy): Si
 
   return {
     seed,
+    configHash: CONFIG_HASH,
     industry,
     policy,
+    monthsSimulated,
+    complete60Months: monthsSimulated === 60,
+    stopReason: monthsSimulated === 60 ? 'COMPLETED_60_MONTHS' : `PHASE_${state.phase}`,
     years: state.gameYear - 1,
     finalProfitYear: lastReport?.profitYuan ?? 0,
     cashEnd: state.company!.cashYuan,
@@ -95,9 +152,16 @@ export function simulate(seed: number, industry: IndustryId, policy: Policy): Si
     deptCount: state.departments.length,
     events: state.annualEvents.filter((e) => e.happened).length,
     autoHires,
+    autoHiresByYear: { ...state.autoHireCountByYear },
+    maxAutoHiresInMonth: Math.max(0, ...hiresByMonth.values()),
+    annualCashBridgeIssue,
     rescueUsed: state.rescueCapitalUsed,
     cashNeverNegative,
     conservationHeld,
+    cashDeltaHeld,
+    cashDeltaFailureCount,
+    firstCashDeltaMismatch,
+    annualCashBridgeHeld,
   };
 }
 
@@ -117,13 +181,14 @@ export function simulateBatch(seedCount: number): SimRow[] {
 }
 
 export function toCsv(rows: SimRow[]): string {
-  const header = 'seed,industry,policy,years,finalProfitYear,cashEnd,assetsEnd,headcountEnd,deptCount,events,autoHires,rescueUsed,cashNeverNegative,conservationHeld';
+  const header = 'seed,configHash,industry,policy,monthsSimulated,complete60Months,stopReason,years,finalProfitYear,cashEnd,assetsEnd,headcountEnd,deptCount,events,autoHires,autoHiresByYear,maxAutoHiresInMonth,rescueUsed,cashNeverNegative,conservationHeld,cashDeltaHeld,annualCashBridgeHeld';
   const body = rows
     .map((r) =>
       [
-        r.seed, r.industry, r.policy, r.years, r.finalProfitYear, r.cashEnd, r.assetsEnd,
-        r.headcountEnd, r.deptCount, r.events, r.autoHires, r.rescueUsed,
-        r.cashNeverNegative, r.conservationHeld,
+        r.seed, r.configHash, r.industry, r.policy, r.monthsSimulated, r.complete60Months, r.stopReason,
+        r.years, r.finalProfitYear, r.cashEnd, r.assetsEnd, r.headcountEnd, r.deptCount, r.events,
+        r.autoHires, JSON.stringify(r.autoHiresByYear), r.maxAutoHiresInMonth, r.rescueUsed,
+        r.cashNeverNegative, r.conservationHeld, r.cashDeltaHeld, r.annualCashBridgeHeld,
       ].join(','),
     )
     .join('\n');
@@ -141,8 +206,17 @@ export function summarize(rows: SimRow[]) {
     runs: rows.length,
     negativeCash: rows.filter((r) => !r.cashNeverNegative).length,
     conservationFail: rows.filter((r) => !r.conservationHeld).length,
+    cashDeltaFail: rows.filter((r) => !r.cashDeltaHeld).length,
+    annualCashBridgeFail: rows.filter((r) => !r.annualCashBridgeHeld).length,
     rescueUsed: rows.filter((r) => r.rescueUsed).length,
     tooManyEvents: rows.filter((r) => r.events > 4).length,
     autoHireMax: Math.max(...rows.map((r) => r.autoHires)),
+    incomplete: rows.filter((r) => !r.complete60Months).length,
+    incompleteReasons: rows.filter((r) => !r.complete60Months).reduce<Record<string, number>>((acc, row) => {
+      acc[row.stopReason] = (acc[row.stopReason] ?? 0) + 1;
+      return acc;
+    }, {}),
+    maxAutoHiresInYear: Math.max(0, ...rows.flatMap((row) => Object.values(row.autoHiresByYear))),
+    maxAutoHiresInMonth: Math.max(0, ...rows.map((row) => row.maxAutoHiresInMonth)),
   };
 }

@@ -1,0 +1,82 @@
+{
+  "status": "PARTIAL",
+  "profile": "Chrome headless, WebGL canvas, 375x812, local 6-employee test fixture",
+  "initialCompanyActionAvailableMs": 84146,
+  "sampleWindowEachMs": 20000,
+  "metrics": [
+    {
+      "frameCount": 1200,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.850000000002183,
+        "max": 17.23999999999978
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 49709683,
+      "speed": "1×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 60,
+      "saveWritesPerMinute": 180
+    },
+    {
+      "frameCount": 1197,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.830000000001746,
+        "max": 33.64999999999782
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 34626226,
+      "speed": "2×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 60,
+      "saveWritesPerMinute": 180
+    },
+    {
+      "frameCount": 1197,
+      "frameMs": {
+        "p50": 16.665000000000873,
+        "p95": 16.81500000000233,
+        "max": 33.419999999998254
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 31650915,
+      "speed": "5×",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 60,
+      "saveWritesPerMinute": 180
+    },
+    {
+      "frameCount": 1199,
+      "frameMs": {
+        "p50": 16.66500000000815,
+        "p95": 16.79999999998836,
+        "max": 16.945000000006985
+      },
+      "longFramesOver50ms": 0,
+      "nodes": 62,
+      "activeNodes": 62,
+      "cocosNodeListeners": 0,
+      "heapUsedBytes": 35571627,
+      "speed": "暂停",
+      "windowMs": 20000,
+      "saveWritesDuringWindow": 0,
+      "saveWritesPerMinute": 0
+    }
+  ],
+  "browserErrors": [],
+  "caveats": [
+    "This is browser diagnostic data, not Tap process FPS or memory.",
+    "No pre-remediation build was preserved for an apples-to-apples before/after comparison.",
+    "The project 30-minute soak and device performance thresholds remain unverified."
+  ]
+}

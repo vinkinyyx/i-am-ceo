@@ -1,0 +1,114 @@
+
+> im-ceo@0.1.0 check
+> npm run typecheck && npm run typecheck:ui && npm run lint && npm run test
+
+
+> im-ceo@0.1.0 typecheck
+> tsc -p tsconfig.core.json --noEmit
+
+
+> im-ceo@0.1.0 typecheck:ui
+> tsc -p tsconfig.ui.json --noEmit
+
+
+> im-ceo@0.1.0 lint
+> eslint "assets/core/**/*.ts" "assets/scripts/**/*.ts" "tests/**/*.ts"
+
+
+> im-ceo@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+ ✓ tests/unit/transactionCommit.test.ts (8 tests) 16ms
+ ✓ tests/unit/saveRecovery.test.ts (14 tests) 27ms
+ ✓ tests/unit/tapPlatform.test.ts (35 tests) 164ms
+ ✓ tests/unit/initialHiring.test.ts (9 tests) 15ms
+PATCH_FAIL fetch-guard: anchor not found (0 matches)
+ ✓ tests/unit/departmentsM2.test.ts (8 tests) 17ms
+ ✓ tests/unit/talentOverview.test.ts (9 tests) 29ms
+ ✓ tests/unit/staffingM2.test.ts (15 tests) 29ms
+ ✓ tests/unit/releaseGaps.test.ts (7 tests) 19ms
+ ✓ tests/unit/departmentOverview.test.ts (15 tests) 33ms
+ ✓ tests/integration/resetCompany.test.ts (10 tests) 58ms
+PATCH_FAIL boot-diag: existing patch does not match this releaseId/version or is incomplete
+ ✓ tests/unit/eventRiskM3.test.ts (14 tests) 22ms
+ ✓ tests/integration/transactionRecoveryMatrix.test.ts (6 tests) 50ms
+ ✓ tests/integration/companyDashboardFacade.test.ts (6 tests) 77ms
+ ✓ tests/golden/goldenYear1.test.ts (6 tests) 14ms
+ ✓ tests/unit/saveRepository.test.ts (10 tests) 22ms
+ ✓ tests/unit/authService.test.ts (11 tests) 15ms
+ ✓ tests/unit/createFlow.test.mjs (15 tests) 31ms
+ ✓ tests/unit/hirePreview.test.ts (6 tests) 28ms
+ ✓ tests/unit/robustnessM3.test.ts (11 tests) 135ms
+ ✓ tests/unit/dialogModel.test.mjs (16 tests) 8ms
+ ✓ tests/integration/resetRecovery.test.ts (5 tests) 15ms
+ ✓ tests/unit/companyCreate.test.ts (8 tests) 11ms
+ ✓ tests/unit/investment.test.ts (7 tests) 14ms
+ ✓ tests/integration/releaseFaults.test.ts (7 tests) 245ms
+ ✓ tests/integration/createFlowFacade.test.ts (4 tests) 23ms
+ ✓ tests/unit/shellLayout.test.mjs (9 tests) 8ms
+ ✓ tests/integration/transactionRecovery.test.ts (2 tests) 26ms
+ ✓ tests/integration/bootstrapGate.test.ts (5 tests) 12ms
+ ✓ tests/unit/annualGoal.test.ts (7 tests) 17ms
+REPACK_FAIL 目标已存在，禁止原地覆盖： C:\Users\vinki\AppData\Local\Temp\ceo-zip-bAoxOe\a\game.zip
+ ✓ tests/unit/loadGuard.test.ts (8 tests) 7ms
+ ✓ tests/unit/packageHygiene.test.ts (7 tests) 13ms
+ ✓ tests/unit/cloneLock.test.ts (9 tests) 17ms
+ ✓ tests/unit/offlineM3.test.ts (6 tests) 17ms
+ ✓ tests/unit/bootDiagnostics.test.ts (7 tests) 8ms
+ ✓ tests/integration/faultFixtures.test.ts (7 tests) 14ms
+ ✓ tests/unit/companyOverview.test.ts (6 tests) 9ms
+ ✓ tests/unit/clock.test.ts (8 tests) 14ms
+ ✓ tests/unit/onceInit.test.ts (6 tests) 9ms
+ ✓ tests/unit/capacityMarket.test.ts (7 tests) 7ms
+ ✓ tests/unit/authCheckSession.test.ts (4 tests) 61ms
+ ✓ tests/unit/safeArea.test.ts (6 tests) 5ms
+ ✓ tests/unit/utf8crc.test.ts (19 tests) 142ms
+ ✓ tests/unit/foregroundClock.test.ts (7 tests) 5ms
+ ✓ tests/unit/config.test.ts (5 tests) 7ms
+ ✓ tests/unit/rewardedAdProvider.test.ts (3 tests) 7ms
+ ✓ tests/integration/adCoordinator.test.ts (2 tests) 15ms
+ ✓ tests/unit/smoke.test.ts (4 tests) 6ms
+ ✓ tests/unit/privacyPolicyText.test.ts (4 tests) 5ms
+ ✓ tests/tools/canvasDriver.test.mjs (6 tests) 36ms
+ ✓ tests/unit/privacyConsent.test.ts (4 tests) 4ms
+ ✓ tests/unit/adRewardState.test.ts (2 tests) 7ms
+VERIFY_FAIL [
+  "assets/main/index.hash.js: EditorMockPlatform in package"
+]
+ ✓ tests/unit/platformSelection.test.ts (4 tests) 6ms
+ ✓ tests/unit/textTokens.test.mjs (3 tests) 6ms
+ ↓ tests/simulation/exportEvidence.test.mjs (1 test | 1 skipped)
+VERIFY_FAIL [
+  "first-screen.js",
+  "logo.png",
+  "slogan.png",
+  "splash.jpg",
+  "marker CEO-PATCH:boot-diag count=0",
+  "marker CEO-PATCH:init-once count=0",
+  "marker CEO-PATCH:fetch-guard count=0",
+  "game.js: fetch throw remains",
+  "productVersion 1.0.0 != 9.9.9",
+  "production profile mismatch",
+  "first-screen splash BG_NAME"
+]
+ ✓ tests/simulation/simulate5year.test.ts (3 tests) 1356ms
+   ✓ 百种子 × 三行业 × 三策略 5 年模拟 > 全部 900 个 run 财务守恒、现金不为负、无重复救助、每年≤3自动招聘 1008ms
+   ✓ 百种子 × 三行业 × 三策略 5 年模拟 > CSV 可生成（首列为表头字段） 344ms
+VERIFY_FAIL [
+  "application.js: development test hook in package"
+]
+ ✓ tests/tools/releasePipeline.test.mjs (9 tests) 5442ms
+   ✓ R20 repack + R21 verify > 打包后校验通过；重复 zip 拒绝覆盖；分隔符为 / 1862ms
+   ✓ R20 repack + R21 verify > 按 game.js 解析 Creator 哈希应用入口，不假定 application.js 固定名 1087ms
+   ✓ R20 repack + R21 verify > 拒绝任意嵌套脚本中的 EditorMockPlatform 1093ms
+   ✓ R20 repack + R21 verify > 校验拒绝版本不符/未打补丁的包 461ms
+   ✓ R20 repack + R21 verify > 校验拒绝生产包里的开发写状态入口 389ms
+
+ Test Files  55 passed | 1 skipped (56)
+      Tests  441 passed | 1 skipped (442)
+   Start at  22:06:19
+   Duration  6.20s (transform 3.46s, setup 0ms, collect 12.59s, tests 8.41s, environment 14ms, prepare 15.10s)
+

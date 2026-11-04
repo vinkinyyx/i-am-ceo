@@ -1,0 +1,45 @@
+{
+  "tool": "taptap-mini-game-publisher/preflight",
+  "version": "1.0.0",
+  "checked_at_utc": "2026-11-03T14:13:36.648015+00:00",
+  "project": "/mnt/data/taptap-mini-game-publisher",
+  "target": "auto",
+  "counts": {
+    "PASS": 1,
+    "FAIL": 0,
+    "WARN": 3,
+    "INFO": 2
+  },
+  "checks": [
+    {
+      "status": "INFO",
+      "code": "FLAVOR",
+      "message": "项目线索: 未检测到常见引擎特征"
+    },
+    {
+      "status": "WARN",
+      "code": "ROUTING",
+      "message": "尚未确认 TapTap 发布形态；auto 不会根据文件名强行决定发布路线"
+    },
+    {
+      "status": "PASS",
+      "code": "VERSION",
+      "message": "版本号符合 Vx.y.z 格式：V1.0.0；未与后台版本历史比对"
+    },
+    {
+      "status": "WARN",
+      "code": "PACKAGE",
+      "message": "未提供 --package，未检查包体"
+    },
+    {
+      "status": "WARN",
+      "code": "ASSETS",
+      "message": "未提供 --asset-manifest，未检查宣传物料"
+    },
+    {
+      "status": "INFO",
+      "code": "BOUNDARY",
+      "message": "只做本地静态预检；不替代游戏真机运行、平台格式/资质/隐私/审核结果"
+    }
+  ]
+}

@@ -1,24 +1,23 @@
 /**
  * 自有启动首屏（替换 Cocos 默认 first-screen）。
  *
- * 设计：整张品牌图铺满屏幕（cover，按高度对齐），底部叠加一条真实进度条。
- * 坐标取自 tools/splash/splash.jpg 原图（941×1672，进度条位于 y≈1540、x≈160..790）。
+ * 设计：仅铺无字背景艺术层（cover），真实进度由本文件单独绘制。
  *
  * 健壮性原则（真机曾出现卡首屏）：
  * - 任何异常/不支持 WebGL/图片加载失败都不 reject，直接放行给引擎；
  * - 进度 Promise 带超时兜底，避免引擎启动链永久挂起。
  */
 (function () {
-  var IMG_W = 941;
-  var IMG_H = 1672;
+  var IMG_W = 1080;
+  var IMG_H = 2400;
   var BAR_LEFT = 160;
-  var BAR_RIGHT = 790;
-  var BAR_CY = -0.842; // 进度条中心（归一化 y，负值靠底部）
+  var BAR_RIGHT = 920;
+  var BAR_CY = -0.82; // 进度条中心（归一化 y，负值靠底部）
   var BAR_HH = 0.016; // 进度条半高（归一化）
   var BAR_FILL = [0.18, 0.84, 0.64, 1];
   var BAR_TRACK = [0.79, 0.86, 0.94, 1];
-  var BG_COLOR = [0.86, 0.925, 0.973, 1];
-  var BG_NAME = 'splash.jpg';
+  var BG_COLOR = [0.94, 0.96, 0.99, 1];
+  var BG_NAME = 'splash-art.png';
 
   var VS_TEX =
     'attribute vec4 a_Position;attribute vec2 a_TexCoord;varying vec2 v_TexCoord;' +

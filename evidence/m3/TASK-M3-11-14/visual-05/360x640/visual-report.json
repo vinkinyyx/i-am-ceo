@@ -1,0 +1,67 @@
+{
+  "url": "http://127.0.0.1:8161/",
+  "viewport": {
+    "width": 360,
+    "height": 640
+  },
+  "checks": [
+    {
+      "id": "360x640-privacy-consent-control",
+      "status": "PASS",
+      "detail": {
+        "text": "同意并继续",
+        "x": 127.5,
+        "y": 115.33333333333343,
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
+      "id": "360x640-company-interactive",
+      "status": "PASS",
+      "detail": {
+        "revision": 11
+      }
+    },
+    {
+      "id": "360x640-department-tab",
+      "status": "PASS",
+      "detail": {
+        "anchor": "自动经营方针"
+      }
+    },
+    {
+      "id": "360x640-talent-tab",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "360x640-leaderboard-tab",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "360x640-settings-modal",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "360x640-navigation-did-not-mutate-save",
+      "status": "PASS",
+      "detail": {
+        "before": 11,
+        "after": 11
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 7,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

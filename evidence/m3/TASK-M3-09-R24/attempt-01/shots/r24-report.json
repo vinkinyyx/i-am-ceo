@@ -1,0 +1,30 @@
+{
+  "url": "http://localhost:8123/",
+  "sizes": [
+    {
+      "name": "375x812",
+      "width": 375,
+      "height": 812,
+      "visibleDesignH": 666,
+      "footerDesignY": -297,
+      "errors": []
+    },
+    {
+      "name": "360x640",
+      "width": 360,
+      "height": 640,
+      "visibleDesignH": 546.88,
+      "footerDesignY": -237.44,
+      "errors": []
+    },
+    {
+      "name": "393x852",
+      "width": 393,
+      "height": 852,
+      "visibleDesignH": 666.98,
+      "footerDesignY": -297.49,
+      "errors": []
+    }
+  ],
+  "ok": true
+}

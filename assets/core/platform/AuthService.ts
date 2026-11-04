@@ -148,6 +148,41 @@ export class AuthService {
     return session.expiresAtMs > this.now();
   }
 
+  /**
+   * R17-T01：显式校验本地登录态，不触发 tap.login、不发网络请求。
+   * - 已确认无记录（null）→ { status:'none' }；
+   * - 存在且未过期 → { status:'valid' }；
+   * - 存在但过期 → { status:'expired' }（UI 据此静默重登，不先清空本地档）；
+   * - 存储暂时不可读 → { status:'unknown' }，区别于 none，禁止当作未登录新建/外发。
+   */
+  async checkSession(): Promise<
+    | { status: 'none' }
+    | { status: 'unknown'; reason?: string }
+    | { status: 'valid'; session: AuthSession }
+    | { status: 'expired'; session: AuthSession }
+  > {
+    if (this.session) {
+      return this.isSessionValid(this.session)
+        ? { status: 'valid', session: this.session }
+        : { status: 'expired', session: this.session };
+    }
+    let stored: AuthSession | null;
+    try {
+      stored = await this.platform.get<AuthSession>(SESSION_STORAGE_KEY);
+    } catch (err) {
+      const reason =
+        err instanceof GameError && err.code === GameErrorCode.SAVE_UNAVAILABLE
+          ? (err.details?.reason as string | undefined) ?? 'io'
+          : 'io';
+      return { status: 'unknown', reason };
+    }
+    if (!stored) return { status: 'none' };
+    this.session = stored;
+    return this.isSessionValid(stored)
+      ? { status: 'valid', session: stored }
+      : { status: 'expired', session: stored };
+  }
+
   /** 是否已具备有效认证（UI 判断是否展示“未登录”状态用）。 */
   async hasValidSession(): Promise<boolean> {
     const s = this.session ?? (await this.readStored());

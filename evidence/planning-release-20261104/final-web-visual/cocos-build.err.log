@@ -1,0 +1,4 @@
+构建参数 mainBundleCompressionType (merge_dep) 校验失败,  compression type(undefined) is invalid for this platform!, 将会使用默认值 "merge_dep"
+构建参数 debug ("false") 校验失败, typeof debug should be boolean but get false, 将会使用默认值 false
+构建参数 buildPath ("build/release-preview-20261104/web-mobile") 校验失败, buildPath is invalid!, 将会使用默认值 "project://build"
+构建参数 md5Cache ("true") 校验失败, typeof md5Cache should be boolean but get true, 将会使用默认值 true

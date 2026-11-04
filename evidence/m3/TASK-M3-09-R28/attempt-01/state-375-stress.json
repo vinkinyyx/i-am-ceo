@@ -1,0 +1,22 @@
+{
+  "runId": "run_134cdm7000000",
+  "revision": 11,
+  "phase": "RUNNING",
+  "speed": 0,
+  "gameYear": 1,
+  "gameMonth": 1,
+  "progressMsInMonth": 0,
+  "cash": 1234567,
+  "asset": 0,
+  "capacityInvestment": 0,
+  "total": 1234567,
+  "ytdRevenue": 950000,
+  "ytdProfit": -325000,
+  "ledgerCount": 1,
+  "companyName": "超长测试公司名称用于换行验证是否不缩字体",
+  "target3YearsAchieved": true,
+  "consecutiveProfitableYears": 3,
+  "cashRisk": "NORMAL",
+  "employees": 2,
+  "executedCommandCount": 4
+}

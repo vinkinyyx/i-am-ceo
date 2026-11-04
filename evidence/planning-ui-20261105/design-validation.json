@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-05",
+  "scope": "Analysis, browser reproduction, design and combined handoff only. No production UI/business fixes, build, upload or release.",
+  "document": {
+    "characters": 19478,
+    "headings": [
+      "22.1",
+      "22.2",
+      "22.3",
+      "22.4",
+      "22.5",
+      "22.6",
+      "22.7",
+      "22.8",
+      "22.9",
+      "22.10",
+      "22.11",
+      "22.12",
+      "22.13",
+      "22.14",
+      "22.15",
+      "22.16",
+      "22.17"
+    ],
+    "unique17": true,
+    "tasks": 10,
+    "balancedFences": true,
+    "noReplacementCharacter": true
+  },
+  "reproduction": {
+    "unexpectedClose": true,
+    "observedAtMs": 3802,
+    "monthBefore": 1,
+    "monthAfter": 2,
+    "monthAdvanced": true,
+    "browserErrors": 0
+  },
+  "existingFiles": [
+    {
+      "path": "assets/scripts/ui/AppView.ts",
+      "exists": true
+    },
+    {
+      "path": "assets/scripts/ui/UiFactory.ts",
+      "exists": true
+    },
+    {
+      "path": "assets/scripts/ui/dialogs.ts",
+      "exists": true
+    },
+    {
+      "path": "assets/scripts/ui/dialogModel.ts",
+      "exists": true
+    },
+    {
+      "path": "assets/scripts/ui/textTokens.ts",
+      "exists": true
+    },
+    {
+      "path": "assets/scripts/ui/shellLayout.ts",
+      "exists": true
+    },
+    {
+      "path": "tools/e2e/canvas-driver.cjs",
+      "exists": true
+    },
+    {
+      "path": "evidence/planning-ui-20261105/attempt-02/detail-opened.png",
+      "exists": true
+    },
+    {
+      "path": "evidence/planning-ui-20261105/attempt-02/detail-after-wait.png",
+      "exists": true
+    }
+  ],
+  "implementationStatus": "NOT_IMPLEMENTED_THIS_TURN",
+  "combinedPrompt": "docs/我是CEO_项目总览.md §22.16",
+  "cloudRankBaseline": "Existing partial implementation in §21.20; reuse and complete, do not recreate"
+}

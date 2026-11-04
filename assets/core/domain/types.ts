@@ -183,6 +183,15 @@ export interface AnnualReport {
   assetCloseYuan: number;
   headcountClose: number;
   settled: boolean;
+  /** New reports record capital flows separately; absent on backward-compatible legacy saves. */
+  cashBridge?: {
+    monthlyLedgerNetCashDeltaYuan: number;
+    investmentCashFlowYuan: number;
+    rescueCapitalYuan: number;
+    unattributedCashFlowYuan: number;
+    attributionComplete: boolean;
+    balanced: boolean;
+  };
 }
 
 export interface EventRecord {
@@ -291,5 +300,32 @@ export interface GameState {
   automationLogs: AutomationLogEntry[];
   /** 各经营年第 1 月结算前的现金快照（年报 cashOpen 口径，含初始注资）。 */
   yearOpenCashYuan: Record<number, number>;
+  /** 年结前未进入月账的资本现金流，仅记录真实命令变动；旧档可缺省。 */
+  cashFlowsByYear?: Record<number, { investmentOutYuan: number; rescueInYuan: number }>;
+  /** 首个可追溯现金流年度；旧档升级时从首次写入该字段的年度开始。 */
+  cashFlowTrackingStartYear?: number;
   executedCommandIds: string[];
+  /** Optional for legacy saves. Ad counters/coupons survive company reset but not reward sessions. */
+  adRewards?: AdRewardState;
+}
+
+export interface AdRewardState {
+  version?: 2;
+  /** Highest UTC+8 calendar day observed. Clock rollback cannot reopen quota. */
+  maxObservedDayIndex?: number;
+  requestsUsed?: number;
+  lastRequestAtMs?: number | null;
+  localDay: string;
+  promptsShown: number;
+  grantsUsed: number;
+  couponIds: string[];
+  completedSessionIds: string[];
+  activeSessionId?: string | null;
+  activeSessionStartedAtMs?: number | null;
+  activeRunId?: string | null;
+  activeSessionReservedDayIndex?: number | null;
+  grantDayIndexes?: number[];
+  consumedCouponIds?: string[];
+  couponCreatedAtMsById?: Record<string, number>;
+  couponRunIdById?: Record<string, string>;
 }

@@ -1,0 +1,443 @@
+[
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-01_Launch_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 101602,
+    "sha256": "1020ad646b48090decedf96bb6af19731f5ef30dc7d5de48cb55108b04fc1382"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-01_Launch_HasSave_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 101648,
+    "sha256": "28e1da498d4ccba8c4eedeb864ce03767f2fb72db1deebecfa4db4dfa4ef6ad4"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-01_Launch_Loading_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 103699,
+    "sha256": "8cf6a95ebdb745216af78691ebac30a1a26c7f99d3884f5ccbfa68bd8924ead2"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-01_Launch_NoSave_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 101602,
+    "sha256": "1020ad646b48090decedf96bb6af19731f5ef30dc7d5de48cb55108b04fc1382"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-01_Launch_SaveRecovery_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 101156,
+    "sha256": "ab2d259c7fefe9326e018d2206f2b8041bf36e29c5993c9099992754ff6fe153"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-02_CreateCompany_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 177610,
+    "sha256": "ffc56db7be0ddd338c6bced8c435d467883af829a96ea0d9dd321d9f45d591e3"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-03_CreateCEO_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 154399,
+    "sha256": "978cba8947861798489c26b12ddb9f4d4e947bee050248cdead849882a9cc449"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-04_FirstHire_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 208560,
+    "sha256": "251ad414b861edcab678e655f34269a3bdc6af9fdd16798e8f8d6e2d88ece993"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-28_GuideCreateCompany_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 161547,
+    "sha256": "009a2c50f21eadba6c2e7f060e2382409ea1b1c72b72762a18d5554f42df0f0d"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-29_GuideCEO_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 157057,
+    "sha256": "9403df7bc14ae1ed5f3f4122aa270284642d951a882ddbd0a0a8a9b58bf7e072"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B01_Onboarding/UI-30_GuideHire_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 201321,
+    "sha256": "994d38f269c4ff9f176ecc9984da3fba738132f8649f2f549586086e164959d8"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-05_CompanyDashboard_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 197072,
+    "sha256": "3ab200dec4512a5bddab3bf0a3617a707795363c252fd001a81b09a8b17b9057"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-06_DepartmentList_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 186963,
+    "sha256": "e6a97a08ab0c650a5bb1cb6ede2e7c26b4825273ad6ae1981187336f308562a6"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-07_StaffList_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 177580,
+    "sha256": "a0bf48fec3f77e9a68a3f2643139a3e704ec005fcdb7c64152fc35907241421b"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-08_Leaderboard_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 189425,
+    "sha256": "b934ac46a5efc130873456ec61894a4a02332cb9477ce236e31f79ec30f7bec8"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-31_GuideMetrics_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 194166,
+    "sha256": "e0d3b668587be55f8ba588df372e7c4afd02f31235440fd60b5c6c7a52f2b33a"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B02_CoreBusiness/UI-32_GuideTime_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 184672,
+    "sha256": "ea4f3f93fdd63b7449637ea4a447e01df72da1f9b5eae3d4d140a343c73db740"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-10_EmployeeDetail_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 115854,
+    "sha256": "45e8b686d8db333c6a3f81f82ffabe97fc9693c692b28a383552e30e9c8cb136"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-11_DepartmentDetail_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 151338,
+    "sha256": "421b831316d9517d8c02f7bba398fdb75dbeb0007d8d62e1e5080ef77197a1ff"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-16_Recruitment_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 182839,
+    "sha256": "eb637e10dcf2c51cae4bc8d1189260acc2c2d8f119e305e7444789a0d169cc08"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-17_HiringConfirm_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 149758,
+    "sha256": "62a61d3447b09a76bb9e635b119ca4fc161633a111875eca4608a06910835893"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-18_LayoffConfirm_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 127826,
+    "sha256": "eeeed079bfe45fb4d1767822d760d0c63aed9f0b233eb2e1989b1b9ff394aa07"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-19_CreateDepartment_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 160897,
+    "sha256": "79cc19dd77b500c1f81742129063416a4d3ae4ea5526a5bb47ec8db94ae3e6ed"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-20_BusinessExpansion_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 177659,
+    "sha256": "cc7276e796399b3d58b5a66c7d3d3e658be8e33d2a5afc41f44d02d17571d129"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-21_BusinessStrategy_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 190088,
+    "sha256": "7adbe37259c0d23dd0aeb6381225adb284d63341507ca7ac39a3a86db2b41225"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B03_StaffDepartments/UI-22_StaffAllocation_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 118875,
+    "sha256": "8299bb39e3bb40038a6f48362b14d97e906890015766790590ae243ca150123e"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-09_AnnualReport_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 160522,
+    "sha256": "208633d9a44e55d09e7f50617383666003efc653618982468dfe70ff0cda416a"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-14_OfflineReport_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 165098,
+    "sha256": "5bad5b6cf9776e678f8e9d7f90a6f7410c640299ee8d963f2775f9d824709699"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-15_CashCrisis_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 182962,
+    "sha256": "d1b8c5a772df2c26a9639ba2ee6b87a31e2d4671c58f6d844116c359474c435c"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-23_FinanceHelp_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 177200,
+    "sha256": "9d4831357f73ac7f6ac9a4317b2a01ff369ab24227a74633fc852060cc735ecf"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-24_LeaderboardRules_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 170583,
+    "sha256": "d3b4f2dcab5f98c09431adcb26529c0a1216d8f4247106a20ba04036f2efb5d5"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-25_ProfitMilestone_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 153353,
+    "sha256": "f3862b944ea7c099edece8c52ad40246cbc8fc270be11a5b91391cd1a86baff7"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-26_RecoveryGrant_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 155753,
+    "sha256": "0e96ffb545cec5acf49cda229c6fa0e8b8f60758b717500e543695bf47003532"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B04_FinanceRisk/UI-33_GuideAnnualReport_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 149276,
+    "sha256": "5176a58ab263b41cbe646973107f530c1a896f9677d06ca536c46c2c8333c584"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B05_SettingsRecovery/UI-12_Settings_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 159999,
+    "sha256": "377011237311efa1bbc0af0da6d54f6597b7efceb0c7926a3b61217eb8766632"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B05_SettingsRecovery/UI-13_CloseCompany_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 174177,
+    "sha256": "922a2c4b636ae3061e89ea1029a389698dec40719b960b2a589cea864f727339"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/01_OfficialUI_PNG/B05_SettingsRecovery/UI-27_SaveError_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 176173,
+    "sha256": "aef49d36f6e11ba88afec5c821133de3781ddc16a7c174f402f76f018d4227dc"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_AnnualReport_Concept_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1880062,
+    "sha256": "738edc316a6533a55d502a3e481d9eb2ba50673720090d87877c58fa117ee8a2"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_CityStartup_Concept_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 2193314,
+    "sha256": "aec09ba365c1fff5deabbb73fd5b8ecacab720fc4ac0f0cb183e6e76a56fcf3f"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_CreateCEO_Progressive_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1691134,
+    "sha256": "0b4db6d320313953358811eed92a2e8279b8c852395f37cad326411e53958c14"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_CreateCompany_Concept_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1987587,
+    "sha256": "44ae55aee3c742424a5d70f58c9c195e5893b2ab434fea627b741eb670ebdccf"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_Dashboard_Concept_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1997678,
+    "sha256": "2ae73b6eda276cf7314d5f6f1da345ea3dd49a0b3723f528e52243687bd827e6"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_FirstHire_Concept_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1883684,
+    "sha256": "9a13f76cbb9e299daa5b6655004d636bf3893c023f4803ce4f4bcab7053f7a99"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_Guide_CEO_Personality_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1758567,
+    "sha256": "8660c9e0aa6fce1b53ff90ce8ec867034b4901eb3e6cb9d6809391cfafc58279"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_Guide_CreateCompany_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 1863779,
+    "sha256": "478d8170032d25552c27b066b22b8db6c1761c1ba33d6d6af96c98192dc1f2a8"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_Guide_FirstHire_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 2165588,
+    "sha256": "2fc2f10c7c61118db8c6c1bf69a0008e7c268be45021e56ab0341dd0208fbe16"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/03_ConceptReference_PNG/CEO_OldSplash_Loading_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 2594088,
+    "sha256": "38d508e553c7cde1f1c35ff9b3d38ffbbe9512660d62dc0965deed53cb9338d2"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/04_SplashAndBackground_PNG/CEO_BG_SoftBlue_UI_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 39606,
+    "sha256": "02f519c14fe2b42a062d070579ca47833768969c0838a67ee527c48dc9488c17"
+  },
+  {
+    "path": "design/00_ALL_49_PNG_37_SVG/04_SplashAndBackground_PNG/CEO_Splash_NewArtwork_9x20.png",
+    "size": [
+      1080,
+      2400
+    ],
+    "bytes": 2879020,
+    "sha256": "19dafd5a269c3d59cd150e20dabd2c05febfe88e799ee6d2a45ba3888731ab5b"
+  }
+]

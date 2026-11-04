@@ -1,0 +1,15 @@
+{
+  "taskId":"TASK-M3-09-R19",
+  "status":"DONE",
+  "releaseId":"m3-20261103-diag-e",
+  "attempt":"01",
+  "purpose":"diagnostic",
+  "creatorVersion":"3.8.8",
+  "buildStartedAt":"2026-11-03T00:21:32.999Z",
+  "buildFinishedAt":"2026-11-03T00:22:04.763Z",
+  "exitCode":36,
+  "completionMarker":true,
+  "freshGameJson":"build/release/m3-20261103-diag-e/01/wechatgame/wechatgame/game.json",
+  "logs":"evidence/m3/build/m3-20261103-diag-e/01/cocos-build.log; cocos-build.err.log; creator-result.json",
+  "limitation":"Real Creator build confirmed. Downstream package failed R21 and is not a usable candidate."
+}

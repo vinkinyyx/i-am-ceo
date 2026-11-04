@@ -5,7 +5,7 @@ import type { IStorageBackend, ITapPlatform } from '../platform/ITapPlatform';
 import { GameStore } from './GameStore';
 import { createCompany, type CreateCompanyInput } from './CompanyService';
 import { getOffer, refreshOffer } from './OfferService';
-import { hireEmployee, startOperating, skipTutorial } from './RecruitmentService';
+import { hireEmployee, previewHire, startOperating, skipTutorial } from './RecruitmentService';
 import { closeCompanyPreview, confirmCloseCompany } from './ResetService';
 import { createInitialState } from '../domain/gameStateFactory';
 import type { AnnualReport, CandidateOffer, Employee, GameSpeed, GameState, IndustryId, MonthlyLedger } from '../domain/types';
@@ -13,6 +13,16 @@ import { NameGenerator } from '../domain/NameGenerator';
 import { Rng, deriveSeed } from '../simulation/rng';
 import { GameClock, type ClockTickResult } from '../simulation/GameClock';
 import { investInBusiness, previewInvest, type InvestPreview } from './InvestmentService';
+import { buildCompanyOverview, type CompanyOverview } from './CompanyOverviewService';
+import { buildDepartmentOverview, type DepartmentOverview } from './DepartmentOverviewService';
+import {
+  buildTalentOverview,
+  buildTransferImpact,
+  estimateLayoffCapacityLoss,
+  transferTargets,
+  type TalentOverview,
+  type TransferImpactVM,
+} from './TalentOverviewService';
 import {
   createDepartment,
   previewCreateDepartment,
@@ -31,8 +41,9 @@ import { previewTransfer, transferEmployee } from './TransferService';
 import { injectRescueCapital, assessRisk, refreshRisk } from './RiskService';
 import { settleOffline } from '../simulation/offline';
 import { assetsLeaderboard, yearsLeaderboard } from '../simulation/leaderboard';
-import type { AutomationLogEntry, Department, Policy, StaffingMode, SupportDeptType } from '../domain/types';
+import type { AutomationLogEntry, Department, DeptType, Policy, StaffingMode, SupportDeptType } from '../domain/types';
 import type { EconomyConfig } from '../config/EconomyConfig';
+import { beginAdSession, cancelAdSession, canRequestAdCoupon, grantAdCoupon, markAdPromptShown } from './AdRewardService';
 
 export interface BootstrapResult {
   state: GameState;
@@ -40,6 +51,14 @@ export interface BootstrapResult {
   recoveryNote?: string;
   environment: 'EDITOR' | 'TAPTAP';
 }
+
+/** R13：启动装载结果（可写 facade 仅在已确认档/新游戏时存在）。 */
+export type FacadeBootstrapResult =
+  | { kind: 'new-game'; facade: GameFacade }
+  | { kind: 'loaded'; facade: GameFacade }
+  | { kind: 'recovered'; facade: GameFacade; note?: string }
+  | { kind: 'unavailable'; reason: string; message: string }
+  | { kind: 'corrupt'; message: string };
 
 function toFailure(err: unknown): CommandResult<never> {
   const code = err instanceof GameError
@@ -61,11 +80,11 @@ const GameErrorCodeLike: Record<string, true> = Object.fromEntries(
  */
 export class GameFacade {
   private store: GameStore;
-  private readonly platform: ITapPlatform;
+  private readonly platform: IStorageBackend;
   private readonly cfg: EconomyConfig;
   private readonly clock = new GameClock();
 
-  private constructor(platform: ITapPlatform, store: GameStore, cfg: EconomyConfig) {
+  private constructor(platform: IStorageBackend, store: GameStore, cfg: EconomyConfig) {
     this.platform = platform;
     this.store = store;
     this.cfg = cfg;
@@ -84,6 +103,28 @@ export class GameFacade {
     return new GameFacade(platform, store, cfg);
   }
 
+  /**
+   * R13：显式启动装载。只有 new-game/loaded/recovered 返回可写 facade；
+   * unavailable/corrupt 返回结果但不创建 facade，UI 必须显示重试/退出且禁止写入。
+   */
+  static async bootstrapWithStatus(
+    platform: IStorageBackend,
+    cfg: EconomyConfig,
+  ): Promise<FacadeBootstrapResult> {
+    const result = await GameStore.inspectForBootstrap(platform);
+    if (result.kind === 'new-game') {
+      return {
+        kind: 'new-game',
+        facade: new GameFacade(platform, new GameStore(platform, createInitialState(Date.now())), cfg),
+      };
+    }
+    if (result.kind === 'loaded' || result.kind === 'recovered') {
+      const note = result.kind === 'recovered' ? result.note : undefined;
+      return { kind: result.kind, facade: new GameFacade(platform, result.store, cfg), note } as FacadeBootstrapResult;
+    }
+    return result;
+  }
+
   /** 测试/首启直接注入存储。 */
   static async fromStorage(
     storage: IStorageBackend & ITapPlatform,
@@ -96,8 +137,61 @@ export class GameFacade {
     return this.store.current;
   }
 
+  canRequestRewardedAd(nowMs = Date.now()): boolean {
+    return canRequestAdCoupon(this.store.current, nowMs);
+  }
+
   getRevision(): number {
     return this.store.currentRevision;
+  }
+
+  async importCloudCheckpointState(state: GameState, expectedRunId: string, expectedRevision: number, nowMs = Date.now()): Promise<CommandResult<true>> {
+    try {
+      const revision = await this.store.importCloudState(state, expectedRunId, expectedRevision, nowMs);
+      return ok(this.store.current.runId, revision, true);
+    } catch (err) { return toFailure(err); }
+  }
+
+  getPersistenceStatus() {
+    return this.store.getPersistenceStatus();
+  }
+
+  async retryPersistenceRecovery(): Promise<boolean> {
+    return this.store.retryPersistenceRecovery(this.store.current.runId);
+  }
+
+  /** Called by a voluntary UI prompt/entry; persisted in the same store gate as gameplay. */
+  async markRewardPromptShown(nowMs = Date.now()): Promise<CommandResult<boolean>> {
+    const runId = this.store.current.runId;
+    try {
+      const { result, revision } = await this.store.mutate((draft) => markAdPromptShown(draft, nowMs), runId);
+      return ok(this.store.current.runId, revision, result);
+    } catch (err) { return toFailure(err); }
+  }
+
+  async beginRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId): Promise<CommandResult<boolean>> {
+    const runId = expectedRunId;
+    try {
+      const { result, revision } = await this.store.mutate((draft) => beginAdSession(draft, sessionId, nowMs), runId);
+      return ok(this.store.current.runId, revision, result);
+    } catch (err) { return toFailure(err); }
+  }
+
+  async cancelRewardedAdSession(sessionId: string, expectedRunId = this.store.current.runId): Promise<CommandResult<true>> {
+    const runId = expectedRunId;
+    try {
+      const { revision } = await this.store.mutate((draft) => { cancelAdSession(draft, sessionId, runId); return true as const; }, runId);
+      return ok(this.store.current.runId, revision, true);
+    } catch (err) { return toFailure(err); }
+  }
+
+  /** Only the coordinator calls this after provider's explicit completed callback. */
+  async completeRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId): Promise<CommandResult<boolean>> {
+    const runId = expectedRunId;
+    try {
+        const { result, revision } = await this.store.mutate((draft) => grantAdCoupon(draft, sessionId, nowMs, runId), runId);
+      return ok(this.store.current.runId, revision, result);
+    } catch (err) { return toFailure(err); }
   }
 
   /**
@@ -135,6 +229,21 @@ export class GameFacade {
     return this.store.read((s) => getOffer(s, deptId));
   }
 
+  /** R26：只读招聘预览（真实 HR 折扣费用、现金影响、生效时点），供确认弹窗。 */
+  previewHire(input: {
+    offerId: string;
+    candidateId: string;
+    departmentId: string;
+    couponId?: string;
+  }): CommandResult<import('./RecruitmentService').HirePreview> {
+    try {
+      const result = this.store.read((s) => previewHire(s, this.cfg, input));
+      return ok(this.store.current.runId, this.store.currentRevision, result);
+    } catch (err) {
+      return toFailure(err);
+    }
+  }
+
   async refreshOffer(
     deptId: string,
     ctx: { commandId: string; expectedRunId: string },
@@ -151,12 +260,21 @@ export class GameFacade {
   }
 
   async hireEmployee(
-    input: { offerId: string; candidateId: string; departmentId: string },
+    input: { offerId: string; candidateId: string; departmentId: string; couponId?: string; expectedRevision?: number },
     ctx: { commandId: string; expectedRunId: string },
   ): Promise<CommandResult<{ employee: Employee; feePaidYuan: number; cashAfterYuan: number }>> {
     try {
       const { result, revision } = await this.store.mutate(
-        (draft) => hireEmployee(draft, this.cfg, input, ctx),
+        (draft) => {
+          // A retry of the same committed command remains idempotent after recovery.
+          // A new command must still match the preview revision or require a fresh quote.
+          if (!draft.executedCommandIds.includes(ctx.commandId)
+            && input.expectedRevision !== undefined
+            && this.store.currentRevision !== input.expectedRevision) {
+            throw new GameError(GameErrorCode.CONFIRMATION_EXPIRED, { reason: 'hire-preview-stale' });
+          }
+          return hireEmployee(draft, this.cfg, input, ctx);
+        },
         ctx.expectedRunId,
       );
       return ok(this.store.current.runId, revision, {
@@ -203,17 +321,31 @@ export class GameFacade {
     nowMs = Date.now(),
   ): Promise<CommandResult<{ newRunId: string }>> {
     try {
-      const current = this.store.current;
-      const { oldRunId, newState } = confirmCloseCompany(current, token, nowMs);
-      await this.store.replaceWithNewRun(newState, oldRunId, nowMs);
-      return ok(newState.runId, this.store.currentRevision, { newRunId: newState.runId });
+      if (this.store.current.adRewards?.activeSessionId) throw new Error(GameErrorCode.RESET_IN_PROGRESS);
+      await this.store.replaceWithNewRun(
+        (confirmedState) => {
+          const newState = confirmCloseCompany(confirmedState, token, nowMs).newState;
+          if (confirmedState.adRewards) {
+            const limits = { ...confirmedState.adRewards };
+            delete limits.couponCreatedAtMsById;
+            delete limits.couponRunIdById;
+            newState.adRewards = { ...limits, couponIds: [], activeSessionId: null,
+              activeSessionStartedAtMs: null, activeRunId: null };
+          }
+          return newState;
+        },
+        token.oldRunId,
+        nowMs,
+      );
+      const newRunId = this.store.current.runId;
+      return ok(newRunId, this.store.currentRevision, { newRunId });
     } catch (err) {
       return toFailure(err);
     }
   }
 
   getEnvironment(): 'EDITOR' | 'TAPTAP' {
-    return this.platform.getEnvironment();
+    return (this.platform as ITapPlatform).getEnvironment();
   }
 
   // ---------------------------------------------------------------- M1 经营
@@ -240,10 +372,16 @@ export class GameFacade {
   async advanceRealTime(
     elapsedRealMs: number,
     expectedRunId: string,
+    wallClockNowMs = Date.now(),
   ): Promise<CommandResult<ClockTickResult>> {
     try {
+      const wallClockAt = Number.isSafeInteger(wallClockNowMs) && wallClockNowMs >= 0 ? wallClockNowMs : Date.now();
       const result = await this.store.mutate(
-        (draft) => this.clock.tick(draft, this.cfg, elapsedRealMs),
+        (draft) => {
+          const tick = this.clock.tick(draft, this.cfg, elapsedRealMs);
+          draft.lastWallClockMs = Math.max(draft.lastWallClockMs, wallClockAt);
+          return tick;
+        },
         expectedRunId,
       );
       return ok(this.store.current.runId, this.store.currentRevision, result.result);
@@ -272,13 +410,18 @@ export class GameFacade {
   ): Promise<CommandResult<InvestPreview>> {
     try {
       const { result } = await this.store.mutate(
-        (draft) => investInBusiness(draft, this.cfg, amount),
+        (draft) => investInBusiness(draft, this.cfg, amount, ctx),
         ctx.expectedRunId,
       );
       return ok(this.store.current.runId, this.store.currentRevision, result);
     } catch (err) {
       return toFailure(err);
     }
+  }
+
+  /** R28：公司首页只读视图（现金/累计收支/产能/需求/风险），不改状态。 */
+  getCompanyOverview(): CompanyOverview | null {
+    return this.store.read((s) => buildCompanyOverview(s, this.cfg));
   }
 
   /** 最近年度报告（按年）。 */
@@ -294,6 +437,31 @@ export class GameFacade {
   }
 
   // ---------------------------------------------------------------- M2 部门 / 裁员
+
+  /** R29：部门页只读视图（人数/工资/系数/当月估算贡献/未建部门/自动预算），不改状态。 */
+  getDepartmentOverview(): DepartmentOverview | null {
+    return this.store.read((s) => buildDepartmentOverview(s, this.cfg));
+  }
+
+  /** R30：人才页只读视图（筛选、人数/月薪合计、入职月数、次月生效信息），不改状态。 */
+  getTalentOverview(filterKey = 'ALL'): TalentOverview | null {
+    return this.store.read((s) => buildTalentOverview(s, filterKey));
+  }
+
+  /** R30：调岗影响预览（原/目标部门人数与工资总额，次月生效）。 */
+  getTransferImpact(employeeId: string, toDeptId: string): TransferImpactVM | null {
+    return this.store.read((s) => buildTransferImpact(s, this.cfg, employeeId, toDeptId));
+  }
+
+  /** R30：可调岗目标部门（只读）。 */
+  getTransferTargets(employeeId: string): Array<{ deptId: string; type: DeptType }> | null {
+    return this.store.read((s) => transferTargets(s, employeeId));
+  }
+
+  /** R30：裁员当月主营产能损失（只读，非主营为 0）。 */
+  getLayoffCapacityLoss(employeeId: string): number | null {
+    return this.store.read((s) => estimateLayoffCapacityLoss(s, this.cfg, employeeId));
+  }
 
   /** 预览设立支持部门（只读）。 */
   previewCreateDepartment(type: SupportDeptType) {

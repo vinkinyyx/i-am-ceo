@@ -1,0 +1,19 @@
+{
+  "taskId": "TASK-M3-09-R06",
+  "title": "initApp 帧调度与单次启动",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T01:53:00+08:00",
+  "delivered": [
+    { "file": "assets/core/platform/onceInit.ts", "note": "startOnceInit：rAF 与定时兜底竞速 once guard；cancel 后迟到回调忽略；init throw 只失败一次；detectRuntimeKind 按 tap/wx/window 能力分流（不按品牌文字）" },
+    { "file": "tests/unit/onceInit.test.ts", "note": "6 例 T01—T05" }
+  ],
+  "cases": [
+    { "id": "R06-T01", "result": "PASS", "note": "无 rAF 宿主定时兜底 init 一次" },
+    { "id": "R06-T02", "result": "PASS", "note": "rAF 注册不回调时兜底触发" },
+    { "id": "R06-T03", "result": "PASS", "note": "帧先到/定时器先到两路径 initCount 均为 1，迟到回调忽略" },
+    { "id": "R06-T04", "result": "PASS", "note": "taptap/wx/web/unknown 分流单测；画布尺寸延迟由 R24 热 resize 验证" },
+    { "id": "R06-T05", "result": "PASS", "note": "init throw reject 且不重复初始化，错误进入 R03 诊断" }
+  ],
+  "commands": [{ "cmd": "npx vitest run tests/unit/onceInit.test.ts", "exitCode": 0, "result": "PASS" }],
+  "remaining": "模型通过不关闭 R09 真机任务；具体接入转换后 game.js 入口在 R20 统一补丁中完成并从最终包验证（不在多个转换文件各写分支）。"
+}

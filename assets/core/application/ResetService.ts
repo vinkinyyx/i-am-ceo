@@ -2,6 +2,7 @@ import { GameErrorCode } from '../domain/errors';
 import { createFreshRunState } from '../domain/gameStateFactory';
 import { uniqueToken } from '../domain/ids';
 import type { GameState } from '../domain/types';
+import { playerYears } from '../simulation/leaderboard';
 
 /**
  * 主动关闭公司（设计文档 02.5 / 12.6）。
@@ -33,8 +34,8 @@ export function closeCompanyPreview(state: GameState, nowMs: number): ClosePrevi
     oldRunId: state.runId,
     summary: {
       companyName: state.company.name,
-      // 已完成经营年数 = 已生成的年报数
-      yearsOperated: state.annualReports.length,
+      // Annual reports are pruned for bounded saves; the game-year axis is monotonic.
+      yearsOperated: playerYears(state),
       cashYuan: state.company.cashYuan,
       employeeCount: state.employees.filter((e) => e.status !== 'DISMISSED').length,
     },

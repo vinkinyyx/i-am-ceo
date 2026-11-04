@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-04",
+  "scope": "Design and handoff only; no cloud/leaderboard production implementation, remote resource creation/deletion, deployment, upload, or submission.",
+  "confirmedUserDecisions": {
+    "backupAndCrossDevice": true,
+    "operatorPlayerAdmin": false,
+    "realPlayerLeaderboard": true,
+    "keepSimulatedLeaderboard": true
+  },
+  "document": {
+    "characters": 26972,
+    "sections": [
+      "21.1",
+      "21.2",
+      "21.3",
+      "21.4",
+      "21.5",
+      "21.6",
+      "21.7",
+      "21.8",
+      "21.9",
+      "21.10",
+      "21.11",
+      "21.12",
+      "21.13",
+      "21.14",
+      "21.15",
+      "21.16",
+      "21.17",
+      "21.18",
+      "21.19"
+    ],
+    "all19Unique": true,
+    "taskCount": 14,
+    "balancedFences": true,
+    "noReplacementCharacter": true
+  },
+  "mcp": {
+    "queriedGuides": [
+      "get_cloud_save_integration_guide",
+      "get_leaderboard_integration_guide"
+    ],
+    "queriedContext": [
+      "get_current_app_info",
+      "check_environment"
+    ],
+    "authorized": false,
+    "selectedApp": false,
+    "remoteWrites": false
+  },
+  "sourceFacts": {
+    "engine": "Cocos Creator 3.8.8 / TypeScript / ordinary Tap minigame",
+    "currentSave": "local dual-slot envelope schema1 with transaction journal",
+    "currentLeaderboard": "12 local simulated companies",
+    "cloudAndRealLeaderboard": "not implemented by this turn"
+  },
+  "verification": {
+    "documentation": "PASS",
+    "newFeatureTests": "NOT_RUN_NOT_IMPLEMENTED",
+    "nativeCloudQuotaAccountIsolation": "NOT_VERIFIED",
+    "previous464Tests": "historical baseline only, not new-feature acceptance"
+  },
+  "requiredPlatformChecks": [
+    "cloud archive count/quota and delete signature",
+    "stable account context and two-account isolation",
+    "ordinary Tap client cloud API support",
+    "latest score overwrite, zero values, numeric range",
+    "same-hash two-device restore and reset/old-run rejection"
+  ]
+}

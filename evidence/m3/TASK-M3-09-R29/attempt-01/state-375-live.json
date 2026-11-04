@@ -1,0 +1,324 @@
+{
+  "s0": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 287027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 4
+  },
+  "afterCancel": {
+    "runId": "run_134cdm7000000",
+    "revision": 11,
+    "cash": 287027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 4
+  },
+  "afterCreate": {
+    "runId": "run_134cdm7000000",
+    "revision": 12,
+    "cash": 277027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_92fy87000001",
+        "type": "PROCUREMENT",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 5
+  },
+  "sAll": {
+    "runId": "run_134cdm7000000",
+    "revision": 16,
+    "cash": 237027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_92fy87000001",
+        "type": "PROCUREMENT",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ds83jc000002",
+        "type": "CUSTOMER_SERVICE",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_rdphwr000003",
+        "type": "MARKETING",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_l79tdt000004",
+        "type": "FINANCE",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ite4zc000005",
+        "type": "HR",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 9
+  },
+  "afterTarget": {
+    "runId": "run_134cdm7000000",
+    "revision": 20,
+    "cash": 237027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_92fy87000001",
+        "type": "PROCUREMENT",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ds83jc000002",
+        "type": "CUSTOMER_SERVICE",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_rdphwr000003",
+        "type": "MARKETING",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_l79tdt000004",
+        "type": "FINANCE",
+        "staffingMode": "LOCKED",
+        "targetCount": 1,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ite4zc000005",
+        "type": "HR",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 10
+  },
+  "afterMode": {
+    "runId": "run_134cdm7000000",
+    "revision": 21,
+    "cash": 237027,
+    "policy": "STEADY",
+    "gameYear": 1,
+    "gameMonth": 1,
+    "departments": [
+      {
+        "deptId": "dp_1h6ho9p000000",
+        "type": "BUSINESS",
+        "staffingMode": "AUTO",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_92fy87000001",
+        "type": "PROCUREMENT",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ds83jc000002",
+        "type": "CUSTOMER_SERVICE",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_rdphwr000003",
+        "type": "MARKETING",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_l79tdt000004",
+        "type": "FINANCE",
+        "staffingMode": "AUTO",
+        "targetCount": 1,
+        "setupPaid": true
+      },
+      {
+        "deptId": "dp_ite4zc000005",
+        "type": "HR",
+        "staffingMode": "LOCKED",
+        "targetCount": 0,
+        "setupPaid": true
+      }
+    ],
+    "employees": [
+      {
+        "id": "emp_run_134cdm7000000_cand_1s2qlux000001",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 7645,
+        "skill": 87,
+        "status": "ACTIVE"
+      },
+      {
+        "id": "emp_run_134cdm7000000_cand_s15nl4000003",
+        "deptId": "dp_1h6ho9p000000",
+        "salary": 5328,
+        "skill": 72,
+        "status": "ACTIVE"
+      }
+    ],
+    "ledgers": [],
+    "executedCommandCount": 11
+  }
+}

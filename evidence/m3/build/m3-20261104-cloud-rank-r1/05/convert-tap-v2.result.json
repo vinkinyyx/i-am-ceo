@@ -1,0 +1,14 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\convert-tap-v2.cjs",
+  "args": [
+    "1.0.2",
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261104-cloud-rank-r1\\05\\wechatgame\\wechatgame",
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261104-cloud-rank-r1\\05\\tap"
+  ],
+  "startedAt": "2026-11-04T15:46:07.101Z",
+  "finishedAt": "2026-11-04T15:46:17.964Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\05\\convert-tap-v2.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\05\\convert-tap-v2.err.log"
+}

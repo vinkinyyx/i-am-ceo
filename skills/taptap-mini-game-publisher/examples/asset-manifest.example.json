@@ -1,0 +1,11 @@
+{
+  "materials": [
+    {"kind": "landscape_promo", "path": "publishing/landscape.png"},
+    {"kind": "square_promo", "path": "publishing/square.png"},
+    {"kind": "screenshot", "path": "publishing/shot-01.png"},
+    {"kind": "screenshot", "path": "publishing/shot-02.png"},
+    {"kind": "screenshot", "path": "publishing/shot-03.png"},
+    {"kind": "gameplay_video", "path": "publishing/gameplay.mp4", "orientation": "portrait"},
+    {"kind": "icon", "path": "publishing/icon.png"}
+  ]
+}

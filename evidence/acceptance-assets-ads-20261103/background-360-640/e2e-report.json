@@ -1,0 +1,70 @@
+{
+  "url": "http://127.0.0.1:8148/",
+  "viewport": {
+    "width": 360,
+    "height": 580
+  },
+  "checks": [
+    {
+      "id": "background-loaded-with-original-ratio",
+      "status": "PASS",
+      "detail": {
+        "target": {
+          "width": 375,
+          "height": 666.6666666666667
+        },
+        "image": {
+          "width": 375,
+          "height": 833.3333333333333
+        },
+        "source": {
+          "width": 1080,
+          "height": 2400
+        },
+        "fallbackEnabled": false
+      }
+    },
+    {
+      "id": "covers-viewport-no-distortion",
+      "status": "PASS",
+      "detail": {
+        "target": {
+          "width": 375,
+          "height": 666.6666666666667
+        },
+        "image": {
+          "width": 375,
+          "height": 833.3333333333333
+        },
+        "source": {
+          "width": 1080,
+          "height": 2400
+        },
+        "fallbackEnabled": false
+      }
+    },
+    {
+      "id": "real-navigation-works-without-save-change",
+      "status": "PASS",
+      "detail": {
+        "before": 11,
+        "after": 11
+      }
+    },
+    {
+      "id": "background-stays-ready-after-resize",
+      "status": "PASS",
+      "detail": null
+    }
+  ],
+  "checkCounts": {
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

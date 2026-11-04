@@ -1,0 +1,46 @@
+{
+  "releaseId": "m3-20261103-adlocal-final-r5",
+  "gameVersion": "1.0.0",
+  "builtAt": "2026-11-03T15:30:45.340Z",
+  "zipPath": "build\\release\\m3-20261103-adlocal-final-r5\\01\\game.zip",
+  "sizeBytes": 4883376,
+  "sizeMib": 4.657,
+  "sha256": "d13351ee38c200fa3d761e0be3abe11ccaa7f08d03d30af8756e955800fbbc87",
+  "entryCount": 459,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "applicationEntry": "application.39914.js",
+  "gameJsRelativeReferences": [
+    "./application.39914.js",
+    "./engine-adapter.e45dd.js",
+    "./first-screen",
+    "./web-adapter.898ec.js"
+  ],
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "m3-20261103-adlocal-final-r5",
+    "gameVersion": "1.0.0"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [
+      "splash.d49ca.jpg: baked-progress splash artwork"
+    ],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": []
+  }
+}

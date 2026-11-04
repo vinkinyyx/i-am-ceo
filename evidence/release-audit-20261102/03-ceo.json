@@ -1,0 +1,67 @@
+{
+  "labels": [
+    "《我是CEO》",
+    "2/3 设定 CEO",
+    "CEO 姓名",
+    "CEO462",
+    "随机姓名",
+    "选择性格（决定年度成长方向）",
+    "进取",
+    "每年 商业+2 管理+1 财务+1，擅长开发市场",
+    "稳健",
+    "每年 商业+1 管理+1 财务+2，擅长资金管理",
+    "亲和",
+    "每年 商业+1 管理+2 财务+1，擅长团队协作",
+    "初始能力：商业 50 ｜ 管理 50 ｜ 财务 50",
+    "上一步",
+    "下一步：招聘员工"
+  ],
+  "buttons": [
+    {
+      "text": "随机姓名",
+      "x": 187.5,
+      "y": 603.7692307692307,
+      "width": 110,
+      "height": 36,
+      "scale": 1
+    },
+    {
+      "text": "上一步",
+      "x": 102.5,
+      "y": 105.76923076923077,
+      "width": 150,
+      "height": 48,
+      "scale": 1
+    },
+    {
+      "text": "下一步：招聘员工",
+      "x": 272.5,
+      "y": 105.76923076923077,
+      "width": 150,
+      "height": 48,
+      "scale": 1
+    }
+  ],
+  "size": {
+    "width": 375,
+    "height": 811.5384615384615
+  },
+  "state": {
+    "runId": "run_1fjquhr000000",
+    "phase": "CREATING",
+    "year": 1,
+    "month": 1,
+    "speed": 0,
+    "employees": [],
+    "departments": [],
+    "reports": [],
+    "onboarding": {
+      "stepId": "TUT-01",
+      "completedSteps": [],
+      "skipped": false,
+      "lastKnownStep": "TUT-01",
+      "tutorialVersion": 1,
+      "initialHiresCompleted": 0
+    }
+  }
+}

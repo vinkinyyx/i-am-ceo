@@ -1,0 +1,44 @@
+
+> im-ceo@0.1.0 test
+> vitest run --run tests/tools/releasePipeline.test.mjs
+
+
+ RUN  v2.1.9 D:/Workspace/TapTap/我是CEO
+
+PATCH_FAIL fetch-guard: anchor not found (0 matches)
+PATCH_FAIL boot-diag: existing patch does not match this releaseId/version or is incomplete
+REPACK_FAIL 目标已存在，禁止原地覆盖： C:\Users\vinki\AppData\Local\Temp\ceo-zip-q770mZ\a\game.zip
+VERIFY_FAIL [
+  "splash.d49ca.jpg: baked-progress splash artwork"
+]
+VERIFY_FAIL [
+  "assets/main/index.hash.js: EditorMockPlatform in package"
+]
+VERIFY_FAIL [
+  "first-screen.js",
+  "logo.png",
+  "slogan.png",
+  "splash-art.png",
+  "marker CEO-PATCH:boot-diag count=0",
+  "marker CEO-PATCH:init-once count=0",
+  "marker CEO-PATCH:fetch-guard count=0",
+  "game.js: fetch throw remains",
+  "productVersion 1.0.0 != 9.9.9",
+  "production profile mismatch",
+  "first-screen splash BG_NAME"
+]
+VERIFY_FAIL [
+  "application.js: development test hook in package"
+]
+ ✓ tests/tools/releasePipeline.test.mjs (11 tests) 3051ms
+   ✓ R20 repack + R21 verify > 打包后校验通过；重复 zip 拒绝覆盖；分隔符为 / 700ms
+   ✓ R20 repack + R21 verify > 拒绝改名成哈希 JPG 的烘焙进度启动稿 432ms
+   ✓ R20 repack + R21 verify > 按 game.js 解析 Creator 哈希应用入口，不假定 application.js 固定名 397ms
+   ✓ R20 repack + R21 verify > 拒绝任意嵌套脚本中的 EditorMockPlatform 344ms
+   ✓ R20 repack + R21 verify > 校验拒绝生产包里的开发写状态入口 375ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  23:36:10
+   Duration  3.65s (transform 22ms, setup 0ms, collect 31ms, tests 3.05s, environment 0ms, prepare 163ms)
+

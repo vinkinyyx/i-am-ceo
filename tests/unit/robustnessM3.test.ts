@@ -6,8 +6,8 @@ import { createInitialState } from '@core/domain/gameStateFactory';
 import { createCompany } from '@core/application/CompanyService';
 import { advanceMonth } from '@core/simulation/advanceMonth';
 import { SaveRepository } from '@core/persistence/SaveRepository';
-import { MemoryStorage } from '@core/platform/MemoryStorage';
-import { EditorMockPlatform } from '@core/platform/EditorMockPlatform';
+import { MemoryStorage } from '../helpers/MemoryStorage';
+import { EditorMockPlatform } from '../helpers/EditorMockPlatform';
 import { GameFacade } from '@core/application/GameFacade';
 import { validateGameState } from '@core/persistence/stateIntegrity';
 import { pruneStateHistory, estimateStateBytes } from '@core/persistence/statePrune';
@@ -122,7 +122,7 @@ describe('B14 奇异存档拒绝恢复', () => {
     const storage = new MemoryStorage();
     const repo = new SaveRepository(storage);
     const good = standardRun();
-    await repo.commit(good, { revision: 1, resetGeneration: 0 });
+    await repo.commit(good, { revision: 1, resetGeneration: 0, expectedBase: null });
     // 直接篡改存储里的 payload 使其业务非法（checksum 会失配 → 该槽不可用）
     // 场景 A：checksum 失配
     const loaded = await repo.load();

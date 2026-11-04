@@ -1,0 +1,141 @@
+{
+  "task": "R27",
+  "title": "公司/CEO/首聘三步页面",
+  "attempt": "attempt-01",
+  "status": "DONE",
+  "generatedAt": "2026-11-02",
+  "environment": {
+    "engine": "Cocos Creator 3.8.8",
+    "runtime": "web-mobile (build/web-mobile) + Chromium(Playwright)",
+    "logicalWidth": 375,
+    "viewports": ["375x812", "360x640", "390x844"],
+    "node": "vitest + typescript gates"
+  },
+  "items": [
+    {
+      "id": "T01",
+      "requirement": "行业切换/换一批/公司自定义不污染市场随机流",
+      "status": "PASS",
+      "evidence": [
+        "state-375.json.checks.noMarketRngAdvance=true（创建后 rngCounter=0、revision=1）",
+        "state-360.json.checks.rngUntouchedSoftware=true",
+        "state-390.json.checks.rngUntouchedService=true",
+        "tests/integration/createFlowFacade.test.ts: rollCompanyNames 不推进 rngCounter/seed/revision"
+      ],
+      "notes": "行业切换与换一批只重算展示名，不调用任何市场随机流；创建后首次月结前 rngCounter 保持 0。"
+    },
+    {
+      "id": "T02",
+      "requirement": "空值/空白/控制符/超长/emoji 按既有规则处理",
+      "status": "PASS",
+      "evidence": [
+        "tests/unit/createFlow.test.mjs: ceoNameError 空/空白/控制符/12 字边界/emoji 计数",
+        "tests/unit/createFlow.test.mjs: validateCompanyName 复用领域校验（EMPTY/TOO_SHORT/TOO_LONG/CONTROL_CHAR/TAG/FORBIDDEN_WORD）",
+        "shots/375-07-custom-dialog.png、375-08-custom-typed.png、375-09-custom-applied.png（20 字公司名两行且不缩字号）",
+        "shots/360-05~07b（360×640 小屏自定义名与长名换行）"
+      ],
+      "notes": "公司名校验直接复用 core/domain/validation，不新增规则；CEO 姓名 12 字上限按 UTF-16 码点计数，emoji 不重复计数。"
+    },
+    {
+      "id": "T03",
+      "requirement": "CEO 随机与手填可选、上一步不丢",
+      "status": "PASS",
+      "evidence": [
+        "shots/375-10-s02.png、375-11-s02-typed.png（手填「张三丰」）",
+        "shots/375-12-s01-back-keeps-custom.png（返回 S01 保留自定义公司名）",
+        "shots/375-13-s02-back-keeps-ceo.png（S02 返回后再进保留 CEO 姓名）",
+        "shots/375-14-s02-random-name.png（随机姓名按钮）",
+        "tests/unit/createFlow.test.mjs: generateCeoName 同 seed/nonce 确定性"
+      ],
+      "notes": "CEO 姓名使用真实 EditBox 即时写入 customCeoName，重渲染与步骤切换均从实例字段取回；随机名基于 FNV-1a(seed+nonce)，不消费领域随机流。"
+    },
+    {
+      "id": "T04",
+      "requirement": "1/2 首聘强杀重载保持，仅 2/2 可继续",
+      "status": "PASS",
+      "evidence": [
+        "state-375.json.checks.continueBlockedAt1of2=true（页脚继续按钮禁用）",
+        "state-375.json.checks.reloadKeeps1of2=true（reload 后 initialHiresCompleted=1、phase 仍 HIRING_INITIAL）",
+        "shots/375-18-s03-1of2.png、375-19-s03-continue-blocked.png、375-20-s03-reload-1of2.png",
+        "shots/375-22-s03-2of2.png（「两名员工已到岗」+「进入公司」）",
+        "tests/integration/createFlowFacade.test.ts: 1/2 重载保持、2/2 才可 startOperating"
+      ],
+      "notes": "1/2 时仅剩未录用候选、页脚继续禁用；2/2 后本会话停留在 S03 完成态，点「进入公司」才调用 startOperating，重载后按领域 phase 恢复。"
+    },
+    {
+      "id": "T05",
+      "requirement": "三行业 UI 均能完成且初始资本只一次",
+      "status": "PASS",
+      "evidence": [
+        "state-375.json.checks.oneCompanyOnceCapital=true / feeEqualsSalary1=true / feeSumMatchesCash=true（TRADE）",
+        "state-360.json.checks.createdSoftware=true / twoHiresSmall=true / enterSmall=true（SOFTWARE）",
+        "state-390.json.checks.createdService=true / twoHiresService=true / enterService=true（SERVICE）",
+        "state-375.json.checks.enterCompanyAt2of2=true",
+        "tests/integration/createFlowFacade.test.ts: 三行业创建 30 万一次注资、同一 create commandId 连点只建一次"
+      ],
+      "notes": "初始资本注入由领域层 initializedCapital 唯一控制，UI 不参与；同一 create commandId 连点被 CreateSubmitGuard + 页脚禁用双层拦截。"
+    }
+  ],
+  "records": {
+    "runId": "run_134cdm7000000",
+    "initialCapitalYuan": 300000,
+    "createRevisionAfter": 1,
+    "createRngCounter": 0,
+    "trade": {
+      "cashAfter2Hires": 287027,
+      "salaries": [7645, 5596, 5328],
+      "recruitFees": [-7645, -5328],
+      "feeSum": -12973,
+      "cashCheck": "300000 - 12973 = 287027"
+    },
+    "software": {
+      "runId": "run_tsrg2i000000",
+      "cashAfter2Hires": 288304,
+      "salaries": [6665, 6815, 5031],
+      "recruitFees": [-6665, -5031],
+      "feeSum": -11696,
+      "cashCheck": "300000 - 11696 = 288304"
+    },
+    "service": {
+      "runId": "run_d7uf32000000",
+      "cashAfter2Hires": 287749,
+      "salaries": [7191, 7113, 5060],
+      "recruitFees": [-7191, -5060],
+      "feeSum": -12251,
+      "cashCheck": "300000 - 12251 = 287749"
+    }
+  },
+  "gates": {
+    "typecheck": { "command": "npm run typecheck", "result": "PASS" },
+    "typecheckUi": { "command": "npm run typecheck:ui", "result": "PASS" },
+    "lint": { "command": "npm run lint", "result": "PASS" },
+    "unitIntegration": { "command": "npx vitest run", "result": "PASS", "files": 45, "tests": 377 },
+    "build": { "command": "powershell -ExecutionPolicy Bypass -File tools/build-web.ps1", "result": "PASS" },
+    "browser": { "command": "node tools/shot-r27.cjs", "result": "PASS", "report": "r27-report.json", "ok": true, "errors": [] }
+  },
+  "newTests": [
+    "tests/unit/createFlow.test.mjs（15 例：姓名校验/随机名确定性/提交守卫/首聘视图/候选行/创建页几何滚动）",
+    "tests/integration/createFlowFacade.test.ts（创建与首聘事务：随机流不推进、单次注资、幂等、重载恢复、费用勾稽）"
+  ],
+  "deliverables": {
+    "screenshots": "shots/（375×812 共 23 张、360×640 共 16 张、390×844 共 5 张）",
+    "states": ["state-375.json", "state-360.json", "state-390.json", "seed-save-375.json"],
+    "report": "r27-report.json"
+  },
+  "assumptions": [
+    "360×640 与 390×844 仅提供浏览器视口证据；真机键盘遮挡、安全区与手势返回验收归 R35—R39（U05）。",
+    "320×568 未单独取证：R24 的 computeScrollBody 纯函数已覆盖最小可视高边界，R27 复用同一函数。",
+    "首聘候选费用一律来自 GameFacade.previewHire（R26），UI 不计算费用与折扣。",
+    "创建页 2/2 完成态由本会话 awaitingEnterCompany 保持在 S03；重载后直接进入公司看板引导，不做重复首聘。"
+  ],
+  "limitations": [
+    "未在真机运行（U05 设备缺失），点击热区与键盘遮挡仅浏览器近似。",
+    "本任务未覆盖公司首页运营操作（R28）与部门/人才页（R29/R30）。"
+  ],
+  "lockedRulesUntouched": [
+    "未修改经济基线/黄金预期",
+    "未修改 LOCKED 业务规则",
+    "未删除或弱化既有测试",
+    "未在 UI 内自算招聘费或初始资本"
+  ]
+}

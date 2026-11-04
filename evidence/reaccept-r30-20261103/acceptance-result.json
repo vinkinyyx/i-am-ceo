@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-03",
+  "scope": "independent acceptance; no production code modifications or rebuild/upload",
+  "reportedDeliverables": "PASS_R30_LOCAL_FIX_AND_DIAGNOSTIC_ZIP",
+  "overallProject": "NOT_COMPLETE_NOT_ACCEPTED_AS_PRODUCT_CANDIDATE",
+  "checks": {
+    "typecheck": "PASS",
+    "typecheckUi": "PASS",
+    "lint": "PASS",
+    "testFilesPassed": 51,
+    "testFilesSkipped": 1,
+    "testsPassed": 427,
+    "testsSkipped": 1,
+    "r30ChecksPassed": 45,
+    "r30Screenshots": 27,
+    "r30PageErrors": []
+  },
+  "layout": {
+    "viewports": [
+      {
+        "width": 375,
+        "height": 812
+      },
+      {
+        "width": 375,
+        "height": 834
+      },
+      {
+        "width": 360,
+        "height": 640
+      },
+      {
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "allGaps": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "allDetailsClickable": true,
+    "allReadOnly": true
+  },
+  "package": {
+    "purpose": "diagnostic",
+    "sha256": "8a97692b220ccc1c70423f8279a248ad7a037498814349c3edd9599bdc5fea23",
+    "bytes": 5153557,
+    "entries": 457,
+    "version": "1.0.0",
+    "backgroundAndCompiledFixPresent": true
+  },
+  "original48TaskCounts": {
+    "DONE": 20,
+    "READY_FOR_QA": 8,
+    "TODO": 13,
+    "IN_PROGRESS": 7
+  },
+  "notCompleted": [
+    "R12 remaining fault matrix",
+    "R31-R40 remaining full functional/visual/performance/long-term validation",
+    "clean splash art",
+    "ads Provider/session/coupon/claim/UI implementation",
+    "device and cloud acceptance"
+  ],
+  "externalActions": "NONE"
+}

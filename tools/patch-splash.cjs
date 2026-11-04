@@ -1,5 +1,5 @@
 // 启动画面 + 启动兼容补丁（每次构建后可重复执行，幂等）。
-// 1) 各平台覆盖自有启动图（logo/slogan/splash.jpg）
+// 1) 各平台覆盖logo/slogan与独立无字启动艺术层
 // 2) 小游戏首屏替换为整张品牌图 + 真实进度条（tools/splash/first-screen.js）
 // 3) game.js / check-version.js 启动兼容（真机 Android 卡首屏的防御）
 // 4) web-mobile 注入整图覆盖层
@@ -8,10 +8,15 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
+if (process.argv.includes('--help')) {
+  console.log('Usage: node tools/patch-splash.cjs [buildRoot]  # buildRoot contains web-mobile/wechatgame/TapBuild; default: <project>/build');
+  process.exit(0);
+}
+const buildRoot = process.argv[2] ? path.resolve(process.argv[2]) : path.join(root, 'build');
 const srcDir = path.join(__dirname, 'splash');
 const LOGO = path.join(srcDir, 'logo.png');
 const SLOGAN = path.join(srcDir, 'slogan.png');
-const SPLASH_FULL = path.join(srcDir, 'splash.jpg');
+const SPLASH_ART = path.join(srcDir, 'splash-art.png');
 const FIRST_SCREEN_TPL = path.join(srcDir, 'first-screen.js');
 
 // 与 tools/splash/splash.html 的卡片背景一致，避免启动层留白出现色差
@@ -29,7 +34,7 @@ function copyAssets(dir) {
   if (!fs.existsSync(dir)) return false;
   copyFile(LOGO, path.join(dir, 'logo.png'));
   copyFile(SLOGAN, path.join(dir, 'slogan.png'));
-  copyFile(SPLASH_FULL, path.join(dir, 'splash.jpg'));
+  copyFile(SPLASH_ART, path.join(dir, 'splash-art.png'));
   return true;
 }
 
@@ -49,7 +54,7 @@ function patchWebSettings(file) {
   return { file, base64Chars: base64.length };
 }
 
-/** 小游戏首屏：整张 splash.jpg 铺满 + 进度条（模板覆盖，避免逐处正则替换）。 */
+/** 小游戏首屏：无字 splash-art.png 背景 + 独立真实进度条。 */
 function installFirstScreen(dir) {
   const dst = path.join(dir, 'first-screen.js');
   if (!fs.existsSync(path.dirname(dst))) return null;
@@ -154,7 +159,7 @@ function patchWebIndex(dir) {
 
   const block = `
   <div id="tap-splash" data-tap-splash="1" style="position:fixed;left:0;top:0;width:100%;height:100%;z-index:99;background:#dcecfb;overflow:hidden;">
-    <img src="splash.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" />
+    <img src="splash-art.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" />
   </div>
   <script>
     (function () {
@@ -177,9 +182,9 @@ function patchWebIndex(dir) {
 }
 
 const targets = [
-  { name: 'web-mobile', dir: path.join(root, 'build', 'web-mobile') },
-  { name: 'wechatgame', dir: path.join(root, 'build', 'wechatgame') },
-  { name: 'tap', dir: path.join(root, 'build', 'TapBuild', 'game') },
+  { name: 'web-mobile', dir: path.join(buildRoot, 'web-mobile') },
+  { name: 'wechatgame', dir: path.join(buildRoot, 'wechatgame') },
+  { name: 'tap', dir: path.join(buildRoot, 'TapBuild', 'game') },
 ];
 
 const report = {
@@ -205,9 +210,9 @@ for (const t of targets) {
   }
 }
 
-const webSettings = path.join(root, 'build', 'web-mobile', 'src', 'settings.json');
+const webSettings = path.join(buildRoot, 'web-mobile', 'src', 'settings.json');
 report.webSettings = patchWebSettings(webSettings);
-const webIndex = patchWebIndex(path.join(root, 'build', 'web-mobile'));
+const webIndex = patchWebIndex(path.join(buildRoot, 'web-mobile'));
 if (webIndex) report.webIndex = webIndex;
 
 // build-templates 让后续构建自动带上自有启动图

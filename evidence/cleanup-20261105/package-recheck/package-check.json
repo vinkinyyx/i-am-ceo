@@ -1,0 +1,48 @@
+{
+  "releaseId": "m3-20261104-cloud-rank-r1",
+  "gameVersion": "1.0.2",
+  "verifiedAt": "2026-11-04T23:38:34.863Z",
+  "projectSizeBudgetBytes": 20971520,
+  "zipPath": "build\\release\\m3-20261104-cloud-rank-r1\\05\\game.zip",
+  "sizeBytes": 4617974,
+  "sizeMib": 4.404,
+  "sha256": "ee8466375391acc91197e5e8805e9e8403952eb803149aab5917e6706bec6183",
+  "entryCount": 462,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "1.0.2",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "applicationEntry": "application.22e42.js",
+  "gameJsRelativeReferences": [
+    "./application.22e42.js",
+    "./engine-adapter.e45dd.js",
+    "./first-screen",
+    "./web-adapter.898ec.js"
+  ],
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "m3-20261104-cloud-rank-r1",
+    "gameVersion": "1.0.2"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": [],
+    "releaseConfigErrors": [],
+    "adsEnvironment": "disabled",
+    "policyVersion": 3
+  }
+}

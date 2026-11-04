@@ -1,0 +1,15 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\verify-package.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\m3-20261104-cloud-rank-r1\\05\\game.zip",
+    "m3-20261104-cloud-rank-r1",
+    "1.0.2",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\05"
+  ],
+  "startedAt": "2026-11-04T15:46:19.429Z",
+  "finishedAt": "2026-11-04T15:46:19.651Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\05\\verify-package.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\m3-20261104-cloud-rank-r1\\05\\verify-package.err.log"
+}

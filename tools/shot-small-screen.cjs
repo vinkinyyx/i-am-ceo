@@ -34,12 +34,12 @@ const dir = process.argv[3] || 'evidence/test-v1.1/R5/small-360x640';
     els.map((e) => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; }));
   const c = geom[0];
   const scale = c.w / 375;
-  // BUG-002 修复后，无安全区时内容层按可视高度兜底缩放 fit=可视设计高/812，
-  // 点击坐标需同时换算 fit，才能命中缩放后的 UI。
+  // R24：不再整屏缩放（原 BUG-002 fit 兜底已移除）；页脚锚定可视区底部，
+  // 底部 Tab 设计 y = -可视设计高/2 + 36，正文超高部分由 Body ScrollView 滚动触达。
   const visibleDesignHeight = c.h / scale;
-  const fit = Math.min(1, visibleDesignHeight / 812);
+  const footerY = -visibleDesignHeight / 2 + 36;
   const tap = async (dx, dy, wait = 600) => {
-    await page.mouse.click(c.x + c.w / 2 + dx * scale * fit, c.y + c.h / 2 - dy * scale * fit);
+    await page.mouse.click(c.x + c.w / 2 + dx * scale, c.y + c.h / 2 - dy * scale);
     await page.waitForTimeout(wait);
   };
   const shot = (n) => page.screenshot({ path: `${dir}/${n}.png` });
@@ -49,18 +49,19 @@ const dir = process.argv[3] || 'evidence/test-v1.1/R5/small-360x640';
   await shot('360-s02');
   await tap(85, -300, 900);
   await shot('360-s03');
-  await tap(124, 164, 500);
-  await tap(124, 46, 500);
-  await tap(0, -360, 1500);
-  await tap(0, -78, 900);
+  await tap(124, 164, 800);   // 候选 1「录用」→ R26 收费确认弹窗
+  await tap(0, -104, 1200);   // 确认支付
+  await tap(124, 46, 800);    // 候选 2「录用」
+  await tap(0, -104, 1200);   // 确认支付
+  await tap(0, -360, 1500);   // 进入公司
   await shot('360-company');
-  await tap(-47, -372, 800);
+  await tap(-47, footerY, 800);
   await shot('360-dept');
-  await tap(-141, -372, 800); // 回公司页（底部 Tab 在屏幕底部，y 为负）
+  await tap(-141, footerY, 800); // 回公司页（底部 Tab 锚定可视区底部）
   await tap(145, 360, 800);
   await shot('360-settings');
 
-  const info = { canvas: c, viewport: { w: 360, h: 640 }, scale, fit, errors: [...new Set(errors)], dir };
+  const info = { canvas: c, viewport: { w: 360, h: 640 }, scale, visibleDesignHeight, footerY, errors: [...new Set(errors)], dir };
   fs.writeFileSync(`${dir}/small-screen-info.json`, JSON.stringify(info, null, 2), 'utf8');
   console.log(JSON.stringify(info, null, 2));
   await browser.close();

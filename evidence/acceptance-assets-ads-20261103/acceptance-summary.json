@@ -1,0 +1,79 @@
+{
+  "date": "2026-11-03",
+  "acceptance": "PARTIAL_NOT_ACCEPTED",
+  "originalTaskCounts": {
+    "DONE": 19,
+    "READY_FOR_QA": 8,
+    "TODO": 13,
+    "IN_PROGRESS": 8
+  },
+  "check": {
+    "pass": true,
+    "testFilesPassed": 51,
+    "testFilesSkipped": 1,
+    "testsPassed": 427,
+    "testsSkipped": 1,
+    "logs": [
+      "check.log",
+      "check-after-assets.log"
+    ]
+  },
+  "originalInvestmentRegression": true,
+  "r30": {
+    "checks": 45,
+    "shots": 27,
+    "pageErrors": 0,
+    "report": "r30/r30-report.json"
+  },
+  "r31r32": {
+    "checks": 5,
+    "status": "PASS",
+    "report": "r31-r32/e2e-report.json"
+  },
+  "r33": {
+    "checks": 6,
+    "status": "PASS",
+    "report": "r33/e2e-report.json"
+  },
+  "newLayoutFinding": {
+    "status": "FAIL",
+    "intersection": 8,
+    "report": "filter-layout-review.json",
+    "mappedTasks": [
+      "R30",
+      "R39"
+    ]
+  },
+  "existingDiagnosticZip": {
+    "purpose": "diagnostic",
+    "sha256": "16e0685d51defa34f76f35eb6441849468c8c716d1f7d9cff977e0a3fd425c38",
+    "staticVerify": "PASS",
+    "includesThisAssetChange": false,
+    "deviceAndCloud": "NOT_RUN"
+  },
+  "assets": {
+    "sourcePng": 49,
+    "sourceSvg": 37,
+    "csvShaMatches": 49,
+    "runtimeBackgroundsAdded": 1,
+    "fourViewportChecksPassed": 16,
+    "loadFailureFallback": "PASS",
+    "report": "asset-replacement.json",
+    "newWebBuild": "build/asset-review-20261103/web-mobile",
+    "sourceHashes": {
+      "assets/scripts/ui/UiFactory.ts": "b7b8c736478f40d5aa3bf969c4dcc9d226a6c1579d39a6f3afd1af0a64db3ea6",
+      "assets/scripts/ui/AppView.ts": "fa5aba2cf1388697b1407f2379dcc0f1a49ae584cb224c5c98a175bf36fbc7b6",
+      "assets/resources/backgrounds/CEO_BG_SoftBlue_UI_9x20.png": "02f519c14fe2b42a062d070579ca47833768969c0838a67ee527c48dc9488c17"
+    }
+  },
+  "ads": {
+    "implementation": "NOT_IMPLEMENTED_DESIGN_ONLY",
+    "userConfirmed": [
+      "daily reminder once; skip continues game",
+      "waive recruitment fee only; salary normal; next month effective; initial hires excluded"
+    ],
+    "planning": "docs/我是CEO_项目总览.md section 18",
+    "liveAdIdAndEligibility": "NOT_VERIFIED"
+  },
+  "externalWrites": "NONE"
+}

@@ -6,7 +6,7 @@ import type { IStorageBackend } from './ITapPlatform';
  */
 export const PRIVACY_CONSENT_KEY = 'ceo/privacy/consent';
 /** 隐私政策版本：文案变更时递增，已同意旧版本的玩家需重新确认。 */
-export const PRIVACY_POLICY_VERSION = 1;
+export const PRIVACY_POLICY_VERSION = 3;
 
 export interface PrivacyConsentRecord {
   accepted: true;

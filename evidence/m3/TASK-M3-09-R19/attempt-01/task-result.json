@@ -1,0 +1,12 @@
+{
+  "taskId": "TASK-M3-09-R19",
+  "title": "独立构建目录与真实成功判定",
+  "status": "READY_FOR_QA",
+  "finishedAt": "2026-11-02T02:29:00+08:00",
+  "delivered": [
+    "tools/build-tap-v2.ps1：-ReleaseId 必填，输出 build/release/<id>/{wechatgame,tap,game.zip} 独立目录；不原地覆盖旧 zip（repack 目标存在即失败）；CocosCreator 进程/路径前置检查；Start-Process 隐藏窗口；每节点真实产物+退出码+CONVERT_OK/REPACK_OK/VERIFY_OK/PIPELINE_OK 判定，失败即停；-SkipBuild 仅用于流水线联调",
+    "tools/convert-tap-v2.cjs：参数化 wxDir/tapDir/gameVersion"
+  ],
+  "verification": "tests/tools/releasePipeline.test.mjs 5 例（与 R20/R21 合并）：补丁命中/幂等/锚点缺失失败/打包校验/坏包拒绝；全部 PASS",
+  "remaining": "真实 CocosCreator CLI 出包需要关闭编辑器后执行 build-tap-v2.ps1（当前编辑器可能驻留，属环境门禁）；构建日志与最终 zip 在执行后落 evidence/m3/build/<releaseId>。"
+}
