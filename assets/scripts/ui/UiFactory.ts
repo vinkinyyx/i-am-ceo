@@ -151,16 +151,25 @@ export function createButton(opts: ButtonOptions): Node {
   });
   // 拦截点击穿透
   node.addComponent(BlockInputEvents);
-  const labelNode = createLabel({
-    text: opts.text,
-    fontSize: opts.fontSize ?? 15,
-    color: opts.textColor ?? Color.WHITE,
-    width: opts.width - 16,
-    height,
-    bold: true,
-    parent: node,
-  });
+
+  // TASK-M3-12-02：label 必须用 rect 实际宽度，不能用 opts.width-16（当 width<44 时 rect 被撑宽但 label 仍窄）。
+  // 固定单行 CENTER 居中，不靠正文 RESIZE_HEIGHT+TOP。
+  const labelNode = new Node('ButtonLabel');
+  if (opts.parent) labelNode.parent = node;
   labelNode.setPosition(Vec3.ZERO);
+  const tr = labelNode.addComponent(UITransform);
+  const contentWidth = touch.width - 16;
+  tr.setContentSize(new Size(contentWidth, height));
+  const label = labelNode.addComponent(Label);
+  label.string = opts.text;
+  label.fontSize = opts.fontSize ?? 15;
+  label.lineHeight = height; // 单行，行高等于按钮高
+  label.color = opts.textColor ?? Color.WHITE;
+  label.isBold = true;
+  label.horizontalAlign = HorizontalTextAlignment.CENTER;
+  label.verticalAlign = VerticalTextAlignment.CENTER;
+  label.overflow = Overflow.NONE; // 单行禁止换行/缩字，调用方负责宽度
+  label.enableWrapText = false;
 
   const button = node.addComponent(Button);
   button.transition = Button.Transition.SCALE;

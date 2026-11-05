@@ -151,6 +151,10 @@ export class AppView extends Component {
   private auth: AuthService | null = null;
   private authed = false;
   private root!: Node;
+  /** TASK-M3-12-03：稳定分层——render 只清 PageLayer，月结/弹窗不互毁。 */
+  private pageLayer!: Node;
+  private modalLayer!: Node;
+  private toastLayer!: Node;
   private toastNode: Node | null = null;
   private selectedIndustry: IndustryId = 'TRADE';
   private selectedTrait: CeoTrait = 'BOLD';
@@ -652,7 +656,8 @@ export class AppView extends Component {
   private async maybeShowDailyRewardPrompt(): Promise<void> {
     if (!this.facade || !this.adCoordinator || this.facade.getState().phase !== 'RUNNING') return;
     if (this.adCoordinator.hasActiveSession()) return;
-    if (this.root?.children.some((child) => child.name === 'ModalOverlay' && child.activeInHierarchy)) return;
+    // TASK-M3-12-03：ModalOverlay 现在挂在 modalLayer 上
+    if (this.modalLayer?.children.some((child) => child.name === 'ModalOverlay' && child.activeInHierarchy)) return;
     if (!this.facade.canRequestRewardedAd() || (this.facade.getState().adRewards?.couponIds.length ?? 0) > 0) return;
     const marked = await this.facade.markRewardPromptShown();
     if (marked.ok && marked.payload) this.renderRewardPrompt('完整观看可领1张免招聘费券，仅免一次招聘费，月薪照常支付，下月到岗；每天最多领取1次，7天内使用。');
@@ -937,6 +942,20 @@ export class AppView extends Component {
     this.root = new Node('AppRoot');
     this.root.parent = canvas;
     this.root.addComponent(UITransform).setContentSize(new Size(DESIGN_WIDTH, DESIGN_HEIGHT));
+
+    // TASK-M3-12-03：三层稳定结构
+    this.pageLayer = new Node('PageLayer');
+    this.pageLayer.parent = this.root;
+    this.pageLayer.addComponent(UITransform).setContentSize(new Size(DESIGN_WIDTH, DESIGN_HEIGHT));
+
+    this.modalLayer = new Node('ModalLayer');
+    this.modalLayer.parent = this.root;
+    this.modalLayer.addComponent(UITransform).setContentSize(new Size(DESIGN_WIDTH, DESIGN_HEIGHT));
+
+    this.toastLayer = new Node('ToastLayer');
+    this.toastLayer.parent = this.root;
+    this.toastLayer.addComponent(UITransform).setContentSize(new Size(DESIGN_WIDTH, DESIGN_HEIGHT));
+
     // R24：不再对 812 内容层整体缩放（原 BUG-002 兜底会把页面缩到 640 并等比缩小所有文字/热区）；
     // 改为页面壳按真实安全区锚定 Header/Footer，Body 取剩余高度滚动（见 renderMainShell/shellLayout）。
   }
@@ -978,15 +997,35 @@ export class AppView extends Component {
     this.unbindLayout = [];
   }
 
-  private clearRoot(): void {
-    this.root.destroyAllChildren();
-    this.toastNode = null;
+  /** TASK-M3-12-03：月结/年结/普通刷新——只清 PageLayer，保留 ModalLayer 与 ToastLayer。 */
+  private clearPageContent(): void {
+    this.pageLayer.destroyAllChildren();
     this.shell = null;
     this.createPane = null;
     this.createGuard = new CreateSubmitGuard();
     this.createCommandId = null;
     this.ceoErrorLabel = null;
     this.speedButtons = [];
+  }
+
+  /** TASK-M3-12-03：显式重建应用（重开/登出等）——全部层清。 */
+  private disposeApplication(): void {
+    this.pageLayer?.destroyAllChildren();
+    this.modalLayer?.destroyAllChildren();
+    this.toastLayer?.destroyAllChildren();
+    this.toastNode = null;
+    this.persistenceRecoveryOverlay = null;
+    this.shell = null;
+    this.createPane = null;
+    this.createGuard = new CreateSubmitGuard();
+    this.createCommandId = null;
+    this.ceoErrorLabel = null;
+    this.speedButtons = [];
+  }
+
+  /** @deprecated 用 clearPageContent/disposeApplication 替代。 */
+  private clearRoot(): void {
+    this.disposeApplication();
   }
 
   private state(): GameState {
@@ -996,7 +1035,8 @@ export class AppView extends Component {
   // ---------------------------------------------------------------- 路由渲染
 
   private render(): void {
-    this.clearRoot();
+    // TASK-M3-12-03：月结/年结只清 PageLayer，保留 ModalLayer 的详情/确认弹窗。
+    this.clearPageContent();
     const s = this.state();
     if (s.phase === 'CREATING') {
       if (this.customCompanyName === '' && this.randomCompanyNames.length === 0) {
@@ -4031,7 +4071,7 @@ export class AppView extends Component {
       height: DESIGN_HEIGHT,
       color: new Color(0, 0, 0, 0),
       radius: 0,
-      parent: this.root,
+      parent: this.pageLayer, // TASK-M3-12-03: PageLayer
     });
     panel.setPosition(0, 0);
     stretchToParent(panel);
@@ -4040,7 +4080,7 @@ export class AppView extends Component {
 
   private modalOverlay(transparent = false): Node {
     const overlay = new Node('ModalOverlay');
-    overlay.parent = this.root;
+    overlay.parent = this.modalLayer; // TASK-M3-12-03: ModalLayer 独立持久
     // R24：遮罩覆盖整个可视高度（高屏 >812 时上下不露正文），并吞噬触摸——
     // 弹窗打开时正文滚动与底层按钮不响应（T05），点遮罩不穿透（T02）。
     const viewport = Math.max(DESIGN_HEIGHT, this.shellLayout().viewportHeight);
@@ -4057,7 +4097,7 @@ export class AppView extends Component {
 
   private toast(message: string): void {
     if (this.toastNode) this.toastNode.destroy();
-    const node = createRect({ width: 300, height: 44, color: new Color(39, 50, 68, 235), radius: 8, parent: this.root });
+    const node = createRect({ width: 300, height: 44, color: new Color(39, 50, 68, 235), radius: 8, parent: this.toastLayer });
     node.setPosition(0, -300);
     createLabel({ text: message, fontSize: 13, color: Color.WHITE, width: 284, parent: node }).setPosition(0, 0);
     this.toastNode = node;
