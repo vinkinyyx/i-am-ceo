@@ -1,0 +1,17 @@
+{
+  "command": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+  "args": [
+    "--project",
+    "d:\\Workspace\\TapTap\\我是CEO",
+    "--build",
+    "platform=web-mobile;debug=true;buildPath=build"
+  ],
+  "platform": "web-mobile",
+  "startedAt": "2026-11-05T17:26:47.835Z",
+  "finishedAt": "2026-11-05T17:27:32.819Z",
+  "exitCode": 36,
+  "doneMarker": true,
+  "spawnError": null,
+  "stdoutPath": "evidence\\acceptance-ui-20261105\\cocos-web-final5.log",
+  "stderrPath": "evidence\\acceptance-ui-20261105\\cocos-web-final5.err.log"
+}

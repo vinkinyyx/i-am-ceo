@@ -1,0 +1,1041 @@
+{
+    "releaseId":  "m4-20261106-r31",
+    "gameVersion":  "1.0.0",
+    "verifiedAt":  "2026-11-05T17:36:17.035Z",
+    "projectSizeBudgetBytes":  20971520,
+    "zipPath":  "build\\release\\m4-20261106-r31\\01\\game.zip",
+    "sizeBytes":  4627082,
+    "sizeMib":  4.413,
+    "sha256":  "8637011aa8f57220ad3aff2d0cc9b4413f7483bce91f942b73b65e257c1ebb26",
+    "entryCount":  462,
+    "gameJson":  {
+                     "deviceOrientation":  "portrait",
+                     "networkTimeout":  {
+                                            "request":  5000,
+                                            "connectSocket":  5000,
+                                            "uploadFile":  5000,
+                                            "downloadFile":  500000
+                                        },
+                     "productVersion":  "1.0.0",
+                     "convertScriptVersion":  "2.0.4-ts"
+                 },
+    "applicationEntry":  "application.ee410.js",
+    "gameJsRelativeReferences":  [
+                                     "./application.ee410.js",
+                                     "./engine-adapter.e45dd.js",
+                                     "./first-screen",
+                                     "./web-adapter.898ec.js"
+                                 ],
+    "productionProfile":  {
+                              "kind":  "taptap",
+                              "releaseId":  "m4-20261106-r31",
+                              "gameVersion":  "1.0.0"
+                          },
+    "findings":  {
+                     "backslashEntries":  [
+
+                                          ],
+                     "absoluteOrTraversal":  [
+
+                                             ],
+                     "duplicateNames":  {
+
+                                        },
+                     "missing":  [
+
+                                 ],
+                     "forbidden":  [
+
+                                   ],
+                     "secrets":  [
+
+                                 ],
+                     "versionMismatch":  null,
+                     "profileMismatch":  null,
+                     "missingResourceReferences":  [
+
+                                                   ],
+                     "releaseConfigErrors":  [
+
+                                             ],
+                     "adsEnvironment":  "disabled",
+                     "policyVersion":  3
+                 },
+    "attempt":  "01",
+    "purpose":  "product-test-candidate",
+    "creatorVersion":  "3.8.8",
+    "tapPluginVersion":  "1.2.2",
+    "sourceHead":  "6e85b0841a5ad22890104bcac16982188814629d",
+    "dirtySourceSha256":  [
+                              {
+                                  "path":  "assets/scripts/ui/dialogSessionModel.ts",
+                                  "sha256":  "ccaf8e23f203dd9dabfb985ce3af35cbce8d4689a9d1ec1276ee6d2b0db09de7"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/dialogSessionModel.ts.meta",
+                                  "sha256":  "ce3d3669c5eee5621674639429876f8e43260fc66730238ea68ddbffec65b744"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/uiMetrics.ts",
+                                  "sha256":  "b2a7a5966a94c80dd5408a10b2458f601174cd4c3133f94703297b3272196483"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/uiMetrics.ts.meta",
+                                  "sha256":  "3e682941dea9cf8196105a8b7be5dd8a395a2825580da6fd7d0bc9074a9fae5a"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V01-100x30s/detail-after-30s.png",
+                                  "sha256":  "0999658535dd0d458810336342af370c05ff2899f3cd002fb1fd0a365d7d9268"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V01-100x30s/detail-opened.png",
+                                  "sha256":  "70a60a2cf02adc140400471c171ce385aee6451cd717017438ea7e8c9ff71805"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V01-100x30s/detail-review.json",
+                                  "sha256":  "8fdc0415bf07c256c1bfcea6c0ea9cd037640a35c74ae5de62a55287a37ce56a"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V01-100x30s/rich-fixture.json",
+                                  "sha256":  "a2dc03cb2451251d817bfe22d26e83a61e4ee74cd0c2518700d9ed2466f7446c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/360x640-company.png",
+                                  "sha256":  "2ad25e78b608d601c26ff265c3b906082bbf11d656cdb5820b3e94aa60fbcdbe"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/360x640-department.png",
+                                  "sha256":  "500fa76802a823e8a42b2be369efc923fba694740b51b2e7ef2f0af09dfc89ef"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/360x640-leaderboard.png",
+                                  "sha256":  "af76578a69149d0329ae33efdb09cb173a4e4dacf32110baa28e8119eae89f52"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/360x640-settings.png",
+                                  "sha256":  "6e0bc45651fdbeeb14ec9ddf5e1594e4fadf7686397804350ccb66fb801e9fe6"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/360x640-talent.png",
+                                  "sha256":  "9d4c8983fe2c6aac5f240432ed61fdddf1cde2d407650dab51c9e4322b39f25e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/360x640/visual-report.json",
+                                  "sha256":  "16cd3ec53bdb27d8c98cca33da69ede3c9ce64092ad274e80ff69db2e6e1f0a0"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/375x812-company.png",
+                                  "sha256":  "8fe0dcaaf5102bf82afdfaf5092f0d2ab4a87815ede1d62a558d593ac1c88c3d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/375x812-department.png",
+                                  "sha256":  "55afec37faf915d0cd0e61e38d4d8e08da3c788ecc46cdad8f099ad3ccb82479"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/375x812-leaderboard.png",
+                                  "sha256":  "4b7948f1f876acd4a024b59b2d62b1e21410ad6ed99ae177d6d951ad2e621fff"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/375x812-settings.png",
+                                  "sha256":  "7d964cd7788bee1abe53829c502d948eaa76402382401b2f823448552f57d5ca"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/375x812-talent.png",
+                                  "sha256":  "ac8a47560d5f9f69ce69bd14070a624b4423419bdf65b7d6cc228fb52040f262"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x812/visual-report.json",
+                                  "sha256":  "652c955fec87367504faaed912dc609aba6305b1f7e1de290aa358f6cf765f4b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/375x834-company.png",
+                                  "sha256":  "8d24fc67f712071669b0872608b66b15c46211845f4d2f64fadb77000d16377f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/375x834-department.png",
+                                  "sha256":  "1f9f51b2f9031fb835cf8997966587c58038a9d649a142e20b1e2629ad69f22d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/375x834-leaderboard.png",
+                                  "sha256":  "fd266d149b6e9d951c93acefabb1ca87a07d6c969f83bef02d11e3b136ed1215"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/375x834-settings.png",
+                                  "sha256":  "7fe3ac8d1cf09560609d766c5a995a265a9fc56711f7b27dcb2e3bf884bd0a7c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/375x834-talent.png",
+                                  "sha256":  "3901eee545cbd425866f270d2ac9951cff3001faa4db9c6d8c2649d332c7c07e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/375x834/visual-report.json",
+                                  "sha256":  "ba1a70b8167b9133a2d03bb79ab2ac95d0b252fd9e8c6d99e79503914c13273e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/390x844-company.png",
+                                  "sha256":  "35c286c7adac4f81b5991a13e5e95a8c190d3408f3ee76f0d6e48fefd5c65d55"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/390x844-department.png",
+                                  "sha256":  "12b856bc86951f62f0f400d214e632ae32857e176f76a6236197f0e0850ab4f1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/390x844-leaderboard.png",
+                                  "sha256":  "d568658ac4f0aba365431fed8af2124e4474e4c57b182d60debcd1fffae10387"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/390x844-settings.png",
+                                  "sha256":  "7dc3d570f921cefe659e68b580e4480bbbd683e6696cf88d89d8f3b3b4ed4b6f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/390x844-talent.png",
+                                  "sha256":  "6e1ab1d3c00f222acb48fbf29cd69df0dc57c44fef14ea51a244a0004df7845b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/390x844/visual-report.json",
+                                  "sha256":  "512c2dcee61e8e75c7b7d4fc3e619b27a498bf1a11edd00950ec1f0aef527c16"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports-final/visual-matrix-report.json",
+                                  "sha256":  "f744253cd9c9a0ecf7c38001285190685e48d47be130ac9dad0232c02fbbd9f5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/360x640-company.png",
+                                  "sha256":  "085b2e9f2df8b41c5a5213259778929692eaff34d293fc1ac8fb625e968f5054"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/360x640-department.png",
+                                  "sha256":  "500fa76802a823e8a42b2be369efc923fba694740b51b2e7ef2f0af09dfc89ef"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/360x640-leaderboard.png",
+                                  "sha256":  "af76578a69149d0329ae33efdb09cb173a4e4dacf32110baa28e8119eae89f52"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/360x640-settings.png",
+                                  "sha256":  "7b456fee6435947993b859ce63316cd118e6e6c90645690d3c6fe4a08f3c56b9"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/360x640-talent.png",
+                                  "sha256":  "9d4c8983fe2c6aac5f240432ed61fdddf1cde2d407650dab51c9e4322b39f25e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/360x640/visual-report.json",
+                                  "sha256":  "f589d9ef63ca193028e1dcf84c6301ac59bebc759f4b694cae95e17941006b2c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/375x812-company.png",
+                                  "sha256":  "7f5b44d3ae48e8ef7ad8318dc00e1b94effb9e597c45b562c9c1321fa993bbad"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/375x812-department.png",
+                                  "sha256":  "55afec37faf915d0cd0e61e38d4d8e08da3c788ecc46cdad8f099ad3ccb82479"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/375x812-leaderboard.png",
+                                  "sha256":  "4b7948f1f876acd4a024b59b2d62b1e21410ad6ed99ae177d6d951ad2e621fff"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/375x812-settings.png",
+                                  "sha256":  "85e2a2f90e1f09791d055ee25d4c272d65f8fda82a63491fd7e30852030c6ca4"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/375x812-talent.png",
+                                  "sha256":  "ac8a47560d5f9f69ce69bd14070a624b4423419bdf65b7d6cc228fb52040f262"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x812/visual-report.json",
+                                  "sha256":  "8024d7d9fedcf88043308eed517ac0850a069861451d368b72339a114f179003"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/375x834-company.png",
+                                  "sha256":  "7c26ac6080dc8326fe43e4e221659f0ca63f61eecec85dfcdcff3b80ba4e96bf"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/375x834-department.png",
+                                  "sha256":  "1f9f51b2f9031fb835cf8997966587c58038a9d649a142e20b1e2629ad69f22d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/375x834-leaderboard.png",
+                                  "sha256":  "fd266d149b6e9d951c93acefabb1ca87a07d6c969f83bef02d11e3b136ed1215"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/375x834-settings.png",
+                                  "sha256":  "5b71359f131f5949cf3426c66ac624aeb7d0e9503dbc378c7729ad8dd0194894"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/375x834-talent.png",
+                                  "sha256":  "3901eee545cbd425866f270d2ac9951cff3001faa4db9c6d8c2649d332c7c07e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/375x834/visual-report.json",
+                                  "sha256":  "f4c9b8739ca4c391884dcf0072a5749f39be216553291dff9a08ce4056fe81dc"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/390x844-company.png",
+                                  "sha256":  "c7d18d8c48dd96add1145663c4c05e9654281017ada2298300d7db8938019828"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/390x844-department.png",
+                                  "sha256":  "12b856bc86951f62f0f400d214e632ae32857e176f76a6236197f0e0850ab4f1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/390x844-leaderboard.png",
+                                  "sha256":  "d568658ac4f0aba365431fed8af2124e4474e4c57b182d60debcd1fffae10387"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/390x844-settings.png",
+                                  "sha256":  "57634c205159c0cefaa44f8844cc6cc50ad9f49876a3329bb8cb7dfe6e586298"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/390x844-talent.png",
+                                  "sha256":  "6e1ab1d3c00f222acb48fbf29cd69df0dc57c44fef14ea51a244a0004df7845b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/390x844/visual-report.json",
+                                  "sha256":  "ef960c2c1e511efde3fde84a1cad9258765fd47681f34485d00587be9f5afcc3"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V09-four-viewports/visual-matrix-report.json",
+                                  "sha256":  "eeb98489643bf4533626087bcbf526696f0bfac54031938662982eae9bf43069"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V02-settings-bottom.png",
+                                  "sha256":  "e25a3410a0fcffe5eb53ae5c1f8c7823ae732d98d8c2c0627c4b176161b65c61"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V03-after-close.png",
+                                  "sha256":  "133210495f4bc20cc63ce76788c2f255628d03c62edfc62c009636958efe183b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V03-detail-after-month.png",
+                                  "sha256":  "d398cf4e9bdad5bbbb331713e97b5a33a187dcaecc0abc0ee21c0d9d91fe9835"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V04-crisis.png",
+                                  "sha256":  "701c88cc67eaead7e91bb0259abb84d295e84cae78fd12046e34a0bda7f267c2"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V05-after-100.png",
+                                  "sha256":  "c2637055c680b83dab652789d4acce9cfcbe4edc78c5e512e6626ff605a2e79f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/V07-expired.png",
+                                  "sha256":  "08a5e424c08a7beca6abd56621a24218777c4353e602c3f07a61f7475b03452d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/open-detail-failure.png",
+                                  "sha256":  "d13c6137227b816bcd68737c9f0d922dede488c0d322bb9488d6fc6b9a25ae0d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-matrix/report.json",
+                                  "sha256":  "49d993dc36fd250160bb45f0e2854979fba51e521a6053dd48887a6d238ad39d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/360x640-company.png",
+                                  "sha256":  "7d944d06a8ac875e4ef69238667f1b33fcfde8c2855642b489becd94caa23286"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/360x640-department.png",
+                                  "sha256":  "d6dd3c7a6471055896b87030df804ae5594899dc3818b60fcd0fdd127b6f4d60"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/360x640-leaderboard.png",
+                                  "sha256":  "b173a9e5533772bdf57ecf370e1d7e578237ac3807df28a04709fa88d0a984e2"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/360x640-settings.png",
+                                  "sha256":  "10454b459931c60c3ccf1c4c7b829d917a63e4157169de6a1ae2124f680c5621"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/360x640-talent.png",
+                                  "sha256":  "8a0c84c4b95515f2ebfb06d8a0966fd977793b2b6d8e0475e8c899f3e03997d5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/360x640/visual-report.json",
+                                  "sha256":  "e365340a64be1afe64b9bbc357ac097ce2b2da735ff994442250f9f41ca83b7d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/375x812-company.png",
+                                  "sha256":  "08ffbe5db63ce1d4e597d8cc9c910fd6f739e70e084b1b7a9a80f395fd004d2f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/375x812-department.png",
+                                  "sha256":  "427db07fc862a52ce12ad11956295f7021ee2b8f2ed22d9c153a1ece6fd4f689"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/375x812-leaderboard.png",
+                                  "sha256":  "f584ec1f8c5350cb3cf9fd6db8e1c0a9c8ed55178276583c91883c9e2136a5c9"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/375x812-settings.png",
+                                  "sha256":  "88745942fed3ca3ef17a18c2061c75746960039cf3b8a742bad04b73c7565244"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/375x812-talent.png",
+                                  "sha256":  "135c4e965af18d6c93dc2217814dc4d7c47df253b7396281e553408465f94afd"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x812/visual-report.json",
+                                  "sha256":  "1f48f6d5c11a5966627ee69db02e585521b6cfd633547c4ab9ebb977d958a43f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/375x834-company.png",
+                                  "sha256":  "3d54f9dea7d68402f369b9bd49763428f2e1d9e791c7bdb25a0af23b12d35f47"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/375x834-department.png",
+                                  "sha256":  "a348e6608e71df8924a348d648df0b069e3183ba7ca564b06cd525f2ce9f95a4"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/375x834-leaderboard.png",
+                                  "sha256":  "a5cebf2439e491f6eaa801862bda1f503892bd908c31a6b4f0db8d74fc21e62c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/375x834-settings.png",
+                                  "sha256":  "a243f8e52153d752d416ec421da57fc0e9ff90bfdf17d8111b17bcfb544e4f83"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/375x834-talent.png",
+                                  "sha256":  "f7b7bdce198c71c0e668452ae208701ed1e8ae0e462432693678f1efca35b69b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/375x834/visual-report.json",
+                                  "sha256":  "7d79eaba38d6210ec697cb4a7e7ae62a6a2b55d241fd77968d3a333c1fdd513c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/390x844-company.png",
+                                  "sha256":  "d062284893f3ffef810ae4dc94e0185f889fb8a3ceb6a75613fe61844666180e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/390x844-department.png",
+                                  "sha256":  "0a01216f6127fe5b09849bebe727a5bbe122bffc9045d7a1b76dc82582b557ac"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/390x844-leaderboard.png",
+                                  "sha256":  "d7cc470e7062d06b010ac8bdd4d7a40a78b59b4077827fff67073a576942b92d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/390x844-settings.png",
+                                  "sha256":  "e354ba5e5378548c426d6457927955f87158d84bc6f3f9847ee7128b7846b9ba"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/390x844-talent.png",
+                                  "sha256":  "1da9af2d1b893078e93e0f65f88d614937a95bf5c5c6a4428d892bae2cd3928c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/390x844/visual-report.json",
+                                  "sha256":  "c7e0c892e06d069ecf22c476910af5956545050181adc6fc795a5e796be39109"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-2/visual-matrix-report.json",
+                                  "sha256":  "807a82ae65163aeae5e78822f061ada3e4919c96269847beda237d2633c270f0"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/360x640-company.png",
+                                  "sha256":  "7d944d06a8ac875e4ef69238667f1b33fcfde8c2855642b489becd94caa23286"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/360x640-department.png",
+                                  "sha256":  "d6dd3c7a6471055896b87030df804ae5594899dc3818b60fcd0fdd127b6f4d60"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/360x640-leaderboard.png",
+                                  "sha256":  "a4df8a9c17c35d40c1957f2526016a63bd59fb18c346f01b769855d9678597ac"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/360x640-settings.png",
+                                  "sha256":  "04579b14450f7e5445deee921960cf46bda03747c64d796779562dfaa3d70460"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/360x640-talent.png",
+                                  "sha256":  "8a0c84c4b95515f2ebfb06d8a0966fd977793b2b6d8e0475e8c899f3e03997d5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/360x640/visual-report.json",
+                                  "sha256":  "e365340a64be1afe64b9bbc357ac097ce2b2da735ff994442250f9f41ca83b7d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/375x812-company.png",
+                                  "sha256":  "08ffbe5db63ce1d4e597d8cc9c910fd6f739e70e084b1b7a9a80f395fd004d2f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/375x812-department.png",
+                                  "sha256":  "427db07fc862a52ce12ad11956295f7021ee2b8f2ed22d9c153a1ece6fd4f689"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/375x812-leaderboard.png",
+                                  "sha256":  "2405a53c53ef5a99a19adcc1ee63f37e9170feeceda88e558ca1f45b84201fe1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/375x812-settings.png",
+                                  "sha256":  "eedc55860ed1e3f0868641409f8d19d39c9d4e682de884f2539af749bb5e8ec1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/375x812-talent.png",
+                                  "sha256":  "135c4e965af18d6c93dc2217814dc4d7c47df253b7396281e553408465f94afd"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x812/visual-report.json",
+                                  "sha256":  "1f48f6d5c11a5966627ee69db02e585521b6cfd633547c4ab9ebb977d958a43f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/375x834-company.png",
+                                  "sha256":  "3d54f9dea7d68402f369b9bd49763428f2e1d9e791c7bdb25a0af23b12d35f47"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/375x834-department.png",
+                                  "sha256":  "a348e6608e71df8924a348d648df0b069e3183ba7ca564b06cd525f2ce9f95a4"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/375x834-leaderboard.png",
+                                  "sha256":  "69fe7412315a8a242f7c661d94580e1d0e29ceac27a60d1c9b1b2b7a15bb09c7"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/375x834-settings.png",
+                                  "sha256":  "1631cb3a791a33a6c727f880ae78d674574d5dcc5433af367825c27962558548"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/375x834-talent.png",
+                                  "sha256":  "f7b7bdce198c71c0e668452ae208701ed1e8ae0e462432693678f1efca35b69b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/375x834/visual-report.json",
+                                  "sha256":  "7d79eaba38d6210ec697cb4a7e7ae62a6a2b55d241fd77968d3a333c1fdd513c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/390x844-company.png",
+                                  "sha256":  "d062284893f3ffef810ae4dc94e0185f889fb8a3ceb6a75613fe61844666180e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/390x844-department.png",
+                                  "sha256":  "0a01216f6127fe5b09849bebe727a5bbe122bffc9045d7a1b76dc82582b557ac"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/390x844-leaderboard.png",
+                                  "sha256":  "2963bcd9ba723738f538877d8bf180c71c491b9a183699979399b95cb33b0467"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/390x844-settings.png",
+                                  "sha256":  "e354ba5e5378548c426d6457927955f87158d84bc6f3f9847ee7128b7846b9ba"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/390x844-talent.png",
+                                  "sha256":  "1da9af2d1b893078e93e0f65f88d614937a95bf5c5c6a4428d892bae2cd3928c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/390x844/visual-report.json",
+                                  "sha256":  "c7e0c892e06d069ecf22c476910af5956545050181adc6fc795a5e796be39109"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual-3/visual-matrix-report.json",
+                                  "sha256":  "807a82ae65163aeae5e78822f061ada3e4919c96269847beda237d2633c270f0"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/360x640-company.png",
+                                  "sha256":  "7d944d06a8ac875e4ef69238667f1b33fcfde8c2855642b489becd94caa23286"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/360x640-department.png",
+                                  "sha256":  "d6dd3c7a6471055896b87030df804ae5594899dc3818b60fcd0fdd127b6f4d60"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/360x640-leaderboard.png",
+                                  "sha256":  "b45b5cf023f6470d77ab4c6f76c0449e6bbb1a8e1d3ce5dfd103333f94dd4579"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/360x640-settings.png",
+                                  "sha256":  "04579b14450f7e5445deee921960cf46bda03747c64d796779562dfaa3d70460"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/360x640-talent.png",
+                                  "sha256":  "8a0c84c4b95515f2ebfb06d8a0966fd977793b2b6d8e0475e8c899f3e03997d5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/360x640/visual-report.json",
+                                  "sha256":  "e365340a64be1afe64b9bbc357ac097ce2b2da735ff994442250f9f41ca83b7d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/375x812-company.png",
+                                  "sha256":  "08ffbe5db63ce1d4e597d8cc9c910fd6f739e70e084b1b7a9a80f395fd004d2f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/375x812-department.png",
+                                  "sha256":  "427db07fc862a52ce12ad11956295f7021ee2b8f2ed22d9c153a1ece6fd4f689"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/375x812-leaderboard.png",
+                                  "sha256":  "8344acf56a688d323b8168e93672f85f0f124eb58c3a145495937b8b21d72b1a"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/375x812-settings.png",
+                                  "sha256":  "88745942fed3ca3ef17a18c2061c75746960039cf3b8a742bad04b73c7565244"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/375x812-talent.png",
+                                  "sha256":  "135c4e965af18d6c93dc2217814dc4d7c47df253b7396281e553408465f94afd"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x812/visual-report.json",
+                                  "sha256":  "1f48f6d5c11a5966627ee69db02e585521b6cfd633547c4ab9ebb977d958a43f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/375x834-company.png",
+                                  "sha256":  "3d54f9dea7d68402f369b9bd49763428f2e1d9e791c7bdb25a0af23b12d35f47"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/375x834-department.png",
+                                  "sha256":  "a348e6608e71df8924a348d648df0b069e3183ba7ca564b06cd525f2ce9f95a4"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/375x834-leaderboard.png",
+                                  "sha256":  "6562b8f38e9cb805121eeb0849ee0d97d9ddde77d11d8b3fc5c7294f7a5a32ec"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/375x834-settings.png",
+                                  "sha256":  "a243f8e52153d752d416ec421da57fc0e9ff90bfdf17d8111b17bcfb544e4f83"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/375x834-talent.png",
+                                  "sha256":  "f7b7bdce198c71c0e668452ae208701ed1e8ae0e462432693678f1efca35b69b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/375x834/visual-report.json",
+                                  "sha256":  "7d79eaba38d6210ec697cb4a7e7ae62a6a2b55d241fd77968d3a333c1fdd513c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/390x844-company.png",
+                                  "sha256":  "d062284893f3ffef810ae4dc94e0185f889fb8a3ceb6a75613fe61844666180e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/390x844-department.png",
+                                  "sha256":  "0a01216f6127fe5b09849bebe727a5bbe122bffc9045d7a1b76dc82582b557ac"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/390x844-leaderboard.png",
+                                  "sha256":  "e1f713c30746d4a5859f7d1b9daaf9828d93b0de2cc33f466da3147a8c245f65"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/390x844-settings.png",
+                                  "sha256":  "e354ba5e5378548c426d6457927955f87158d84bc6f3f9847ee7128b7846b9ba"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/390x844-talent.png",
+                                  "sha256":  "1da9af2d1b893078e93e0f65f88d614937a95bf5c5c6a4428d892bae2cd3928c"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/390x844/visual-report.json",
+                                  "sha256":  "c7e0c892e06d069ecf22c476910af5956545050181adc6fc795a5e796be39109"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/V31-visual/visual-matrix-report.json",
+                                  "sha256":  "807a82ae65163aeae5e78822f061ada3e4919c96269847beda237d2633c270f0"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/acceptance-result.json",
+                                  "sha256":  "6db381b48365d4f2e3a428c1c0a6952798fdd86fecc66cc54612d3bd6192abc9"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/check-final.log",
+                                  "sha256":  "cb5ee0850f67b837af6b550f5792f965ed1093a410c95d95275e6d109314123d"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final2.err.log",
+                                  "sha256":  "6fdbef6a8c7836071045ed77ed587e9b595a157a5b1b6fbf893e6134c622d984"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final2.log",
+                                  "sha256":  "4b35b3556afdf6ddc4b181e9c0f6bd1ad448da898395bb3ad7670e41eca2fdaa"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final2.result.json",
+                                  "sha256":  "b0df589044ede061d47fbb2439ab05e050f390e9cff3df26335017ab7676c67f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final3.err.log",
+                                  "sha256":  "d82a385b9b23bf067f8b2539660349170b1221b71b81559e91a7bd4de255d615"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final3.log",
+                                  "sha256":  "a1eb876f669f099c6f4919341904b38c30513db1ca6f7e23ec0c72e374cb53ad"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final3.result.json",
+                                  "sha256":  "1100037e9a599be76f192a71b2599fe7fbe1849d516874de3c2edd317ff0ec99"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final4.err.log",
+                                  "sha256":  "d82a385b9b23bf067f8b2539660349170b1221b71b81559e91a7bd4de255d615"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final4.log",
+                                  "sha256":  "ec081af0f4165e57e4469b2fe509648ffe8c958b37530af9b90c1fa4552042f7"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final4.result.json",
+                                  "sha256":  "5871f3462200a8b8efa66393e034f93bd37660389dc0c6bf16bf4fd3c8762b60"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final5.err.log",
+                                  "sha256":  "d82a385b9b23bf067f8b2539660349170b1221b71b81559e91a7bd4de255d615"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final5.log",
+                                  "sha256":  "9efa7514db68e3291f07a93fcda320f68d33fdfc19762954c0a3dc1d0ad81871"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-final5.result.json",
+                                  "sha256":  "a266c3ad640e9b6a47323535593140ede8319a2071a06bfaa0e7114859946274"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-result.json",
+                                  "sha256":  "96e35b56ce82b8f1eccc6043cb1dcbdb0cc60fc6e1e93f7b5f6a3e2046062ce8"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31check.err.log",
+                                  "sha256":  "3da4814f3d7b7699d7a100d725053b2b7510e80232704a3aeb06942f94d630c5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31check.log",
+                                  "sha256":  "df1b7e29aac093a03b81aa322f84a8dc52bda70e23da9c87ca7472526318e3cd"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31check.result.json",
+                                  "sha256":  "6ec19e1768a64f9758c64f78e690cefbdcd421d05abf1fc9d6711bdbf9757978"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31final.err.log",
+                                  "sha256":  "3da4814f3d7b7699d7a100d725053b2b7510e80232704a3aeb06942f94d630c5"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31final.log",
+                                  "sha256":  "478033b2edd35dca79e6de40e0164fd37bc782f5496ebd24f8e95a9ca58a75b8"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web-ui31final.result.json",
+                                  "sha256":  "27eaf627aa9559d7dce6c2dc2ef9444155c00c41fa170e8bf3070749a4ac0746"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web.err.log",
+                                  "sha256":  "821ef6910919a5c54aeb64e6ac719adb2c729555fac60c0d5fb9447338914ec1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/cocos-web.log",
+                                  "sha256":  "b255ca76985261d1c0bb344ac1bfa5f9839c8753fcd6d346dcc0fd30206d200e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug.cjs",
+                                  "sha256":  "2c45bb6fa52d2374ee679abc2ff847f506c7b600c1742b32b6045a36c9a5dc05"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/debug-report.json",
+                                  "sha256":  "550d4915918a654e0dc95b07a9f5ed38afe855176c411c5b9e1378c117956e71"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/debug4-report.json",
+                                  "sha256":  "550d4915918a654e0dc95b07a9f5ed38afe855176c411c5b9e1378c117956e71"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/probe-report.json",
+                                  "sha256":  "81f7ac265d22da7b38c1e469b47483f3c2f2ca1a93b2f4dc27d949ca445846dc"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/probe-v07-report.json",
+                                  "sha256":  "81f7ac265d22da7b38c1e469b47483f3c2f2ca1a93b2f4dc27d949ca445846dc"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/rank-measure.json",
+                                  "sha256":  "550d4915918a654e0dc95b07a9f5ed38afe855176c411c5b9e1378c117956e71"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/rank-measure.png",
+                                  "sha256":  "be31fadadc9cc1003bfce79ffe5acf6db1b99baad80ac1b2144039bffd45e2fd"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/rank-top.json",
+                                  "sha256":  "5e74a9bafcfcc68f01dc1b392b6a19576b130e1dfcd5c34e983769dc295d3868"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/settings-tree.txt",
+                                  "sha256":  "41c47fff1eebd1757af5e74cc83a658ce47bf1c9d334ca93b1688c9b8f5dc562"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/settings.png",
+                                  "sha256":  "e934a37d6ebd5de4404fc7bb5493860f2b5cf8545188c551320050cffc7659a8"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/talent.json",
+                                  "sha256":  "324798bf667d922db94fdb02482922bcced24898f8add80c593f11f639508572"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/talent.png",
+                                  "sha256":  "5efa2d112bcad36836a358e3a4e15d02666752d75f34faa3abea081d36d9d6b1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/v05-debug.png",
+                                  "sha256":  "c2637055c680b83dab652789d4acce9cfcbe4edc78c5e512e6626ff605a2e79f"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug/v07-debug.png",
+                                  "sha256":  "a417a9d12080c5c3a05b00068e46f506972f781802cf33c020ee8b79d9dc3f6b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug2.cjs",
+                                  "sha256":  "34cb866676dd1706fbafb5b67c8b8d340c90cace42d3fc46e450cbf86e29c579"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug3.cjs",
+                                  "sha256":  "af9c67e1f489a73f82626fd8da15edc9c022a87fa1a041a070081a8da5ae4774"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug4.cjs",
+                                  "sha256":  "09191d03f95033d8712adf356236f7f5bc82fd90fa4cc4b673c7e4d462eb4c4e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/debug5.cjs",
+                                  "sha256":  "99583ed24c6c5fcaa4baa09bdec2718bfde7dd34f6b3953dbd60c2cf3f4876ab"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/detail-after-30s.png",
+                                  "sha256":  "e550bf89efc74391eed01f39484ade05ef60bf0791a75833d1322307aee29ca4"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/detail-opened.png",
+                                  "sha256":  "99cfd616b5c35a2f772e76c5d19bdf425f31d3019f115b5f3803e10c01eeb8d8"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/detail-review.cjs",
+                                  "sha256":  "4ba47b0b7bf10357b6acaf52cb99403ca9491c4d8ffc703b9bca3623abd49d07"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/detail-review.json",
+                                  "sha256":  "dc4c8bf23c028a8cbdf1fda8d18ba859c0c3c1f4224fb0c9eec58675745715c1"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/matrix-8171.log",
+                                  "sha256":  "9bc48aeba18ee6175b11b7ed2d427eadbea31ec235b550df1416780e8bc53749"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/matrix-8172.log",
+                                  "sha256":  "596276162e689aa2ebe12296826160588c4d3bc07dd0f6114da73117e3dc313b"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/npm-check-restore31.log",
+                                  "sha256":  "8d34fc395e0019b4840de1f639528365f3ea98beaca6d27f324340f8fe880739"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/npm-check.log",
+                                  "sha256":  "49723e96f2cf063f06e851990dace6e133e640e1027465ddeddc4ddd9873fcf6"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/r31-matrix.cjs",
+                                  "sha256":  "eb7af18a41818f2a44dd632f28b65e87a59a938ebec0d830b30a93becb717608"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/rich-attempt-02.log",
+                                  "sha256":  "b36e5dd21d5f8e72e9a1ddd3cdd3112474c424061141f76abb0b0beb611a2374"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/rich-attempt-02/detail-after-30s.png",
+                                  "sha256":  "033297fc7a459cc989ac14f0e7f0e979088f4536a6ee9c1a8c886de12fa86fff"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/rich-attempt-02/detail-opened.png",
+                                  "sha256":  "99cfd616b5c35a2f772e76c5d19bdf425f31d3019f115b5f3803e10c01eeb8d8"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/rich-attempt-02/detail-review.json",
+                                  "sha256":  "5efa2ac3bcf6b81781e7dbf715f025a79480ed67638b934165de77170c59f38e"
+                              },
+                              {
+                                  "path":  "evidence/acceptance-ui-20261105/rich-attempt-02/rich-fixture.json",
+                                  "sha256":  "4c80f02827c5d6e46f75258bc0cfb934605a39deb4f23b08846a1f421ac00549"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/cocos-build.err.log",
+                                  "sha256":  "2501b5f6935ce5cccb4dd0b7c608579ed45fed7dd513066acc9c5d56ae5fcb28"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/cocos-build.log",
+                                  "sha256":  "ae43b9e3c9f1e0821942d8fd928ea62147a283b6ff91c6dcac64b71a114dd2d6"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/convert-tap-v2.err.log",
+                                  "sha256":  "3608623880c9eb0ed34704f3824a2dc29024c3a10ea2ab38c6ccf28c145848d4"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/convert-tap-v2.log",
+                                  "sha256":  "0c28c0608752fcdafb2782ac2641aebf931382d0d6f301fa4430a42d45969cb8"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/convert-tap-v2.result.json",
+                                  "sha256":  "d53c3037eb4b4d9a589ed7a8cf7bd7ce05ff540e74b49d165a26e15e53552db1"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/creator-result.json",
+                                  "sha256":  "e5aac994f5107115d4f29c96a55e6b8fc7e5581fbcec5d3025725c02f4bda387"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/entry-list.txt",
+                                  "sha256":  "15a7c0ec5e678916c9a7390ee9513326cbc56ec16e650ea16c85ff26fbf98a5c"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/manifest.json",
+                                  "sha256":  "dc541e277671dad26f172aa066a08316f1a798ada14e645f7ba8dbc4e7dfd916"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/package-check.json",
+                                  "sha256":  "dc541e277671dad26f172aa066a08316f1a798ada14e645f7ba8dbc4e7dfd916"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/patch-release.err.log",
+                                  "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/patch-release.log",
+                                  "sha256":  "691fb33822db8d1c5d65dc21663842573fdee7b706111d3b584e128ed6c1f5c9"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/patch-release.result.json",
+                                  "sha256":  "308956125f4b0a91b9101911a74183dd0bb19d066d3af60c43a8b8a7a89dd2f7"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/release-inputs-before.json",
+                                  "sha256":  "e471c2f4eae7f09c165d7c69f94914770064f0db6ee63d2509f95a88477e7f1b"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/repack-release.err.log",
+                                  "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/repack-release.log",
+                                  "sha256":  "23cec49b15907ee3d0e8ee20afed5254a0d2f20e3c715c4f44a0fc7d1af69515"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/repack-release.result.json",
+                                  "sha256":  "a31027d850ef4574ca6350700ddd308f7b13bc568e64f8cdb70cfa639075642f"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/verify-package.err.log",
+                                  "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/verify-package.log",
+                                  "sha256":  "b41688a3aa189f3465f94b385ff33a3b9538c601335c651a5b55d41fb5d14d73"
+                              },
+                              {
+                                  "path":  "evidence/m3/build/m4-20261106-r31/01/verify-package.result.json",
+                                  "sha256":  "886198eed44c509a878383ad4f299aedb80eba338da5ddce062aa8f9e65391b4"
+                              },
+                              {
+                                  "path":  "tests/unit/dialogSessionModel.test.mjs",
+                                  "sha256":  "3cbabd9787e6693d4f8905e2b6d52ec2bbd26d183406c32365ccd12536edf26e"
+                              },
+                              {
+                                  "path":  "tests/unit/uiMetrics.test.mjs",
+                                  "sha256":  "139682a2965e55c79c0139c117f16009b4a824209ecbd700c8c5180df2cb8288"
+                              },
+                              {
+                                  "path":  "AGENT.md",
+                                  "sha256":  "3ddd3f14913a05426c713c08a0c23422449ee90aeb1776113c7e0bc60cfd1785"
+                              },
+                              {
+                                  "path":  "README.md",
+                                  "sha256":  "ffc1f98723bb5b5656d431e0628b383609c18b2c356438acc8e40a8e29f5d93a"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/AppView.ts",
+                                  "sha256":  "72660c5f967c03cc18e9e18f8a9e72095fdb53c69081bf4069f381ca96c0692c"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/UiFactory.ts",
+                                  "sha256":  "a01aa8725def3c967fd74acf8f8af3e3205dc4ac5e1091c4c01b8bc59851236c"
+                              },
+                              {
+                                  "path":  "assets/scripts/ui/dialogs.ts",
+                                  "sha256":  "5629be78de320900842388469d38d5f29d24d71eab289d17bea398e64dd1f478"
+                              },
+                              {
+                                  "path":  "docs/鎴戞槸CEO_椤圭洰鎬昏.md",
+                                  "sha256":  "47083521950da020cca54e53d8fb2416b153490534a0eb8a31e686fcc5cc2705"
+                              },
+                              {
+                                  "path":  "tools/e2e/canvas-driver.cjs",
+                                  "sha256":  "dfbc1e29394883e461698b78afc90ecfea7398793f9baa05c7edd86c7ed40bdb"
+                              },
+                              {
+                                  "path":  "tools/e2e/visual-viewports.cjs",
+                                  "sha256":  "44706b180c1c32a0a1066d8618247ecc4b8ae8c7051165226d036fa333328280"
+                              }
+                          ],
+    "configSha256":  "378d50e8ac889368cfa52831256181d21d58078d895740d9e9c0472c3c6f4e86",
+    "buildExitCode":  36,
+    "buildWasExecuted":  true,
+    "buildStartedAt":  "2026-11-05T17:32:19.110Z",
+    "buildFinishedAt":  "2026-11-05T17:35:56.025Z",
+    "inputFingerprint":  "0f6f1d32f9bd3f29c53792cc35b0b51c7fc8875e7f0f693c8c55ea21f328dc0f",
+    "inputFiles":  [
+                       {
+                           "path":  "AGENT.md",
+                           "sha256":  "3ddd3f14913a05426c713c08a0c23422449ee90aeb1776113c7e0bc60cfd1785"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/AppView.ts",
+                           "sha256":  "72660c5f967c03cc18e9e18f8a9e72095fdb53c69081bf4069f381ca96c0692c"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/UiFactory.ts",
+                           "sha256":  "a01aa8725def3c967fd74acf8f8af3e3205dc4ac5e1091c4c01b8bc59851236c"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/dialogSessionModel.ts",
+                           "sha256":  "ccaf8e23f203dd9dabfb985ce3af35cbce8d4689a9d1ec1276ee6d2b0db09de7"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/dialogSessionModel.ts.meta",
+                           "sha256":  "ce3d3669c5eee5621674639429876f8e43260fc66730238ea68ddbffec65b744"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/dialogs.ts",
+                           "sha256":  "5629be78de320900842388469d38d5f29d24d71eab289d17bea398e64dd1f478"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/uiMetrics.ts",
+                           "sha256":  "b2a7a5966a94c80dd5408a10b2458f601174cd4c3133f94703297b3272196483"
+                       },
+                       {
+                           "path":  "assets/scripts/ui/uiMetrics.ts.meta",
+                           "sha256":  "3e682941dea9cf8196105a8b7be5dd8a395a2825580da6fd7d0bc9074a9fae5a"
+                       },
+                       {
+                           "path":  "tools/e2e/canvas-driver.cjs",
+                           "sha256":  "dfbc1e29394883e461698b78afc90ecfea7398793f9baa05c7edd86c7ed40bdb"
+                       },
+                       {
+                           "path":  "tools/e2e/visual-viewports.cjs",
+                           "sha256":  "44706b180c1c32a0a1066d8618247ecc4b8ae8c7051165226d036fa333328280"
+                       }
+                   ],
+    "logFiles":  [
+                     "cocos-build.err.log",
+                     "cocos-build.log",
+                     "convert-tap-v2.err.log",
+                     "convert-tap-v2.log",
+                     "convert-tap-v2.result.json",
+                     "creator-result.json",
+                     "entry-list.txt",
+                     "manifest.json",
+                     "package-check.json",
+                     "patch-release.err.log",
+                     "patch-release.log",
+                     "patch-release.result.json",
+                     "release-inputs-before.json",
+                     "repack-release.err.log",
+                     "repack-release.log",
+                     "repack-release.result.json",
+                     "verify-package.err.log",
+                     "verify-package.log",
+                     "verify-package.result.json"
+                 ],
+    "sourceFingerprint":  "0f6f1d32f9bd3f29c53792cc35b0b51c7fc8875e7f0f693c8c55ea21f328dc0f"
+}

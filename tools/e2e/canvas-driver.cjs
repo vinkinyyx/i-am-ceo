@@ -45,6 +45,12 @@ class CanvasDriver {
 
   async findLabels(text, { exact = true, parentContains, nth = 0 } = {}) {
     return this.page.evaluate(({ text, exact, parentContains }) => {
+      // Some Cocos web builds do not expose cc.UITransform on the global `cc` object;
+      // fall back to the component list so geometry assertions do not silently read 0.
+      const uiTransformOf = (node) =>
+        node.getComponent(cc.UITransform) ||
+        node.components?.find((component) => component.constructor?.name === 'UITransform') ||
+        null;
       const found = [];
       const walk = (node) => {
         if (!node.activeInHierarchy) return;
@@ -60,7 +66,7 @@ class CanvasDriver {
               if (ancestor.getComponent(cc.Button)) { targetNode = ancestor; break; }
               ancestor = ancestor.parent;
             }
-            const transform = targetNode.getComponent(cc.UITransform);
+            const transform = uiTransformOf(targetNode);
             const box = transform?.getBoundingBoxToWorld();
             if (box) found.push({ text: label.string, x: box.x + box.width / 2, y: box.y + box.height / 2, width: box.width, height: box.height });
             else {

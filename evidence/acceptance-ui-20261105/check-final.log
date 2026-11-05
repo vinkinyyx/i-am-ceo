@@ -1,0 +1,143 @@
+
+> im-ceo@0.1.0 check
+> npm run typecheck && npm run typecheck:ui && npm run lint && npm run test
+
+
+> im-ceo@0.1.0 typecheck
+> tsc -p tsconfig.core.json --noEmit
+
+
+> im-ceo@0.1.0 typecheck:ui
+> tsc -p tsconfig.ui.json --noEmit
+
+
+> im-ceo@0.1.0 lint
+> eslint "assets/core/**/*.ts" "assets/scripts/**/*.ts" "tests/**/*.ts"
+
+
+> im-ceo@0.1.0 test
+> vitest run
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/Workspace/TapTap/我是CEO[39m
+
+ [32m✓[39m tests/unit/tapPlatform.test.ts [2m([22m[2m35 tests[22m[2m)[22m[90m 179[2mms[22m[39m
+ [32m✓[39m tests/unit/transactionCommit.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m tests/integration/transactionRecoveryMatrix.test.ts [2m([22m[2m13 tests[22m[2m)[22m[90m 86[2mms[22m[39m
+ [32m✓[39m tests/unit/initialHiring.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m tests/unit/departmentsM2.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m tests/unit/releaseGaps.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 36[2mms[22m[39m
+ [32m✓[39m tests/unit/staffingM2.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 43[2mms[22m[39m
+ [32m✓[39m tests/unit/departmentOverview.test.ts [2m([22m[2m15 tests[22m[2m)[22m[90m 112[2mms[22m[39m
+ [32m✓[39m tests/integration/resetCompany.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 269[2mms[22m[39m
+ [32m✓[39m tests/integration/transactionRecovery.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 271[2mms[22m[39m
+PATCH_FAIL fetch-guard: anchor not found (0 matches)
+ [32m✓[39m tests/unit/talentOverview.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 46[2mms[22m[39m
+PATCH_FAIL boot-diag: existing patch does not match this releaseId/version or is incomplete
+ [32m✓[39m tests/unit/eventRiskM3.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 75[2mms[22m[39m
+ [32m✓[39m tests/unit/saveRecovery.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 56[2mms[22m[39m
+ [32m✓[39m tests/integration/companyDashboardFacade.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 205[2mms[22m[39m
+ [32m✓[39m tests/golden/goldenYear1.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 21[2mms[22m[39m
+ [32m✓[39m tests/unit/saveRepository.test.ts [2m([22m[2m10 tests[22m[2m)[22m[90m 52[2mms[22m[39m
+ [32m✓[39m tests/unit/authService.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m tests/unit/hirePreview.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/robustnessM3.test.ts [2m([22m[2m11 tests[22m[2m)[22m[90m 293[2mms[22m[39m
+ [32m✓[39m tests/unit/rewardedAdProvider.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/createFlow.test.mjs [2m([22m[2m15 tests[22m[2m)[22m[90m 57[2mms[22m[39m
+ [32m✓[39m tests/integration/createFlowFacade.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 55[2mms[22m[39m
+ [32m✓[39m tests/unit/adRewardState.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 20[2mms[22m[39m
+ [32m✓[39m tests/unit/dialogModel.test.mjs [2m([22m[2m16 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+ [32m✓[39m tests/integration/resetRecovery.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 26[2mms[22m[39m
+REPACK_FAIL 目标已存在，禁止原地覆盖： C:\Users\vinki\AppData\Local\Temp\ceo-zip-Yn92d2\a\game.zip
+ [32m✓[39m tests/unit/shellLayout.test.mjs [2m([22m[2m9 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/investment.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 25[2mms[22m[39m
+ [32m✓[39m tests/unit/companyCreate.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 22[2mms[22m[39m
+ [32m✓[39m tests/integration/bootstrapGate.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/annualGoal.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 34[2mms[22m[39m
+ [32m✓[39m tests/integration/releaseFaults.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 441[2mms[22m[39m
+   [33m[2m✓[22m[39m REL-02｜R04：crc32 在无 TextEncoder 宿主仍可工作[2m > [22m缺 TextEncoder 时：旧实现模块导入期即失败；修复后输出标准 UTF-8 CRC32 [33m387[2mms[22m[39m
+ [32m✓[39m tests/unit/loadGuard.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/packageHygiene.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/cloneLock.test.ts [2m([22m[2m9 tests[22m[2m)[22m[90m 28[2mms[22m[39m
+ [32m✓[39m tests/unit/offlineM3.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+ [32m✓[39m tests/integration/cloudSync.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 15[2mms[22m[39m
+ [32m✓[39m tests/unit/dialogSessionModel.test.mjs [2m([22m[2m8 tests[22m[2m)[22m[90m 14[2mms[22m[39m
+ [32m✓[39m tests/unit/companyOverview.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m tests/unit/bootDiagnostics.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 16[2mms[22m[39m
+ [32m✓[39m tests/integration/faultFixtures.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 23[2mms[22m[39m
+VERIFY_FAIL [
+  "splash.d49ca.jpg: baked-progress splash artwork"
+]
+ [32m✓[39m tests/unit/clock.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 25[2mms[22m[39m
+ [32m✓[39m tests/unit/onceInit.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/capacityMarket.test.ts [2m([22m[2m7 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/authCheckSession.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 71[2mms[22m[39m
+ [32m✓[39m tests/unit/foregroundClock.test.ts [2m([22m[2m8 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m tests/integration/cloudImport.test.ts [2m([22m[2m3 tests[22m[2m)[22m[90m 32[2mms[22m[39m
+ [32m✓[39m tests/unit/utf8crc.test.ts [2m([22m[2m19 tests[22m[2m)[22m[33m 687[2mms[22m[39m
+   [33m[2m✓[22m[39m R04-T03 缺 TextEncoder 宿主[2m > [22m全新加载 crc32 模块不依赖 TextEncoder，结果与当前实现相同 [33m671[2mms[22m[39m
+ [32m✓[39m tests/unit/uiMetrics.test.mjs [2m([22m[2m8 tests[22m[2m)[22m[90m 11[2mms[22m[39m
+ [32m✓[39m tests/integration/adCoordinator.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 39[2mms[22m[39m
+ [32m✓[39m tests/unit/safeArea.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 9[2mms[22m[39m
+ [32m✓[39m tests/integration/leaderboardSync.test.ts [2m([22m[2m1 test[22m[2m)[22m[90m 11[2mms[22m[39m
+ [32m✓[39m tests/unit/config.test.ts [2m([22m[2m5 tests[22m[2m)[22m[90m 12[2mms[22m[39m
+ [32m✓[39m tests/unit/privacyPolicyText.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/smoke.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [32m✓[39m tests/unit/cloudSaveCodec.test.ts [2m([22m[2m2 tests[22m[2m)[22m[90m 19[2mms[22m[39m
+ [32m✓[39m tests/unit/privacyConsent.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 8[2mms[22m[39m
+ [32m✓[39m tests/tools/canvasDriver.test.mjs [2m([22m[2m6 tests[22m[2m)[22m[90m 93[2mms[22m[39m
+VERIFY_FAIL [
+  "packaged ads configuration is malformed or policyVersion differs from packaged privacy policy"
+]
+ [32m✓[39m tests/unit/platformSelection.test.ts [2m([22m[2m4 tests[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/textTokens.test.mjs [2m([22m[2m3 tests[22m[2m)[22m[90m 10[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/simulation/exportEvidence.test.mjs [2m([22m[2m1 test[22m[2m | [22m[33m1 skipped[39m[2m)[22m
+ [32m✓[39m tests/unit/leaderboardScores.test.ts [2m([22m[2m1 test[22m[2m)[22m[90m 6[2mms[22m[39m
+ [32m✓[39m tests/unit/cloudConflict.test.ts [2m([22m[2m1 test[22m[2m)[22m[90m 5[2mms[22m[39m
+ [32m✓[39m tests/simulation/longRun120.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 9803[2mms[22m[39m
+   [33m[2m✓[22m[39m R40 120-year persistence boundary[2m > [22mretains the last 100 annual reports while preserving 120 operated years through save/reload [33m9801[2mms[22m[39m
+VERIFY_FAIL [
+  "enabled ads require a non-empty real adUnitId and privacyReviewed=true"
+]
+ [32m✓[39m tests/simulation/simulate5year.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 3935[2mms[22m[39m
+   [33m[2m✓[22m[39m 百种子 × 三行业 × 三策略 5 年模拟[2m > [22m全部 900 个 run 财务守恒、现金不为负、无重复救助、每年≤3自动招聘 [33m2631[2mms[22m[39m
+   [33m[2m✓[22m[39m 百种子 × 三行业 × 三策略 5 年模拟[2m > [22mCSV 可生成（首列为表头字段） [33m1296[2mms[22m[39m
+VERIFY_FAIL [
+  "assets/main/index.hash.js: EditorMockPlatform in package"
+]
+VERIFY_FAIL [
+  "first-screen.js",
+  "logo.png",
+  "slogan.png",
+  "splash-art.png",
+  "marker CEO-PATCH:boot-diag count=0",
+  "marker CEO-PATCH:init-once count=0",
+  "marker CEO-PATCH:fetch-guard count=0",
+  "game.js: fetch throw remains",
+  "productVersion 1.0.0 != 9.9.9",
+  "production profile mismatch",
+  "first-screen splash BG_NAME"
+]
+VERIFY_FAIL [
+  "application.js: development test hook in package"
+]
+ [32m✓[39m tests/tools/releasePipeline.test.mjs [2m([22m[2m13 tests[22m[2m)[22m[33m 25413[2mms[22m[39m
+   [33m[2m✓[22m[39m release manifest source paths[2m > [22mpreserves UTF-8 paths from Git NUL-delimited output [33m1062[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 patch-release.cjs[2m > [22mT01 补丁命中 fetch/init/boot-diag/check-version 标记 [33m723[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 patch-release.cjs[2m > [22mT02 重复应用幂等（不出现多份诊断） [33m765[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 patch-release.cjs[2m > [22mT03 锚点消失时补丁失败退出而非静默继续 [33m1284[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 patch-release.cjs[2m > [22m重复 required 锚点与不匹配 releaseId 均拒绝 [33m1467[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m打包后校验通过；重复 zip 拒绝覆盖；分隔符为 / [33m4825[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m拒绝改名成哈希 JPG 的烘焙进度启动稿 [33m3395[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m按 game.js 解析 Creator 哈希应用入口，不假定 application.js 固定名 [33m4170[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m从ZIP内的Cocos JsonAsset拒绝广告与隐私版本不一致 [33m3324[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m拒绝启用但没有真实广告位ID的ZIP配置 [33m2108[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m拒绝任意嵌套脚本中的 EditorMockPlatform [33m893[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m校验拒绝版本不符/未打补丁的包 [33m574[2mms[22m[39m
+   [33m[2m✓[22m[39m R20 repack + R21 verify[2m > [22m校验拒绝生产包里的开发写状态入口 [33m822[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m64 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (65)[39m
+[2m      Tests [22m [1m[32m493 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (494)[39m
+[2m   Start at [22m 01:31:38
+[2m   Duration [22m 28.43s[2m (transform 18.62s, setup 0ms, collect 41.42s, tests 43.07s, environment 59ms, prepare 62.68s)[22m
+

@@ -23,6 +23,15 @@ import {
 import { THEME } from './theme';
 import { ensureTouchSize, TEXT_TOKENS } from './textTokens';
 import { moneyText } from './money';
+import {
+  BUTTON_BASELINE,
+  BUTTON_VARIANTS,
+  type ButtonVariant,
+  buttonTextCapacity,
+  estimateTextWidth,
+  estimateWrappedLines,
+  layoutActionRow,
+} from './uiMetrics';
 
 export { moneyText };
 
@@ -104,7 +113,11 @@ export function createLabel(opts: LabelOptions): Node {
   // R23：字号下限 12；默认行高取语义令牌近似（body），禁止靠缩字塞内容
   const fontSize = Math.max(opts.fontSize ?? TEXT_TOKENS.body.fontSize, TEXT_TOKENS.caption.fontSize);
   const lineHeight = opts.lineHeight ?? Math.round(fontSize * 1.45);
-  tr.setContentSize(new Size(opts.width ?? 200, opts.height ?? lineHeight));
+  // R31：换行 Label 在创建时按“估算行数 × 行高”给初值，避免 Layout 首帧把下一行叠到正文上。
+  const width = opts.width ?? 200;
+  const estimatedLines = opts.width ? estimateWrappedLines(opts.text, fontSize, width) : 1;
+  const height = opts.height ?? lineHeight * estimatedLines;
+  tr.setContentSize(new Size(width, height));
   const label = node.addComponent(Label);
   label.string = opts.text;
   label.fontSize = fontSize;
@@ -135,35 +148,115 @@ export interface ButtonOptions {
   parent?: Node;
   onClick: () => void;
   disabled?: boolean;
+  /** R31：语义变体。声明后强制同一变体同高（48），并参与几何验收。 */
+  variant?: ButtonVariant;
+}
+
+interface ButtonVisualState {
+  label: Node;
+  color: Color;
+  textColor: Color;
+  width: number;
+  height: number;
+  radius: number;
+}
+
+const BUTTON_VISUALS = new WeakMap<Node, ButtonVisualState>();
+
+/** 重绘按钮底色；只改颜色/透明度，不改布局尺寸。 */
+function paintButton(node: Node, state: ButtonVisualState, color: Color, textColor: Color): void {
+  const graphics = node.getComponent(Graphics);
+  const tr = node.getComponent(UITransform);
+  if (graphics && tr) {
+    graphics.clear();
+    graphics.fillColor = color;
+    graphics.roundRect(-tr.width / 2, -tr.height / 2, tr.width, tr.height, state.radius);
+    graphics.fill();
+  }
+  const label = state.label.getComponent(Label);
+  if (label) label.color = textColor;
+}
+
+/** 按当前运行态启/禁按钮；与创建时的初始 disabled 解耦。 */
+export function setButtonEnabled(node: Node, enabled: boolean): void {
+  if (!isValid(node, true)) return;
+  const state = BUTTON_VISUALS.get(node);
+  const button = node.getComponent(Button);
+  if (button) button.interactable = enabled;
+  if (!state) return;
+  paintButton(node, state, enabled ? state.color : THEME.disabled, enabled ? state.textColor : THEME.textWeak);
+}
+
+export function isButtonEnabled(node: Node): boolean {
+  const button = node.getComponent(Button);
+  return Boolean(button && button.interactable);
+}
+
+/** 就地更新开关类按钮的底色/文字色（不重建节点，不改变几何）。 */
+export function setButtonLook(node: Node, color: Color, textColor: Color): void {
+  if (!isValid(node, true)) return;
+  const state = BUTTON_VISUALS.get(node);
+  if (!state) return;
+  state.color = color;
+  state.textColor = textColor;
+  const enabled = node.getComponent(Button)?.interactable ?? true;
+  paintButton(node, state, enabled ? color : THEME.disabled, enabled ? textColor : THEME.textWeak);
+}
+
+/** 就地更新按钮文案（保持同一按钮框，不重建节点）。 */
+export function setButtonLabel(node: Node, text: string): void {
+  const state = BUTTON_VISUALS.get(node);
+  const label = state?.label.getComponent(Label);
+  if (!label) return;
+  label.string = text;
+  if (state) {
+    const capacity = buttonTextCapacity(state.width);
+    if (estimateTextWidth(text, label.fontSize) > capacity) {
+      console.warn(`[ui] button label overflows: "${text}" (${estimateTextWidth(text, label.fontSize)} > ${capacity})`);
+    }
+  }
+}
+
+export function getButtonLabel(node: Node): string {
+  return stateLabelString(node);
+}
+
+function stateLabelString(node: Node): string {
+  const state = BUTTON_VISUALS.get(node);
+  return state?.label.getComponent(Label)?.string ?? '';
 }
 
 export function createButton(opts: ButtonOptions): Node {
-  // R23：有效热区 ≥44×44（视觉矩形可小于热区时由调用方外扩触摸节点，这里先守底线）
-  const touch = ensureTouchSize(opts.width, opts.height ?? 44);
+  const variant = opts.variant;
+  const minHeight = variant ? BUTTON_VARIANTS[variant].height : BUTTON_BASELINE.minHit;
+  // 常规按钮统一 48 高；未声明变体的旧入口保留 44 触控底线，避免历史坐标组整体错位。
+  const requestedHeight = opts.height ?? (variant ? BUTTON_VARIANTS[variant].height : BUTTON_BASELINE.minHit);
+  const touch = ensureTouchSize(opts.width, Math.max(requestedHeight, minHeight));
   const height = touch.height;
+  const radius = 8;
   const node = createRect({
     name: opts.name ?? 'Button',
     width: touch.width,
     height,
     color: opts.disabled ? THEME.disabled : (opts.color ?? THEME.primary),
-    radius: 8,
+    radius,
     parent: opts.parent,
   });
   // 拦截点击穿透
   node.addComponent(BlockInputEvents);
 
-  // TASK-M3-12-02：label 必须用 rect 实际宽度，不能用 opts.width-16（当 width<44 时 rect 被撑宽但 label 仍窄）。
-  // 固定单行 CENTER 居中，不靠正文 RESIZE_HEIGHT+TOP。
+  // R31/V05：Label 无条件挂到 Button；支持先创建、后挂载父节点。
   const labelNode = new Node('ButtonLabel');
-  if (opts.parent) labelNode.parent = node;
+  labelNode.parent = node;
   labelNode.setPosition(Vec3.ZERO);
   const tr = labelNode.addComponent(UITransform);
-  const contentWidth = touch.width - 16;
+  const contentWidth = Math.max(1, touch.width - BUTTON_BASELINE.paddingX * 2);
   tr.setContentSize(new Size(contentWidth, height));
   const label = labelNode.addComponent(Label);
   label.string = opts.text;
-  label.fontSize = opts.fontSize ?? 15;
-  label.lineHeight = height; // 单行，行高等于按钮高
+  label.fontSize = opts.fontSize ?? (variant === 'compact' ? 14 : 15);
+  // R31：行高使用文字令牌，不再等于按钮高度。
+  label.lineHeight = variant === 'compact' ? TEXT_TOKENS.caption.lineHeight : TEXT_TOKENS.button.lineHeight;
   label.color = opts.textColor ?? Color.WHITE;
   label.isBold = true;
   label.horizontalAlign = HorizontalTextAlignment.CENTER;
@@ -171,13 +264,49 @@ export function createButton(opts: ButtonOptions): Node {
   label.overflow = Overflow.NONE; // 单行禁止换行/缩字，调用方负责宽度
   label.enableWrapText = false;
 
+  const textColor = opts.textColor ?? Color.WHITE;
+  const fillColor = opts.color ?? THEME.primary;
+  if (estimateTextWidth(opts.text, label.fontSize) > contentWidth) {
+    // 开发期可定位警告：长文案必须由调用方改宽度/换行/缩短，不能静默裁字。
+    console.warn(
+      `[ui] button label overflow at create: "${opts.text}" (${estimateTextWidth(opts.text, label.fontSize)} > ${contentWidth})`,
+    );
+  }
+
   const button = node.addComponent(Button);
   button.transition = Button.Transition.SCALE;
   button.zoomScale = 0.96;
+  button.interactable = !opts.disabled;
+  BUTTON_VISUALS.set(node, { label: labelNode, color: fillColor, textColor, width: touch.width, height, radius });
   node.on(Button.EventType.CLICK, () => {
-    if (!opts.disabled) opts.onClick();
+    // V07：读取当前 interactable，而不是创建时的 opts.disabled 闭包。
+    if (!node.getComponent(Button)?.interactable) return;
+    opts.onClick();
   });
   return node;
+}
+
+/** 生成一行等宽按钮；按钮数量/宽度由可用宽与 gap 统一决定。 */
+export function createActionRow(
+  parent: Node,
+  totalWidth: number,
+  buttons: Array<Omit<ButtonOptions, 'parent' | 'width'>>,
+  y = 0,
+  gap = BUTTON_BASELINE.gap,
+): Node[] {
+  const items = layoutActionRow(totalWidth, buttons.length, gap);
+  return buttons.map((spec, index) => {
+    const item = items[index]!;
+    const node = createButton({
+      ...spec,
+      parent,
+      width: item.width,
+      height: spec.height ?? BUTTON_BASELINE.height,
+      variant: spec.variant ?? 'secondary',
+    });
+    node.setPosition(item.x, y);
+    return node;
+  });
 }
 
 /** 让节点四边对齐父节点（安全区/全屏面板用）。 */

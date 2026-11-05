@@ -160,7 +160,7 @@ async function main() {
       await driver.waitForLabel('总开关（关闭后全静音）', { timeoutMs: 5_000 });
       driver.check(`${viewport.name}-settings-modal`, true);
       await driver.screenshot(`${viewport.name}-settings`);
-      await driver.clickLabel('取消');
+      await driver.clickLabel('关闭');
 
       const after = await driver.readCommittedSave();
       driver.check(`${viewport.name}-navigation-did-not-mutate-save`,

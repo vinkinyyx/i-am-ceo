@@ -1,8 +1,9 @@
 import {
   BlockInputEvents,
-  Button,
   Color,
+  Component,
   EditBox,
+  Graphics,
   Input,
   KeyCode,
   Label,
@@ -11,13 +12,14 @@ import {
   Node,
   ScrollView,
   Size,
-  UIOpacity,
   UITransform,
+  _decorator,
   input,
+  isValid,
 } from 'cc';
 import { THEME } from './theme';
 import { SPACE_TOKENS, TEXT_TOKENS } from './textTokens';
-import { createButton, createLabel, createRect } from './UiFactory';
+import { createButton, createLabel, createRect, setButtonEnabled, setButtonLabel } from './UiFactory';
 import {
   ConfirmGuard,
   DIALOG_METRICS,
@@ -27,6 +29,14 @@ import {
   dialogInputLength,
   type DialogPhase,
 } from './dialogModel';
+import {
+  DialogSessionModel,
+  type DialogCloseReason,
+  type DialogKind,
+  type DialogOwner,
+} from './dialogSessionModel';
+
+const { ccclass } = _decorator;
 
 /**
  * R25：弹窗、输入与确认操作通用件（不修改现金、不调用平台登录，只负责交互壳）。
@@ -40,6 +50,10 @@ import {
  */
 
 export interface DialogHandle {
+  readonly id: string;
+  readonly kind: DialogKind;
+  readonly semanticKey: string;
+  readonly owner: DialogOwner;
   readonly overlay: Node;
   readonly card: Node;
   /** 正文容器（Scrollable/Confirm 已装纵向 Layout；Input 为固定区） */
@@ -49,12 +63,23 @@ export interface DialogHandle {
   readonly phase: DialogPhase;
   readonly closed: boolean;
   readonly busy: boolean;
+  /** 本次提交是否已由调用方给出明确结论（成功/失败/过期/失效），避免被兜底错误覆盖。 */
+  readonly handled: boolean;
   /** 是否允许取消关闭（忙碌/结果未知时为 false） */
   canClose(): boolean;
   /** 切换忙碌视觉（按钮禁用 + 文案），不改变状态机 */
   setBusy(busy: boolean, busyText?: string): void;
   /** 内联错误提示（null 清除） */
   setError(message: string | null): void;
+  /** 就地更新正文说明（确认窗过期/重新预览时使用，不重建窗口） */
+  setMessage(text: string): void;
+  /**
+   * 预览/确认令牌过期：保留同一窗口，禁用“直接提交”，转为手动“重新预览”。
+   * 不自动关框；用户重新预览并再次确认后才允许提交。
+   */
+  markExpired(message: string, retryText?: string): void;
+  /** 上下文永久失效（换 run/账号）：保留窗口显示原因，但禁止再次提交。 */
+  blockSubmit(message: string): void;
   /** 明确失败：恢复可重试状态并显示原因 */
   fail(message: string): void;
   /** 结果未知：保持锁定，提示稍后核对（不能关闭/重试） */
@@ -68,10 +93,112 @@ export interface DialogHandle {
   onClose(cb: () => void): void;
 }
 
-// ---------------------------------------------------------------- 返回键栈
+// ---------------------------------------------------------------- 会话登记 / 返回键栈
 
-const dialogStack: DialogHandleImpl[] = [];
+/** R31：确认/输入弹窗底部按钮统一 48 高（同基线，不再 48/44 混用）。 */
+const BUTTON_ACTION_HEIGHT = 48;
+
+/** 弹窗会话元信息（R31）；不传时按普通展示弹窗登记。 */
+export interface DialogSessionOptions {
+  /** 同语义去重键：employee:<id>、distress:<run>:<year>:<month> 等 */
+  semanticKey?: string;
+  kind?: DialogKind;
+  owner?: Partial<DialogOwner>;
+  policy?: 'manual' | 'submit-result' | 'recovery';
+  sourceRevision?: number | null;
+}
+
+const ownerDefaults: DialogOwner = { runId: null, accountEpoch: 0, contextEpoch: 0 };
+const registry = new DialogSessionModel();
+const dialogHandles: DialogHandleImpl[] = [];
+const closedListeners = new Set<(reason: DialogCloseReason) => void>();
+let dialogSequence = 0;
 let backKeyInstalled = false;
+
+/** AppView 只注册一个“任何弹窗关闭”监听，用于补弹危机/刷新状态。 */
+export function setDialogClosedListener(listener: ((reason: DialogCloseReason) => void) | null): void {
+  closedListeners.clear();
+  if (listener) closedListeners.add(listener);
+}
+
+function notifyClosed(reason: DialogCloseReason): void {
+  for (const listener of closedListeners) {
+    try {
+      listener(reason);
+    } catch (err) {
+      console.warn('[dialog] closed listener failed', err);
+    }
+  }
+}
+
+/** 供 AppView/广告/危机判断“最上层是否已被占用”，不再靠 ModalLayer 子节点猜测。 */
+export function hasOpenDialog(): boolean {
+  pruneDialogs();
+  return dialogHandles.some((handle) => !handle.closed);
+}
+
+export function hasBlockingDialog(): boolean {
+  pruneDialogs();
+  return registry.hasBlockingModal();
+}
+
+export function findOpenDialog(semanticKey: string): DialogHandle | null {
+  pruneDialogs();
+  return dialogHandles.find((handle) => !handle.closed && handle.semanticKey === semanticKey) ?? null;
+}
+
+/** 真正上下文失效（换 run/账号/应用销毁）时强制结束旧 UI；不伪造业务取消/成功。 */
+export function invalidateDialogs(reason: DialogCloseReason = 'context-invalidated', owner?: Partial<DialogOwner>): number {
+  let count = 0;
+  for (const handle of [...dialogHandles].reverse()) {
+    if (owner && !handle.ownerMatches(owner)) continue;
+    if (!handle.closed) handle.forceDispose(reason);
+    count += 1;
+  }
+  registry.pruneInvalid(() => true, reason);
+  notifyClosed(reason);
+  return count;
+}
+
+/** 外部 destroy/父层清理后补注销；不模拟用户取消。 */
+export function pruneDialogs(): void {
+  for (const handle of [...dialogHandles]) {
+    if (!handle.closed && !isValid(handle.overlay, true)) handle.handleExternalDestroy();
+  }
+}
+
+export function relayoutDialogs(viewportHeight: number): void {
+  for (const handle of dialogHandles) {
+    if (!handle.closed) handle.relayout(viewportHeight);
+  }
+}
+
+/** 证据脚本只读快照；不包含可写测试 hook。 */
+export function dialogDebugSnapshot(): Array<Record<string, unknown>> {
+  pruneDialogs();
+  return dialogHandles
+    .filter((handle) => !handle.closed)
+    .map((handle) => ({
+      id: handle.id,
+      kind: handle.kind,
+      semanticKey: handle.semanticKey,
+      runId: handle.owner.runId,
+      contextEpoch: handle.owner.contextEpoch,
+      closed: handle.closed,
+      overlayValid: isValid(handle.overlay, true),
+    }));
+}
+
+@ccclass('CeoDialogLifecycle')
+class DialogLifecycle extends Component {
+  host: DialogHandleImpl | null = null;
+
+  override onDestroy(): void {
+    const host = this.host;
+    this.host = null;
+    host?.handleExternalDestroy();
+  }
+}
 
 function installBackKey(): void {
   if (backKeyInstalled) return;
@@ -81,9 +208,10 @@ function installBackKey(): void {
 
 function onBackKey(event: { keyCode: number }): void {
   if (event.keyCode !== KeyCode.MOBILE_BACK && event.keyCode !== KeyCode.ESCAPE) return;
-  const top = dialogStack.length > 0 ? dialogStack[dialogStack.length - 1] : undefined;
+  pruneDialogs();
+  const top = dialogHandles.length > 0 ? dialogHandles[dialogHandles.length - 1] : undefined;
   // 只做取消/关闭：危险操作必须由玩家点确认按钮
-  if (top) top.requestCancel();
+  if (top && !top.closed) top.requestCancel();
 }
 
 // ---------------------------------------------------------------- 通用卡片
@@ -108,6 +236,20 @@ interface Scaffold {
   cardHeight: number;
   bodyHeight: number;
   width: number;
+  /** resize 时按同一实例重排所需信息 */
+  geometry: { viewportHeight: number; desiredBodyHeight: number; cardY: number };
+  titleNode: Node;
+  subtitleNode: Node | null;
+}
+
+function paintCard(card: Node, width: number, height: number): void {
+  const g = card.getComponent(Graphics);
+  if (!g) return;
+  g.clear();
+  g.fillColor = Color.WHITE;
+  g.roundRect(-width / 2, -height / 2, width, height, 12);
+  g.fill();
+  card.getComponent(UITransform)?.setContentSize(new Size(width, height));
 }
 
 function buildScaffold(opts: ScaffoldOptions): Scaffold {
@@ -120,22 +262,25 @@ function buildScaffold(opts: ScaffoldOptions): Scaffold {
   card.setPosition(0, opts.cardY ?? 0);
 
   const titleY = geo.cardHeight / 2 - 28;
-  createLabel({
+  const titleNode = createLabel({
     text: opts.title,
     fontSize: TEXT_TOKENS.heading.fontSize,
     bold: true,
     color: opts.titleColor ?? THEME.text,
     width: width - 32,
     parent: card,
-  }).setPosition(0, titleY);
+  });
+  titleNode.setPosition(0, titleY);
+  let subtitleNode: Node | null = null;
   if (opts.subtitle) {
-    createLabel({
+    subtitleNode = createLabel({
       text: opts.subtitle,
       fontSize: TEXT_TOKENS.caption.fontSize,
       color: THEME.textWeak,
       width: width - 32,
       parent: card,
-    }).setPosition(0, titleY - 24);
+    });
+    subtitleNode.setPosition(0, titleY - 24);
   }
 
   const innerWidth = width - 32;
@@ -167,6 +312,13 @@ function buildScaffold(opts: ScaffoldOptions): Scaffold {
     cardHeight: geo.cardHeight,
     bodyHeight: geo.bodyHeight,
     width,
+    geometry: {
+      viewportHeight: opts.viewportHeight,
+      desiredBodyHeight: opts.desiredBodyHeight,
+      cardY: opts.cardY ?? 0,
+    },
+    titleNode,
+    subtitleNode,
   };
 }
 
@@ -215,24 +367,65 @@ class DialogHandleImpl implements DialogHandle {
   readonly card: Node;
   readonly body: Node;
   readonly footer: Node;
+  readonly id: string;
+  readonly kind: DialogKind;
+  readonly semanticKey: string;
+  readonly owner: DialogOwner;
+  private readonly scaffold: Scaffold;
   private readonly scrollView: ScrollView | null;
   private readonly closeCallbacks: Array<() => void> = [];
   private readonly onCancelCb: (() => void) | undefined;
+  private readonly overlayLifecycle: DialogLifecycle;
   private closedFlag = false;
+  private finishing = false;
   private errorNode: Node | null = null;
+  private messageNode: Node | null = null;
   private submitNode: Node | null = null;
   private cancelNode: Node | null = null;
   private submitIdleText = '';
   private submitBusyText = '处理中…';
+  private expiredFlag = false;
+  private handledFlag = false;
+  private refreshHandler: (() => Promise<{ message: string; confirmText: string; confirmEnabled: boolean }>) | null = null;
 
-  constructor(scaffold: Scaffold, overlay: Node, onCancelCb?: () => void) {
+  constructor(
+    scaffold: Scaffold,
+    overlay: Node,
+    session: DialogSessionOptions | undefined,
+    onCancelCb?: () => void,
+  ) {
     this.overlay = overlay;
     this.card = scaffold.card;
     this.body = scaffold.body;
     this.footer = scaffold.footer;
+    this.scaffold = scaffold;
     this.scrollView = scaffold.scrollView;
     this.onCancelCb = onCancelCb;
-    dialogStack.push(this);
+    this.kind = session?.kind ?? 'notice';
+    this.owner = { ...ownerDefaults, ...(session?.owner ?? {}) };
+    this.id = `dialog-${++dialogSequence}`;
+    this.semanticKey = session?.semanticKey ?? this.id;
+
+    // 外部销毁（父层清理/场景切换）也要注销，避免残留“幽灵弹窗”阻塞后续交互
+    const lifecycle = overlay.addComponent(DialogLifecycle);
+    lifecycle.host = this;
+    this.overlayLifecycle = lifecycle;
+
+    const registered = registry.register({
+      id: this.id,
+      kind: this.kind,
+      semanticKey: this.semanticKey,
+      owner: this.owner,
+      sourceRevision: session?.sourceRevision ?? null,
+      policy: session?.policy ?? 'manual',
+    });
+    if (!registered) {
+      // 同语义弹窗已存在：不叠层，直接丢弃新壳（调用方应先 findOpenDialog 聚焦旧窗）
+      this.closedFlag = true;
+      if (isValid(overlay, true)) overlay.destroy();
+      return;
+    }
+    dialogHandles.push(this);
     installBackKey();
   }
 
@@ -252,6 +445,14 @@ class DialogHandleImpl implements DialogHandle {
     return !this.closedFlag && this.guard.canClose;
   }
 
+  ownerMatches(partial: Partial<DialogOwner>): boolean {
+    if (partial.runId !== undefined && partial.runId !== this.owner.runId) return false;
+    if (partial.accountEpoch !== undefined && partial.accountEpoch !== this.owner.accountEpoch) return false;
+    if (partial.contextEpoch !== undefined && partial.contextEpoch !== this.owner.contextEpoch) return false;
+    if (partial.entityId !== undefined && partial.entityId !== this.owner.entityId) return false;
+    return true;
+  }
+
   /** 绑定底部按钮（确认/取消），由 Confirm/Input 构造时调用。 */
   attachActions(submit: Node, cancelButton: Node, idleText: string, busyText: string): void {
     this.submitNode = submit;
@@ -262,29 +463,26 @@ class DialogHandleImpl implements DialogHandle {
 
   setBusy(busy: boolean, busyText?: string): void {
     if (busyText) this.submitBusyText = busyText;
-    if (this.submitNode) {
-      setEnabled(this.submitNode, !busy);
-      const label = this.submitNode.getComponentInChildren(Label);
-      if (label) label.string = busy ? this.submitBusyText : this.submitIdleText;
+    if (this.submitNode && isValid(this.submitNode, true)) {
+      setButtonEnabled(this.submitNode, !busy);
+      setButtonLabel(this.submitNode, busy ? this.submitBusyText : this.submitIdleText);
     }
-    if (this.cancelNode) setEnabled(this.cancelNode, !busy);
+    if (this.cancelNode && isValid(this.cancelNode, true)) setButtonEnabled(this.cancelNode, !busy);
   }
 
   setError(message: string | null): void {
+    if (this.closedFlag) return;
     if (message === null) {
-      if (this.errorNode) {
-        this.errorNode.destroy();
-        this.errorNode = null;
-      }
+      if (this.errorNode && isValid(this.errorNode, true)) this.errorNode.destroy();
+      this.errorNode = null;
       return;
     }
-    const errorColor = THEME.danger;
-    if (!this.errorNode) {
+    if (!this.errorNode || !isValid(this.errorNode, true)) {
       this.errorNode = createLabel({
         text: message,
         fontSize: TEXT_TOKENS.caption.fontSize,
-        color: errorColor,
-        width: Math.max(160, this.card.getComponent(UITransform)?.contentSize.width ?? DIALOG_METRICS.width),
+        color: THEME.danger,
+        width: this.scaffold.width - 48,
         lineHeight: TEXT_TOKENS.caption.lineHeight,
         align: 'left',
         parent: this.body,
@@ -297,8 +495,93 @@ class DialogHandleImpl implements DialogHandle {
     this.scrollView?.scrollToTop(0);
   }
 
+  /** R31：就地换正文说明，供“预览已过期/已刷新”复用同一窗口。 */
+  setMessage(text: string): void {
+    if (this.closedFlag) return;
+    if (!this.messageNode || !isValid(this.messageNode, true)) {
+      this.messageNode = createLabel({
+        text,
+        fontSize: TEXT_TOKENS.body.fontSize,
+        lineHeight: TEXT_TOKENS.body.lineHeight,
+        color: THEME.text,
+        width: this.scaffold.width - 56,
+        align: 'left',
+        parent: this.body,
+      });
+      return;
+    }
+    const label = this.messageNode.getComponent(Label);
+    if (label) label.string = text;
+  }
+
+  /** 当前正文文案（证据脚本读取；无正文返回空串）。 */
+  currentMessage(): string {
+    return this.messageNode?.getComponent(Label)?.string ?? '';
+  }
+
+  bindMessage(node: Node): void {
+    this.messageNode = node;
+  }
+
+  configureRefresh(handler: (() => Promise<{ message: string; confirmText: string; confirmEnabled: boolean }>) | null): void {
+    this.refreshHandler = handler;
+  }
+
+  get expired(): boolean {
+    return this.expiredFlag;
+  }
+
+  get handled(): boolean {
+    return this.handledFlag;
+  }
+
+  markExpired(message: string, retryText = '重新预览'): void {
+    if (this.closedFlag) return;
+    this.expiredFlag = true;
+    this.handledFlag = true;
+    this.guard.fail();
+    this.setError(message);
+    if (this.submitNode && isValid(this.submitNode, true)) {
+      setButtonLabel(this.submitNode, retryText);
+      setButtonEnabled(this.submitNode, this.refreshHandler !== null);
+    }
+    if (this.cancelNode && isValid(this.cancelNode, true)) setButtonEnabled(this.cancelNode, true);
+  }
+
+  /** 由确认按钮的点击路径调用；返回 true 表示已消费一次过期状态。 */
+  consumeExpired(): boolean {
+    if (!this.expiredFlag) return false;
+    this.expiredFlag = false;
+    return true;
+  }
+
+  async refreshPreview(): Promise<boolean> {
+    if (!this.refreshHandler) return false;
+    this.handledFlag = false;
+    const result = await this.refreshHandler();
+    this.setMessage(result.message);
+    this.submitIdleText = result.confirmText;
+    if (this.submitNode && isValid(this.submitNode, true)) {
+      setButtonLabel(this.submitNode, result.confirmText);
+      setButtonEnabled(this.submitNode, result.confirmEnabled);
+    }
+    this.setError('预览已刷新，请再次确认');
+    return true;
+  }
+
+  blockSubmit(message: string): void {
+    if (this.closedFlag) return;
+    this.handledFlag = true;
+    this.guard.fail();
+    this.expiredFlag = false;
+    this.setError(message);
+    if (this.submitNode && isValid(this.submitNode, true)) setButtonEnabled(this.submitNode, false);
+    if (this.cancelNode && isValid(this.cancelNode, true)) setButtonEnabled(this.cancelNode, true);
+  }
+
   fail(message: string): void {
     if (this.closedFlag) return;
+    this.handledFlag = true;
     this.guard.fail();
     this.setBusy(false);
     this.setError(message);
@@ -306,6 +589,7 @@ class DialogHandleImpl implements DialogHandle {
 
   markUncertain(message: string): void {
     if (this.closedFlag) return;
+    this.handledFlag = true;
     this.guard.markUncertain();
     this.setBusy(true);
     this.setError(message);
@@ -313,21 +597,23 @@ class DialogHandleImpl implements DialogHandle {
 
   succeed(): void {
     if (this.closedFlag) return;
+    this.handledFlag = true;
     if (!this.guard.succeed()) return;
-    this.finish();
+    this.finish('submit-success');
   }
 
   cancel(): void {
     if (this.closedFlag) return;
     if (!this.guard.canClose) return;
-    this.close();
+    if (!this.guard.close()) return;
+    this.finish('user-close');
     this.onCancelCb?.();
   }
 
   close(): void {
     if (this.closedFlag) return;
     if (!this.guard.close()) return;
-    this.finish();
+    this.finish('user-close');
   }
 
   requestCancel(): void {
@@ -345,22 +631,73 @@ class DialogHandleImpl implements DialogHandle {
     this.closeCallbacks.push(cb);
   }
 
-  private finish(): void {
+  /** 父层/场景销毁导致的失效：注销并清理引用，但不伪造业务成功。 */
+  handleExternalDestroy(): void {
+    if (this.closedFlag) return;
     this.closedFlag = true;
-    const idx = dialogStack.indexOf(this);
-    if (idx >= 0) dialogStack.splice(idx, 1);
-    const overlay = this.overlay;
-    for (const cb of this.closeCallbacks) cb();
-    this.closeCallbacks.length = 0;
-    if (overlay.isValid) overlay.destroy();
+    this.detach('application-dispose');
+    this.notifyClose('application-dispose');
   }
-}
 
-function setEnabled(node: Node, enabled: boolean): void {
-  const button = node.getComponent(Button);
-  if (button) button.enabled = enabled;
-  const opacity = node.getComponent(UIOpacity) ?? node.addComponent(UIOpacity);
-  opacity.opacity = enabled ? 255 : 150;
+  forceDispose(reason: DialogCloseReason): void {
+    if (this.closedFlag) return;
+    this.closedFlag = true;
+    this.detach(reason);
+    if (isValid(this.overlay, true)) this.overlay.destroy();
+    this.notifyClose(reason);
+  }
+
+  /** 视口变化时按同一几何模型重排，避免卡片越界。 */
+  relayout(viewportHeight: number): void {
+    if (this.closedFlag) return;
+    const geo = computeDialogGeometry({
+      viewportHeight,
+      desiredBodyHeight: this.scaffold.geometry.desiredBodyHeight,
+    });
+    this.scaffold.cardHeight = geo.cardHeight;
+    this.scaffold.bodyHeight = geo.bodyHeight;
+    paintCard(this.card, this.scaffold.width, geo.cardHeight);
+    const bodyNode = this.scrollView ? this.body.parent : this.body;
+    const bodyTransform = bodyNode?.getComponent(UITransform);
+    if (bodyTransform && bodyNode) {
+      bodyTransform.setContentSize(new Size(this.scaffold.width - 32, geo.bodyHeight));
+      bodyNode.setPosition(0, (DIALOG_METRICS.footerHeight - DIALOG_METRICS.titleHeight) / 2);
+    }
+    this.scaffold.titleNode.setPosition(0, geo.cardHeight / 2 - 28);
+    this.scaffold.subtitleNode?.setPosition(0, geo.cardHeight / 2 - 52);
+    this.footer.setPosition(0, -geo.cardHeight / 2 + DIALOG_METRICS.footerHeight / 2);
+  }
+
+  private finish(reason: DialogCloseReason): void {
+    if (this.closedFlag || this.finishing) return;
+    this.finishing = true;
+    this.closedFlag = true;
+    this.detach(reason);
+    if (isValid(this.overlay, true)) {
+      this.overlayLifecycle.host = null;
+      this.overlay.destroy();
+    }
+    this.notifyClose(reason);
+  }
+
+  private detach(reason: DialogCloseReason): void {
+    const idx = dialogHandles.indexOf(this);
+    if (idx >= 0) dialogHandles.splice(idx, 1);
+    registry.unregisterOnce(this.id, reason);
+  }
+
+  private notifyClose(reason: DialogCloseReason): void {
+    const callbacks = [...this.closeCallbacks];
+    this.closeCallbacks.length = 0;
+    for (const cb of callbacks) {
+      try {
+        cb();
+      } catch (err) {
+        console.warn('[dialog] close callback failed', err);
+      }
+    }
+    notifyClosed(reason);
+  }
 }
 
 // ---------------------------------------------------------------- ScrollableDialog
@@ -374,6 +711,8 @@ export interface ScrollableDialogOptions {
   width?: number;
   /** 正文期望可视高（超出则滚动；小屏自动压缩） */
   desiredBodyHeight?: number;
+  /** 会话元信息（R31）：语义去重键、归属上下文、类型 */
+  session?: DialogSessionOptions;
   onCancel?: () => void;
 }
 
@@ -392,7 +731,7 @@ export function openScrollableDialog(opts: ScrollableDialogOptions): DialogHandl
     desiredBodyHeight: opts.desiredBodyHeight ?? 360,
     scrollable: true,
   });
-  return new DialogHandleImpl(scaffold, opts.overlay, opts.onCancel);
+  return new DialogHandleImpl(scaffold, opts.overlay, opts.session, opts.onCancel);
 }
 
 // ---------------------------------------------------------------- ConfirmDialog
@@ -412,6 +751,10 @@ export interface ConfirmDialogOptions {
   danger?: boolean;
   /** false 时确认按钮初始置灰（如余额不足），点击不发起提交 */
   confirmEnabled?: boolean;
+  /** 会话元信息（R31）：语义去重键、归属上下文、类型 */
+  session?: DialogSessionOptions;
+  /** 预览过期时的就地刷新（R31）：返回新的正文/按钮文案与可提交性 */
+  onRefreshPreview?: () => Promise<{ message: string; confirmText: string; confirmEnabled: boolean }>;
   onConfirm: (handle: DialogHandle) => void | Promise<void>;
   onCancel?: () => void;
 }
@@ -434,7 +777,7 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
     scrollable: true,
   });
 
-  createLabel({
+  const messageNode = createLabel({
     text: opts.message,
     fontSize: TEXT_TOKENS.body.fontSize,
     lineHeight: TEXT_TOKENS.body.lineHeight,
@@ -444,23 +787,31 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
     parent: scaffold.body,
   });
 
-  const handle = new DialogHandleImpl(scaffold, opts.overlay, opts.onCancel);
+  const handle = new DialogHandleImpl(scaffold, opts.overlay, opts.session, opts.onCancel);
+  if (handle.closed) return handle;
+  handle.bindMessage(messageNode);
+  handle.configureRefresh(opts.onRefreshPreview ?? null);
+
+  // 两个按钮同宽、同基线高（48），上下两行固定；避免 48/44 混用与窄屏文字挤压
+  const actionWidth = Math.min(240, width - 64);
   const confirmButton = createButton({
     text: opts.confirmText,
-    width: Math.min(240, width - 64),
-    height: 48,
+    width: actionWidth,
+    height: BUTTON_ACTION_HEIGHT,
+    variant: 'primary',
     color: opts.danger ? THEME.danger : THEME.primary,
     disabled: opts.confirmEnabled === false,
     parent: scaffold.footer,
     onClick: () => void runConfirm(),
   });
-  confirmButton.setPosition(0, 28);
+  confirmButton.setPosition(0, 26);
 
   const cancelButton = createButton({
     text: opts.cancelText ?? '再想想（取消）',
-    width: Math.min(200, width - 88),
-    height: 44,
-    fontSize: TEXT_TOKENS.caption.fontSize,
+    width: actionWidth,
+    height: BUTTON_ACTION_HEIGHT,
+    variant: 'secondary',
+    fontSize: TEXT_TOKENS.body.fontSize,
     color: Color.WHITE,
     textColor: THEME.text,
     parent: scaffold.footer,
@@ -471,13 +822,18 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
   handle.attachActions(confirmButton, cancelButton, opts.confirmText, opts.busyText ?? '处理中…');
 
   async function runConfirm(): Promise<void> {
+    // 过期令牌：第一次点击只做“重新预览”，绝不携带旧预览直接提交
+    if (handle.consumeExpired()) {
+      await handle.refreshPreview();
+      return;
+    }
     // 状态机拦截连点：同一弹窗只发一个意图
     if (!handle.guard.begin()) return;
     handle.setError(null);
     handle.setBusy(true);
     try {
       await opts.onConfirm(handle);
-      if (!handle.closed) {
+      if (!handle.closed && !handle.handled) {
         // 调用方未同时给出成功/失败结论 → 视为可重试的明确失败
         handle.fail('操作未完成，请重试');
       }
@@ -507,6 +863,8 @@ export interface InputDialogOptions {
   cancelText?: string;
   /** 业务校验（返回错误文案；null 通过）。基础空值/字数已由通用件处理 */
   validate?: (value: string) => string | null;
+  /** 会话元信息（R31） */
+  session?: DialogSessionOptions;
   onSubmit: (value: string, handle: DialogHandle) => void | Promise<void>;
   onCancel?: () => void;
 }
@@ -608,20 +966,22 @@ export function openInputDialog(opts: InputDialogOptions): DialogHandle {
   });
   errorLabel.setPosition(-42, inputY - 26);
 
-  const handle = new DialogHandleImpl(scaffold, opts.overlay, opts.onCancel);
+  const handle = new DialogHandleImpl(scaffold, opts.overlay, opts.session, opts.onCancel);
+  const actionWidth = Math.min(240, width - 64);
   const submitButton = createButton({
     text: opts.submitText ?? '确定',
-    width: Math.min(240, width - 64),
-    height: 48,
+    width: actionWidth,
+    height: BUTTON_ACTION_HEIGHT,
+    variant: 'primary',
     parent: scaffold.footer,
     onClick: () => void submit(),
   });
-  submitButton.setPosition(0, 28);
+  submitButton.setPosition(0, 26);
   const cancelButton = createButton({
     text: opts.cancelText ?? '取消',
-    width: Math.min(200, width - 88),
-    height: 44,
-    fontSize: TEXT_TOKENS.caption.fontSize,
+    width: actionWidth,
+    height: BUTTON_ACTION_HEIGHT,
+    variant: 'secondary',
     color: Color.WHITE,
     textColor: THEME.text,
     parent: scaffold.footer,
@@ -665,5 +1025,6 @@ export function openInputDialog(opts: InputDialogOptions): DialogHandle {
 
 /** 便于证据脚本/测试读取当前打开弹窗数量（不参与业务）。 */
 export function openDialogCount(): number {
-  return dialogStack.length;
+  pruneDialogs();
+  return dialogHandles.length;
 }

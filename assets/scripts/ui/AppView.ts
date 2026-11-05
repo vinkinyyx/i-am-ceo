@@ -40,18 +40,32 @@ import { acceptPrivacy, hasAcceptedPrivacy } from '../../core/platform/privacyCo
 import { PRIVACY_POLICY_TEXT } from '../../core/platform/privacyPolicyText';
 import { GameError } from '../../core/domain/errors';
 import { validateCompanyName } from '../../core/domain/validation';
-import { openConfirmDialog, openInputDialog, openScrollableDialog, type DialogHandle } from './dialogs';
+import {
+  findOpenDialog,
+  hasOpenDialog,
+  invalidateDialogs,
+  openConfirmDialog,
+  openInputDialog,
+  openScrollableDialog,
+  pruneDialogs,
+  setDialogClosedListener,
+  type DialogHandle,
+} from './dialogs';
 import { createForegroundClock } from '../../core/platform/foregroundClock';
 import { bootTrapError, bootTrapReady, bootTrapWatchdog } from '../boot/BootTrap';
 import { getBootController, initCocosBootDiagnostics } from '../boot/cocosBootHost';
 import {
+  attachCoverBackground,
   createButton,
   createLabel,
   createRect,
   moneyText,
+  setButtonEnabled,
+  setButtonLabel,
+  setButtonLook,
   stretchToParent,
-  attachCoverBackground,
 } from './UiFactory';
+import { BUTTON_BASELINE, layoutActionRow } from './uiMetrics';
 import { THEME, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
 import { TEXT_TOKENS } from './textTokens';
 import { audioManager } from '../audio/AudioManager';
@@ -176,6 +190,8 @@ export class AppView extends Component {
   private cloudConfig: CloudRuntimeConfig | null = null;
   private cloudStatusText = '云备份尚未检查';
   private cloudSync: CloudSyncService | null = null;
+  /** R31：只有平台返回稳定账号标识后，云上传/恢复才允许启用；不猜昵称/设备号。 */
+  private cloudProfileBound = false;
   private annualReportYear: number | null = null;
   private pendingOffer: CandidateOffer | null = null;
   /** R24：主壳布局引用——热 resize 时只重算几何，不重建内容（保 Tab/滚动/输入）。 */
@@ -225,8 +241,42 @@ export class AppView extends Component {
     step: number;
     cards: Array<{ node: Node; name: Node; meta: Node; pay: Node; state: Node; index: number }>;
   } | null = null;
+  /** R31：应用上下文代际（换 run/恢复云档/重开公司时递增，旧弹窗必须失效）。 */
+  private contextEpoch = 0;
+  /** R31：账号代际；登录/登出/换号后旧弹窗不得继续提交。 */
+  private authEpoch = 0;
+  private bootStarted = false;
+  private clockScheduled = false;
+  private backdrop: Node | null = null;
+  /** R31：危机的“已忽略”语义键；同一 run/年份/月份只自动弹一次。 */
+  private distressAckKey: string | null = null;
+  /** §23.5.6：最近一次主壳渲染的 Tab；仅同 Tab 刷新才恢复滚动。 */
+  private lastRenderedTab: TabId | null = null;
+  /** R31：详情快照会话；跨月只提示一次“数据已更新”，手动刷新才重取 VM。 */
+  private detailSessions: Array<{
+    key: string;
+    employeeId: string;
+    asOfYear: number;
+    asOfMonth: number;
+    notified: boolean;
+    notify: () => void;
+    alive: () => boolean;
+  }> = [];
 
   override async start(): Promise<void> {
+    // R31：启动页重试/二次启动必须销毁旧根与旧时钟，避免双重 Backdrop、Root 与时钟叠加
+    if (this.bootStarted) {
+      this.exitApplicationContext('application-dispose');
+      this.unschedule(this.clockTick);
+      this.clockScheduled = false;
+      this.teardownLayoutListeners();
+    }
+    this.bootStarted = true;
+    setDialogClosedListener((reason) => {
+      if (reason === 'application-dispose' || !this.bootStarted) return;
+      // 详情/确认关闭后再补弹危机提示（危机不抢占阅读，也不永久消失）
+      this.scheduleOnce(() => this.ensureDistressNotice(), 0);
+    });
     // 启动故障捕获：真机卡启动页时把错误显示在屏幕上（诊断设施，ready 后自动失效）
     bootTrapWatchdog(this.node);
     // R03：统一启动诊断（引擎前注入片段可能已安装；这里取得控制器并补引擎后阶段打点）
@@ -292,7 +342,9 @@ export class AppView extends Component {
     // 在线经营时钟：按真实帧时间推进（仅 RUNNING 且 speed>0 时月结）
     // 每秒保存一次真实进度，避免 5Hz 双槽事务产生过多平台存储写入。
     // GameClock 仍按真实 elapsed 逐月结算；跨阈值 tick 会在同一事务内补齐所有月份。
+    if (this.clockScheduled) this.unschedule(this.clockTick);
     this.schedule(this.clockTick, 1);
+    this.clockScheduled = true;
 
     // 前后台生命周期：进后台暂停音频+记水位；回前台做离线结算
     platform.onHide(() => {
@@ -498,6 +550,7 @@ export class AppView extends Component {
       title: '隐私保护提示',
       width: 320,
       desiredBodyHeight: 380,
+      session: { semanticKey: `privacy-consent:${this.contextEpoch}`, kind: 'blocking-recovery', owner: this.dialogOwner() },
     });
     const contentWidth = 320 - 56;
     const body = handle.body;
@@ -549,7 +602,7 @@ export class AppView extends Component {
     createButton({
       text: '不同意并退出',
       width: 110,
-      height: 44,
+      height: 48,
       fontSize: 13,
       color: Color.WHITE,
       textColor: THEME.textWeak,
@@ -583,24 +636,31 @@ export class AppView extends Component {
 
   /** 打开隐私政策：真机经 tap 能力受限，最小实现为复制/展示 URL；web 用新窗口。 */
   private openPrivacyPolicy(url: string): void {
-    const overlay = this.modalOverlay();
-    createRect({ width: 290, height: 190, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '隐私政策链接', fontSize: 17, bold: true, parent: overlay }).setPosition(0, 66);
-    createLabel({ text: url, fontSize: 12, color: THEME.primary, width: 240, parent: overlay }).setPosition(0, 16);
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '隐私政策链接',
+      width: 316,
+      desiredBodyHeight: 130,
+      session: { semanticKey: `privacy-link:${this.contextEpoch}`, kind: 'notice', owner: this.dialogOwner() },
+    });
+    createLabel({ text: url, fontSize: 12, color: THEME.primary, width: 260, align: 'left', parent: handle.body });
     createLabel({
       text: '如未自动打开，请在浏览器访问以上地址查看完整政策。',
-      fontSize: 11,
+      fontSize: 12,
       color: THEME.textWeak,
-      width: 240,
-      parent: overlay,
-    }).setPosition(0, -24);
+      width: 260,
+      lineHeight: 18,
+      align: 'left',
+      parent: handle.body,
+    });
     createButton({
       text: '知道了',
-      width: 180,
-      height: 42,
-      parent: overlay,
-      onClick: () => overlay.destroy(),
-    }).setPosition(0, -68);
+      width: 240,
+      height: 48,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(0, 0);
     // web/编辑器可直接打开；真机运行时没有 DOM，打开失败静默（链接已展示）
     try {
       const g = globalThis as { open?: (u: string) => void };
@@ -648,28 +708,73 @@ export class AppView extends Component {
     this.cloudSync = new CloudSyncService(new TapCloudSaveProvider(), this.platform, this.cloudConfig,
       this.cloudConfig.appId, environment, null);
     const status = await this.cloudSync.status();
-    this.cloudStatusText = status.available
-      ? '云备份可用；请先完成账号绑定'
-      : '云备份未配置，当前进度只保存在本机';
+    this.cloudProfileBound = status.profileId !== null;
+    if (!this.cloudConfig.enabled) this.cloudStatusText = '云备份：未启用（当前进度只保存在本机）';
+    else if (!status.available) this.cloudStatusText = '云备份：平台能力未就绪（仅本机保存）';
+    else if (!status.profileId) this.cloudStatusText = '云备份：待账号绑定（未绑定前不可上传或恢复）';
+    else this.cloudStatusText = status.pendingCheckpointId
+      ? '云备份：上次结果待核对，请勿重复上传'
+      : '云备份：已绑定账号，可手动备份/恢复';
   }
 
   private async maybeShowDailyRewardPrompt(): Promise<void> {
     if (!this.facade || !this.adCoordinator || this.facade.getState().phase !== 'RUNNING') return;
     if (this.adCoordinator.hasActiveSession()) return;
-    // TASK-M3-12-03：ModalOverlay 现在挂在 modalLayer 上
-    if (this.modalLayer?.children.some((child) => child.name === 'ModalOverlay' && child.activeInHierarchy)) return;
+    // R31：以弹窗会话栈为准，不再按 ModalLayer 子节点名猜测；任何窗口在场都不叠加
+    if (hasOpenDialog()) return;
     if (!this.facade.canRequestRewardedAd() || (this.facade.getState().adRewards?.couponIds.length ?? 0) > 0) return;
     const marked = await this.facade.markRewardPromptShown();
     if (marked.ok && marked.payload) this.renderRewardPrompt('完整观看可领1张免招聘费券，仅免一次招聘费，月薪照常支付，下月到岗；每天最多领取1次，7天内使用。');
   }
 
   private renderRewardPrompt(message: string): void {
-    const overlay = this.modalOverlay();
-    createRect({ width: 310, height: 220, color: Color.WHITE, radius: 12, parent: overlay });
-    createLabel({ text: '自愿激励广告', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 72);
-    createLabel({ text: `${message}\n完整观看后发券；也可跳过继续经营。`, fontSize: 13, color: THEME.text, width: 270, lineHeight: 22, align: 'center', parent: overlay }).setPosition(0, 12);
-    createButton({ text: '看视频领取', width: 130, height: 42, parent: overlay, onClick: () => { overlay.destroy(); void this.requestAdCoupon(); } }).setPosition(-72, -72);
-    createButton({ text: '跳过', width: 110, height: 42, color: Color.WHITE, textColor: THEME.textWeak, parent: overlay, onClick: () => overlay.destroy() }).setPosition(72, -72);
+    const s = this.state();
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '自愿激励广告',
+      subtitle: '可跳过，不影响经营',
+      width: 316,
+      desiredBodyHeight: 140,
+      session: {
+        semanticKey: `reward-prompt:${s.runId}:${s.gameYear}:${s.gameMonth}:${this.contextEpoch}`,
+        kind: 'notice',
+        owner: this.dialogOwner(),
+      },
+    });
+    createLabel({
+      text: `${message}\n完整观看后发券；也可跳过继续经营。`,
+      fontSize: 13,
+      color: THEME.text,
+      width: 260,
+      lineHeight: 22,
+      align: 'left',
+      parent: handle.body,
+    });
+    const items = layoutActionRow(260, 2, BUTTON_BASELINE.gap);
+    const watch = items[0]!;
+    const skip = items[1]!;
+    createButton({
+      text: '看视频领取',
+      width: watch.width,
+      height: 48,
+      variant: 'primary',
+      parent: handle.footer,
+      onClick: () => {
+        handle.close();
+        void this.requestAdCoupon();
+      },
+    }).setPosition(watch.x, 0);
+    createButton({
+      text: '跳过',
+      width: skip.width,
+      height: 48,
+      variant: 'secondary',
+      color: Color.WHITE,
+      textColor: THEME.textWeak,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(skip.x, 0);
   }
 
   private async requestAdCoupon(): Promise<void> {
@@ -729,9 +834,19 @@ export class AppView extends Component {
 
   /** 离线结算摘要弹窗（M3-01）。 */
   private renderOfflineSummary(p: { monthsSettled: number; yearsClosed: number[]; cashBefore: number; cashAfter: number }): void {
-    const overlay = this.modalOverlay();
-    createRect({ width: 310, height: 260, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '欢迎回来', fontSize: 20, bold: true, parent: overlay }).setPosition(0, 92);
+    const s = this.state();
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '欢迎回来',
+      width: 316,
+      desiredBodyHeight: 170,
+      session: {
+        semanticKey: `offline-summary:${s.runId}:${s.gameYear}:${s.gameMonth}:${this.contextEpoch}`,
+        kind: 'notice',
+        owner: this.dialogOwner(),
+      },
+    });
     createLabel({
       text:
         `离线期间结算 ${p.monthsSettled} 个月` +
@@ -742,15 +857,16 @@ export class AppView extends Component {
       color: THEME.text,
       width: 260,
       lineHeight: 24,
-      parent: overlay,
-    }).setPosition(0, 20);
+      align: 'left',
+      parent: handle.body,
+    });
     createButton({
       text: '知道了',
-      width: 180,
-      height: 46,
-      parent: overlay,
-      onClick: () => overlay.destroy(),
-    }).setPosition(0, -84);
+      width: 240,
+      height: 48,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(0, 0);
   }
 
   private clockTick(): void {
@@ -926,7 +1042,9 @@ export class AppView extends Component {
 
   private buildRoot(): void {
     const canvas = this.node;
-    // 全屏背景铺满画布，保证安全区/高屏外的留白与应用底色一致
+    // R31：启动页重试/二次 start 时先销毁旧根与旧背景，禁止双 Backdrop / 双 AppRoot
+    if (this.root && this.root.isValid) this.root.destroy();
+    if (this.backdrop && this.backdrop.isValid) this.backdrop.destroy();
     const backdrop = createRect({
       name: 'Backdrop',
       width: DESIGN_WIDTH,
@@ -935,6 +1053,7 @@ export class AppView extends Component {
       radius: 0,
       parent: canvas,
     });
+    this.backdrop = backdrop;
     backdrop.setPosition(0, 0);
     stretchToParent(backdrop);
     attachCoverBackground(backdrop, 'backgrounds/CEO_BG_SoftBlue_UI_9x20/spriteFrame');
@@ -993,8 +1112,38 @@ export class AppView extends Component {
   }
 
   override onDestroy(): void {
+    setDialogClosedListener(null);
+    this.unschedule(this.clockTick);
+    this.clockScheduled = false;
+    this.teardownLayoutListeners();
+    this.exitApplicationContext('application-dispose');
+    this.bootStarted = false;
+  }
+
+  /** R31：真正换上下文（重开公司/整档恢复/销毁）时，旧弹窗与旧快照全部作废。 */
+  private exitApplicationContext(reason: 'context-invalidated' | 'application-dispose'): void {
+    this.detailSessions = [];
+    this.distressAckKey = null;
+    this.contextEpoch += 1;
+    invalidateDialogs(reason);
+    this.disposeApplication();
+  }
+
+  private teardownLayoutListeners(): void {
     for (const unbind of this.unbindLayout) unbind();
     this.unbindLayout = [];
+  }
+
+  /** R31：弹窗归属信息；跨月 revision 变化不算上下文失效。 */
+  private dialogOwner(entityId?: string): { runId: string | null; accountEpoch: number; contextEpoch: number; entityId?: string } {
+    let runId: string | null = null;
+    try {
+      const s = this.facade?.getState?.();
+      runId = s?.runId ?? null;
+    } catch {
+      runId = null;
+    }
+    return { runId, accountEpoch: this.authEpoch, contextEpoch: this.contextEpoch, ...(entityId ? { entityId } : {}) };
   }
 
   /** TASK-M3-12-03：月结/年结/普通刷新——只清 PageLayer，保留 ModalLayer 与 ToastLayer。 */
@@ -1006,6 +1155,7 @@ export class AppView extends Component {
     this.createCommandId = null;
     this.ceoErrorLabel = null;
     this.speedButtons = [];
+    this.lastRenderedTab = null;
   }
 
   /** TASK-M3-12-03：显式重建应用（重开/登出等）——全部层清。 */
@@ -1036,6 +1186,12 @@ export class AppView extends Component {
 
   private render(): void {
     // TASK-M3-12-03：月结/年结只清 PageLayer，保留 ModalLayer 的详情/确认弹窗。
+    // R31：外部销毁的弹窗先补注销，避免“幽灵弹窗”占用最上层。
+    // §23.5.6：同 Tab 的自动刷新保留滚动锚点，不把玩家从长列表中段弹回首卡。
+    const previous = this.shell;
+    const keepScroll = previous !== null && this.lastRenderedTab === this.activeTab;
+    const offset = keepScroll && previous ? previous.scrollView.getScrollOffset() : null;
+    pruneDialogs();
     this.clearPageContent();
     const s = this.state();
     if (s.phase === 'CREATING') {
@@ -1050,64 +1206,92 @@ export class AppView extends Component {
       this.renderInitialHiring();
     } else {
       this.renderMainShell();
-      if (s.phase === 'DISTRESS') this.renderDistressDialog();
+      this.lastRenderedTab = this.activeTab;
+      if (offset && offset.y > 0) {
+        this.scheduleOnce(() => {
+          if (!this.shell) return;
+          this.shell.scrollView.stopAutoScroll();
+          this.shell.scrollView.scrollToOffset(offset, 0);
+        }, 0);
+      }
+      this.refreshDetailFreshness();
+      this.ensureDistressNotice();
     }
+  }
+
+  private distressKey(s: GameState): string {
+    return `distress:${s.runId}:${s.gameYear}:${s.gameMonth}`;
+  }
+
+  /** R31：危机不叠层、不抢占正在阅读的详情；关闭详情后自动补弹，除非玩家已忽略该月。 */
+  private ensureDistressNotice(): void {
+    if (!this.bootStarted) return;
+    let s: GameState;
+    try {
+      s = this.state();
+    } catch {
+      return;
+    }
+    if (s.phase !== 'DISTRESS') return;
+    const key = this.distressKey(s);
+    if (this.distressAckKey === key) return;
+    if (findOpenDialog(key)) return;
+    if (hasOpenDialog()) return;
+    this.renderDistressDialog();
   }
 
   /** 经营困难弹窗：现金无法覆盖下月刚性费用，引导救助（一次性10万）。 */
   private renderDistressDialog(): void {
     const s = this.state();
+    const key = this.distressKey(s);
+    if (this.distressAckKey === key || findOpenDialog(key)) return;
     const risk = this.facade.assessRisk();
-    const overlay = this.modalOverlay();
-    createRect({ width: 320, height: 320, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '经营困难', fontSize: 20, bold: true, color: THEME.danger, parent: overlay }).setPosition(0, 122);
     const rescueHint = s.rescueCapitalUsed
       ? '救助资本已使用，无法再次领取。\n请裁员、降低工资支出或关闭公司重开。'
       : `当前现金 ${moneyText(risk.cash)}，下月必要支出约 ${moneyText(risk.nextMonthNeed)}。\n月结已暂停，时间不会继续推进。`;
-    createLabel({
-      text: rescueHint,
-      fontSize: 13,
-      color: THEME.text,
-      width: 266,
-      lineHeight: 22,
-      parent: overlay,
-    }).setPosition(0, 50);
-
-    if (!s.rescueCapitalUsed) {
-      createButton({
-        text: '领取 10 万元 CEO 救助资本',
-        width: 250,
-        height: 48,
-        color: THEME.secondary,
-        parent: overlay,
-        onClick: () => void this.onRescue(overlay),
-      }).setPosition(0, -56);
-    }
-    createButton({
-      text: '我再想想（去裁员/调整）',
-      width: 220,
-      height: 42,
-      fontSize: 13,
-      color: Color.WHITE,
-      textColor: THEME.text,
-      parent: overlay,
-      onClick: () => overlay.destroy(),
-    }).setPosition(0, -112);
-  }
-
-  private async onRescue(overlay: Node): Promise<void> {
-    const s = this.state();
-    const r = await this.facade.injectRescueCapital({
-      commandId: nextCommandId('rescue'),
-      expectedRunId: s.runId,
+    const handle = openConfirmDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '经营困难',
+      danger: true,
+      message: rescueHint,
+      width: 320,
+      desiredBodyHeight: 120,
+      confirmText: s.rescueCapitalUsed ? '去人事页裁员/调整' : '领取 10 万元 CEO 救助资本',
+      cancelText: '我再想想（稍后处理）',
+      session: { semanticKey: key, kind: 'blocking-recovery', policy: 'recovery', owner: this.dialogOwner() },
+      onConfirm: async (dialog) => {
+        if (s.rescueCapitalUsed) {
+          this.activeTab = 'TALENT';
+          dialog.close();
+          this.render();
+          return;
+        }
+        const r = await this.facade.injectRescueCapital({
+          commandId: nextCommandId('rescue'),
+          expectedRunId: s.runId,
+        });
+        if (!r.ok) {
+          if (r.code === 'RUN_CHANGED') {
+            dialog.blockSubmit('本局已切换，旧救助意图失效；请关闭窗口后在新局面重新操作。');
+            return;
+          }
+          dialog.fail(r.displayMessage);
+          return;
+        }
+        dialog.succeed();
+        this.toast(`已到账救助资本 ${moneyText(r.payload.amountYuan)}（不计收入/利润）`);
+        this.render();
+      },
+      onCancel: () => {
+        // 玩家主动忽略：本月不再自动弹，但保留入口，关闭后回到公司页可再次查看
+        this.distressAckKey = key;
+        this.render();
+      },
     });
-    overlay.destroy();
-    if (!r.ok) {
-      this.toast(r.displayMessage);
-      return;
-    }
-    this.toast(`已到账救助资本 ${moneyText(r.payload.amountYuan)}（不计收入/利润）`);
-    this.render();
+    handle.onClose(() => {
+      if (this.state().phase === 'DISTRESS') this.distressAckKey = key;
+    });
   }
 
   // ---------------------------------------------------------------- R27 创建页通用壳
@@ -2075,22 +2259,28 @@ export class AppView extends Component {
     createRect({ width: 375, height: 88, color: THEME.primary, radius: 0, parent: parent }).setPosition(0, 356);
     const nameNode = createLabel({
       text: company.name,
-      fontSize: 16,
+      fontSize: 15,
       bold: true,
       color: Color.WHITE,
       width: 238,
+      height: 34,
+      lineHeight: 17,
       align: 'left',
       parent: parent,
     });
-    nameNode.setPosition(-38, 372);
+    nameNode.setPosition(-38, 378);
     const nameLabel = nameNode.getComponent(Label);
-    if (nameLabel) nameLabel.overflow = Label.Overflow.CLAMP;
+    if (nameLabel) {
+      // 公司名最多 20 字：允许两行，超出才裁切；不再压住副标题
+      nameLabel.overflow = Label.Overflow.CLAMP;
+      nameLabel.enableWrapText = true;
+    }
     createLabel({
       text: `${INDUSTRY_LABELS[company.industry]} · 创业第 ${s.gameYear} 年 · 第 ${s.gameMonth} 月`,
       fontSize: 11,
       color: new Color(220, 230, 245),
       parent: parent,
-    }).setPosition(-38, 348);
+    }).setPosition(-38, 338);
     // 透明整块热区：长名不压设置，点按公司名查看完整档案
     createButton({
       text: '',
@@ -2104,7 +2294,7 @@ export class AppView extends Component {
     createButton({
       text: '设置',
       width: 56,
-      height: 40,
+      height: 48,
       fontSize: 12,
       color: new Color(255, 255, 255, 40),
       parent: parent,
@@ -2218,7 +2408,7 @@ export class AppView extends Component {
     createButton({
       text: '扩大产能（1万起）',
       width: 158,
-      height: 44,
+      height: 48,
       fontSize: 13,
       color: THEME.secondary,
       parent: actionCard,
@@ -2227,9 +2417,9 @@ export class AppView extends Component {
     createButton({
       text: '年度报告',
       width: 158,
-      height: 44,
+      height: 48,
       fontSize: 13,
-      color: Color.WHITE,
+      color: THEME.divider,
       textColor: THEME.primary,
       parent: actionCard,
       onClick: () => this.renderAnnualReport(),
@@ -2263,6 +2453,21 @@ export class AppView extends Component {
     if (s.phase === 'TUTORIAL_DASHBOARD') {
       this.renderStartOperatingBubble();
     }
+
+    // R31：忽略危机后的常驻入口（不自动再弹，但玩家可随时回到救助/裁员）
+    if (s.phase === 'DISTRESS') {
+      createButton({
+        text: '经营困难：查看救助 / 调整人员',
+        width: 343,
+        height: 48,
+        variant: 'danger',
+        parent: parent,
+        onClick: () => {
+          this.distressAckKey = null;
+          this.ensureDistressNotice();
+        },
+      }).setPosition(0, -190);
+    }
   }
 
   /** R28：公司完整档案（长名不被顶部栏裁切影响，完整名称在此查看）。 */
@@ -2277,9 +2482,18 @@ export class AppView extends Component {
       title: '公司档案',
       width: 336,
       desiredBodyHeight: 360,
+      session: { semanticKey: 'company-detail', kind: 'detail', owner: this.dialogOwner() },
     });
     const body = handle.body;
     const innerWidth = 336 - 40;
+    createLabel({
+      text: `数据截至：第 ${s.gameYear} 年 ${s.gameMonth} 月（月结快照）`,
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: innerWidth,
+      align: 'left',
+      parent: body,
+    });
     createLabel({
       text: company.name,
       fontSize: 16,
@@ -2424,7 +2638,7 @@ export class AppView extends Component {
       const node = createButton({
         text: label,
         width: 52,
-        height: 44,
+        height: 48,
         fontSize: 13,
         color: active ? THEME.primary : new Color(238, 241, 247),
         textColor: active ? Color.WHITE : THEME.textWeak,
@@ -2507,24 +2721,24 @@ export class AppView extends Component {
     });
 
     // 自动预算入口：门槛/安全线/可支配余量（真实查询）
-    createRect({ width: 343, height: 56, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 200);
+    createRect({ width: 343, height: 64, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 196);
     createLabel({
-      text: `自动预算｜${POLICY_META[vm.autoBudget.policy].name}：ROI≥${(vm.autoBudget.roiThresholdBps / 10_000).toFixed(1)}`
-        + `｜保留 ${vm.autoBudget.cashReserveMonths} 个月刚性费用｜可支配 ${compactMoney(vm.autoBudget.spendableYuan)}`,
+      text: `自动预算｜${POLICY_META[vm.autoBudget.policy].name}（ROI≥${(vm.autoBudget.roiThresholdBps / 10_000).toFixed(1)}）\n`
+        + `保留 ${vm.autoBudget.cashReserveMonths} 个月刚性费用｜可支配 ${compactMoney(vm.autoBudget.spendableYuan)}`,
       fontSize: 12,
       color: vm.autoBudget.spendableYuan > 0 ? THEME.textWeak : THEME.warning,
-      width: 232,
+      width: 210,
       lineHeight: 17,
       parent: parent,
-    }).setPosition(-48, 200);
+    }).setPosition(-60, 196);
     createButton({
       text: '预览',
       width: 76,
-      height: 44,
+      height: 48,
       fontSize: 13,
       parent: parent,
       onClick: () => this.openAutoBudgetDialog(),
-    }).setPosition(118, 200);
+    }).setPosition(125, 196);
 
     // 归因说明：历史账本无逐部门归因，数字只代表当月估算
     createLabel({
@@ -2561,7 +2775,7 @@ export class AppView extends Component {
         ? '尚未配置人员：无部门效益'
         : `系数 ${percentText(deptVm.effectBps)}｜${VALUE_KIND_TEXT[deptVm.valueKind]}`;
     const valueText = isBiz
-      ? `当月主营毛利 ${compactMoney(deptVm.estimatedMonthlyValueYuan)}`
+      ? `主营毛利 ${compactMoney(deptVm.estimatedMonthlyValueYuan)}`
       : `估算${VALUE_KIND_TEXT[deptVm.valueKind]} ${compactMoney(deptVm.estimatedMonthlyValueYuan)}`;
 
     createRect({ width: 343, height: 156, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
@@ -2594,7 +2808,8 @@ export class AppView extends Component {
       text: `${valueText}｜净贡献 ${compactMoney(deptVm.estimatedNetContributionYuan)}`,
       fontSize: 12,
       color: deptVm.estimatedNetContributionYuan >= 0 ? THEME.profit : THEME.danger,
-      width: 311,
+      width: 303,
+      lineHeight: 16,
       align: 'left',
       parent: parent,
     }).setPosition(-16, y - 18);
@@ -2602,34 +2817,38 @@ export class AppView extends Component {
     // 操作行：编制 / 招聘 / 详情（间距独立，不越卡）
     const dept = s.departments.find((d) => d.deptId === deptVm.deptId);
     if (!dept) return;
+    const actions = layoutActionRow(311, 3, BUTTON_BASELINE.gap);
+    const a0 = actions[0]!;
+    const a1 = actions[1]!;
+    const a2 = actions[2]!;
     createButton({
       text: deptVm.staffingMode === 'AUTO' ? '编制 自动' : '编制 手动',
-      width: 94,
-      height: 44,
+      width: a0.width,
+      height: 48,
       fontSize: 12,
       color: deptVm.staffingMode === 'AUTO' ? THEME.secondary : THEME.divider,
       textColor: deptVm.staffingMode === 'AUTO' ? Color.WHITE : THEME.text,
       parent: parent,
       onClick: () => void this.onToggleStaffing(dept),
-    }).setPosition(-105, y - 52);
+    }).setPosition(a0.x, y - 52);
     createButton({
       text: '招聘',
-      width: 76,
-      height: 44,
+      width: a1.width,
+      height: 48,
       fontSize: 12,
       parent: parent,
       onClick: () => this.openHireForDept(deptVm.deptId),
-    }).setPosition(-8, y - 52);
+    }).setPosition(a1.x, y - 52);
     createButton({
       text: '详情',
-      width: 76,
-      height: 44,
+      width: a2.width,
+      height: 48,
       fontSize: 12,
       color: Color.WHITE,
       textColor: THEME.text,
       parent: parent,
       onClick: () => this.openDeptDetail(deptVm.deptId),
-    }).setPosition(76, y - 52);
+    }).setPosition(a2.x, y - 52);
   }
 
   private renderUncreatedDept(parent: Node, u: UncreatedDeptVM, y: number): void {
@@ -2637,25 +2856,36 @@ export class AppView extends Component {
     createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
     createLabel({ text: meta.name, fontSize: 14, bold: true, width: 200, align: 'left', parent: parent }).setPosition(-60, y + 28);
     createLabel({
-      text: `${meta.desc}｜设立费 ${moneyText(u.feeYuan)}｜建后余额 ${compactMoney(u.cashAfterYuan)}`,
+      text: meta.desc,
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: 214,
+      lineHeight: 16,
+      align: 'left',
+      parent: parent,
+    }).setPosition(-53, y + 6);
+    createLabel({
+      text: `设立费 ${moneyText(u.feeYuan)}｜建后余额 ${compactMoney(u.cashAfterYuan)}`,
       fontSize: 12,
       color: u.affordable ? THEME.textWeak : THEME.danger,
       width: 214,
+      lineHeight: 16,
       align: 'left',
       parent: parent,
-    }).setPosition(-53, y + 4);
+    }).setPosition(-53, y - 10);
     createLabel({
       text: u.affordable ? '默认手动编制，0 员工无部门效益' : '现金不足，无法设立',
       fontSize: 12,
       color: u.affordable ? THEME.textWeak : THEME.danger,
       width: 214,
+      lineHeight: 16,
       align: 'left',
       parent: parent,
-    }).setPosition(-53, y - 20);
+    }).setPosition(-53, y - 26);
     createButton({
       text: u.affordable ? '创建' : '余额不足',
       width: 80,
-      height: 44,
+      height: 48,
       fontSize: 12,
       parent: parent,
       disabled: !u.affordable,
@@ -2748,17 +2978,31 @@ export class AppView extends Component {
     if (!dept || !dv || !vm) return;
     const isBiz = dv.type === 'BUSINESS';
     const name = isBiz ? '主营业务部' : SUPPORT_DEPT_META[dv.type as SupportDeptType].name;
+    const sessionKey = `dept-detail:${s.runId}:${deptId}:${this.contextEpoch}`;
     const handle = openScrollableDialog({
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
       title: `${name} · 详情`,
       width: 320,
       desiredBodyHeight: 430,
+      session: { semanticKey: sessionKey, kind: 'detail', owner: this.dialogOwner(deptId) },
     });
     const body = handle.body;
     const innerWidth = 288;
+    const asOfLabel = createLabel({ text: this.detailAsOfText(s), fontSize: 11, color: THEME.textWeak, width: innerWidth, align: 'left', parent: body });
+    const hintLabel = createLabel({
+      text: '数据已跨月更新；当月数字请点“更新数据”刷新，本窗口不重建。',
+      fontSize: 11,
+      color: THEME.warning,
+      width: innerWidth,
+      lineHeight: 16,
+      align: 'left',
+      parent: body,
+    });
+    hintLabel.active = false;
+    const lineNodes: Node[] = [];
     const addLine = (text: string, color = THEME.text, bold = false): void => {
-      createLabel({
+      const node = createLabel({
         text,
         fontSize: 12,
         bold,
@@ -2768,69 +3012,48 @@ export class AppView extends Component {
         align: 'left',
         parent: body,
       });
+      lineNodes.push(node);
     };
-
-    addLine(
-      isBiz
-        ? `职责：交付主营产能。当月产能 ${moneyText(vm.monthlyCapacityYuan)}，当月需求 ${moneyText(vm.monthlyPotentialOrderYuan)}，预计收入 ${moneyText(vm.projectedRevenueYuan)}。`
-        : `职责：${SUPPORT_DEPT_META[dv.type as SupportDeptType].desc}。${dv.headcount === 0 ? '当前 0 人，效益严格为 0。' : ''}`,
-      THEME.textWeak,
-    );
-    addLine(`在岗：${dv.headcount} 人｜月薪合计 ${moneyText(dv.monthlyPayrollYuan)}`);
-    addLine(
-      isBiz
-        ? `收入覆盖率：${percentText(dv.effectBps)}（预计收入 / 当月产能）`
-        : `部门系数：${percentText(dv.effectBps)}（${DEPT_EFFECT_TEXT[dv.type as SupportDeptType]}）`,
-    );
-    addLine(`当月估算效益：${moneyText(dv.estimatedMonthlyValueYuan)}（${VALUE_KIND_TEXT[dv.valueKind]}）`, THEME.profit);
-    addLine(`部门月薪成本：${moneyText(dv.monthlyPayrollYuan)}；估算净贡献：${moneyText(dv.estimatedNetContributionYuan)}`,
-      dv.estimatedNetContributionYuan >= 0 ? THEME.profit : THEME.danger);
-    if (!isBiz) {
-      addLine(`设立费：${moneyText(vm.setupFeeYuan)}（${dv.setupPaid ? '确认建部时已一次性支付' : '尚未支付'}）`, THEME.textWeak);
-    }
-    addLine(
-      '归因限制：月账只保存净费用，未按部门留存“历史节省”；所以本页数字均为当月估算，不代表历史已实现收益，也不会重复计入利润。',
-      THEME.textWeak,
-    );
-    addLine(
-      `编制模式：${dept.staffingMode === 'AUTO' ? '自动（自动招聘受 ROI/安全线约束）' : '手动锁定（自动决策不增删人员）'}。切换编制不产生费用，也永不自动裁员。`,
-      THEME.textWeak,
-    );
+    for (let i = 0; i < 8; i += 1) addLine('');
 
     // 建议人数：仅记录目标，减少目标不裁员、不退费
     const targetRow = new Node('TargetRow');
     targetRow.parent = body;
-    targetRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 44));
-    createLabel({
+    targetRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
+    const targetLabel = createLabel({
       text: `建议编制人数：${dv.targetCount} 人（仅建议，不自动裁员）`,
       fontSize: 12,
-      width: 170,
+      width: 176,
       align: 'left',
       parent: targetRow,
-    }).setPosition(-55, 0);
+    });
+    targetLabel.setPosition(-52, 0);
     createButton({
       text: '－',
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       fontSize: 14,
       color: THEME.divider,
       textColor: THEME.text,
       parent: targetRow,
       onClick: () => void this.changeTarget(deptId, -1, handle),
-    }).setPosition(70, 0);
+    }).setPosition(72, 0);
     createButton({
       text: '＋',
-      width: 44,
-      height: 44,
+      width: 48,
+      height: 48,
       fontSize: 14,
       parent: targetRow,
       onClick: () => void this.changeTarget(deptId, 1, handle),
-    }).setPosition(118, 0);
+    }).setPosition(122, 0);
 
-    createButton({
+    const row1 = layoutActionRow(288, 2, BUTTON_BASELINE.gap);
+    const r1a = row1[0]!;
+    const r1b = row1[1]!;
+    const staffingButton = createButton({
       text: dept.staffingMode === 'AUTO' ? '切为手动锁定' : '切为自动编制',
-      width: 136,
-      height: 46,
+      width: r1a.width,
+      height: 48,
       fontSize: 12,
       color: THEME.divider,
       textColor: THEME.text,
@@ -2840,15 +3063,95 @@ export class AppView extends Component {
           if (!handle.closed) handle.close();
         });
       },
-    }).setPosition(-72, 0);
+    });
+    staffingButton.setPosition(r1a.x, 30);
+    createButton({
+      text: '更新数据',
+      width: r1b.width,
+      height: 48,
+      fontSize: 13,
+      parent: handle.footer,
+      onClick: () => fill(),
+    }).setPosition(r1b.x, 30);
     createButton({
       text: '关闭',
-      width: 136,
-      height: 46,
+      width: 288,
+      height: 48,
       fontSize: 14,
       parent: handle.footer,
       onClick: () => handle.close(),
-    }).setPosition(72, 0);
+    }).setPosition(0, -30);
+
+    const fill = (): void => {
+      const latest = this.state();
+      const latestVm = this.facade.getDepartmentOverview();
+      const latestDept = latest.departments.find((d) => d.deptId === deptId);
+      const latestDv = latestVm?.departments.find((d) => d.deptId === deptId);
+      if (!latestDept || !latestDv || !latestVm) {
+        handle.setError('该部门已不存在，可能已随本局重置。');
+        return;
+      }
+      const biz = latestDv.type === 'BUSINESS';
+      const texts: Array<[string, Color, boolean]> = [
+        [
+          biz
+            ? `职责：交付主营产能。当月产能 ${moneyText(latestVm.monthlyCapacityYuan)}，当月需求 ${moneyText(latestVm.monthlyPotentialOrderYuan)}，预计收入 ${moneyText(latestVm.projectedRevenueYuan)}。`
+            : `职责：${SUPPORT_DEPT_META[latestDv.type as SupportDeptType].desc}。${latestDv.headcount === 0 ? '当前 0 人，效益严格为 0。' : ''}`,
+          THEME.textWeak,
+          false,
+        ],
+        [`在岗：${latestDv.headcount} 人｜月薪合计 ${moneyText(latestDv.monthlyPayrollYuan)}`, THEME.text, false],
+        [
+          biz
+            ? `收入覆盖率：${percentText(latestDv.effectBps)}（预计收入 / 当月产能）`
+            : `部门系数：${percentText(latestDv.effectBps)}（${DEPT_EFFECT_TEXT[latestDv.type as SupportDeptType]}）`,
+          THEME.text,
+          false,
+        ],
+        [`当月估算效益：${moneyText(latestDv.estimatedMonthlyValueYuan)}（${VALUE_KIND_TEXT[latestDv.valueKind]}）`, THEME.profit, false],
+        [
+          `部门月薪成本：${moneyText(latestDv.monthlyPayrollYuan)}；估算净贡献：${moneyText(latestDv.estimatedNetContributionYuan)}`,
+          latestDv.estimatedNetContributionYuan >= 0 ? THEME.profit : THEME.danger,
+          false,
+        ],
+        [
+          biz ? '' : `设立费：${moneyText(latestVm.setupFeeYuan)}（${latestDv.setupPaid ? '确认建部时已一次性支付' : '尚未支付'}）`,
+          THEME.textWeak,
+          false,
+        ],
+        [
+          '归因限制：月账只保存净费用，未按部门留存“历史节省”；所以本页数字均为当月估算，不代表历史已实现收益，也不会重复计入利润。',
+          THEME.textWeak,
+          false,
+        ],
+        [
+          `编制模式：${latestDept.staffingMode === 'AUTO' ? '自动（自动招聘受 ROI/安全线约束）' : '手动锁定（自动决策不增删人员）'}。切换编制不产生费用，也永不自动裁员。`,
+          THEME.textWeak,
+          false,
+        ],
+      ];
+      texts.forEach(([text, color, bold], index) => this.setLabelText(lineNodes[index]!, text, color, bold));
+      this.setLabelText(targetLabel, `建议编制人数：${latestDv.targetCount} 人（仅建议，不自动裁员）`);
+      setButtonLabel(staffingButton, latestDept.staffingMode === 'AUTO' ? '切为手动锁定' : '切为自动编制');
+      this.setLabelText(asOfLabel, this.detailAsOfText(latest));
+      hintLabel.active = false;
+    };
+
+    fill();
+    this.detailSessions.push({
+      key: sessionKey,
+      employeeId: `dept:${deptId}`,
+      asOfYear: s.gameYear,
+      asOfMonth: s.gameMonth,
+      notified: false,
+      notify: () => {
+        if (!handle.closed) hintLabel.active = true;
+      },
+      alive: () => !handle.closed,
+    });
+    handle.onClose = () => {
+      this.detailSessions = this.detailSessions.filter((item) => item.key !== sessionKey);
+    };
   }
 
   private async changeTarget(deptId: string, delta: number, handle: DialogHandle): Promise<void> {
@@ -2884,6 +3187,7 @@ export class AppView extends Component {
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
       title: `创建${SUPPORT_DEPT_META[type].name}？`,
+      session: { semanticKey: `create-dept:${originRunId}:${type}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner(type) },
       message:
         `${SUPPORT_DEPT_META[type].desc}\n` +
         `设立费：${moneyText(p.feeYuan)}（确认即扣现金）\n` +
@@ -2897,8 +3201,8 @@ export class AppView extends Component {
         const r = await this.facade.createDepartment(type, { commandId, expectedRunId: originRunId });
         if (!r.ok) {
           if (r.code === 'RUN_CHANGED') {
-            dialog.succeed();
-            this.toast(r.displayMessage);
+            // 旧 run 的建部意图永久失效：不自动关框、不重开，只锁定提交
+            dialog.blockSubmit(r.displayMessage);
             return;
           }
           dialog.fail(r.displayMessage);
@@ -2987,6 +3291,7 @@ export class AppView extends Component {
       createButton({
         text: '详情',
         width: 56,
+        height: 48,
         fontSize: 12,
         parent: card,
         onClick: () => {
@@ -3053,16 +3358,7 @@ export class AppView extends Component {
     const s = this.state();
     const emp = s.employees.find((e) => e.employeeId === employeeId);
     if (!emp) return;
-    const dept = s.departments.find((d) => d.deptId === emp.departmentId);
-    const deptName = dept ? this.deptLabel(dept.type) : '—';
-    const monthIndex = (s.gameYear - 1) * 12 + (s.gameMonth - 1);
-    const tenureMonths = Math.max(1, monthIndex - emp.hiredAtMonthIndex + 1);
-    const hiredYear = Math.floor(emp.hiredAtMonthIndex / 12) + 1;
-    const hiredMonth = (emp.hiredAtMonthIndex % 12) + 1;
-    const pendingDept = emp.pendingDepartmentId
-      ? s.departments.find((d) => d.deptId === emp.pendingDepartmentId)
-      : null;
-
+    const snapshotKey = `employee:${s.runId}:${employeeId}:${this.contextEpoch}`;
     const handle = openScrollableDialog({
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
@@ -3070,65 +3366,192 @@ export class AppView extends Component {
       subtitle: emp.name,
       width: 330,
       desiredBodyHeight: 420,
+      session: { semanticKey: snapshotKey, kind: 'detail', owner: this.dialogOwner(employeeId) },
     });
+    if (handle.closed) return;
+
     const body = handle.body;
-    const line = (text: string, color = THEME.text, bold = false, size = 13) => {
-      createLabel({ text, fontSize: size, bold, color, width: 292, lineHeight: 22, align: 'left', parent: body });
+    const asOfLabel = createLabel({
+      text: this.detailAsOfText(s),
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: 292,
+      align: 'left',
+      parent: body,
+    });
+    const updateHint = createLabel({
+      text: '月结快照：月中发生的变化不会自动改写本窗口',
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: 292,
+      align: 'left',
+      parent: body,
+    });
+
+    const salaryLabel = createLabel({ text: '', fontSize: 15, bold: true, width: 292, lineHeight: 22, align: 'left', parent: body });
+    const attrLabel = createLabel({ text: '', fontSize: 13, width: 292, lineHeight: 22, align: 'left', parent: body });
+    const tenureLabel = createLabel({ text: '', fontSize: 13, width: 292, lineHeight: 22, align: 'left', parent: body });
+    const stateLabel = createLabel({ text: '', fontSize: 13, width: 292, lineHeight: 22, align: 'left', parent: body });
+
+    const fill = (note?: string): void => {
+      const latest = this.state();
+      const latestEmp = latest.employees.find((e) => e.employeeId === employeeId);
+      const dept = latest.departments.find((d) => d.deptId === latestEmp?.departmentId);
+      const deptName = dept ? this.deptLabel(dept.type) : '—';
+      const monthIndex = (latest.gameYear - 1) * 12 + (latest.gameMonth - 1);
+      const pendingDept = latestEmp?.pendingDepartmentId
+        ? latest.departments.find((d) => d.deptId === latestEmp.pendingDepartmentId)
+        : null;
+      const asOf = this.detailAsOfText(latest);
+      this.setLabelText(asOfLabel, note ? `${asOf}\n${note}` : asOf);
+      if (!latestEmp) {
+        this.setLabelText(salaryLabel, '员工已不在当前名册');
+        this.setLabelText(attrLabel, '可能已离岗；本窗口不再展示旧能力/薪资。');
+        this.setLabelText(tenureLabel, '');
+        this.setLabelText(stateLabel, '状态：已离岗（以最新月结为准）');
+        setButtonEnabled(transferButton, false);
+        setButtonEnabled(layoffButton, false);
+        return;
+      }
+      this.setLabelText(salaryLabel, `${deptName}｜月薪 ${moneyText(latestEmp.salaryMonthlyYuan)}`);
+      this.setLabelText(attrLabel, `能力 ${latestEmp.skill}｜潜力 ${latestEmp.potential}｜协作 ${latestEmp.teamwork}`);
+      const tenureMonths = Math.max(1, monthIndex - latestEmp.hiredAtMonthIndex + 1);
+      const hiredYear = Math.floor(latestEmp.hiredAtMonthIndex / 12) + 1;
+      const hiredMonth = (latestEmp.hiredAtMonthIndex % 12) + 1;
+      this.setLabelText(
+        tenureLabel,
+        `入职 ${tenureMonths} 个月（第 ${hiredYear} 年 ${hiredMonth} 月入职）`,
+      );
+      this.setLabelText(
+        stateLabel,
+        latestEmp.status === 'PENDING_DISMISSAL'
+          ? '状态：次月离岗（补偿已支付，本月仍计薪/计产能）'
+          : pendingDept
+            ? `状态：调岗下月生效 → ${this.deptLabel(pendingDept.type)}（当月仍按原部门计薪）`
+            : '状态：在职',
+      );
+      const color =
+        latestEmp.status === 'PENDING_DISMISSAL' ? THEME.danger : pendingDept ? THEME.warning : THEME.textWeak;
+      stateLabel.getComponent(Label)!.color = color;
+      const active = latestEmp.status === 'ACTIVE';
+      setButtonEnabled(transferButton, active);
+      setButtonEnabled(layoffButton, active);
     };
-    line(`${deptName}｜月薪 ${moneyText(emp.salaryMonthlyYuan)}`, THEME.text, true, 15);
-    line(`能力 ${emp.skill}｜潜力 ${emp.potential}｜协作 ${emp.teamwork}`);
-    line(`入职 ${tenureMonths} 个月（第 ${hiredYear} 年 ${hiredMonth} 月入职）`);
-    line(
-      emp.status === 'PENDING_DISMISSAL'
-        ? '状态：次月离岗（补偿已支付，本月仍计薪/计产能）'
-        : pendingDept
-          ? `状态：调岗下月生效 → ${this.deptLabel(pendingDept.type)}（当月仍按原部门计薪）`
-          : '状态：在职',
-      emp.status === 'PENDING_DISMISSAL' ? THEME.danger : pendingDept ? THEME.warning : THEME.textWeak,
-    );
-    line('调岗：下月生效，无招聘费/赔偿；当月不重复计工资与产能。', THEME.textWeak);
-    line('裁员：仅玩家主动触发；补偿月数按在职年数计算，次月起停薪停产能，系统永不自动裁员。', THEME.textWeak);
-    createButton({
+
+    const row1 = layoutActionRow(292, 2, BUTTON_BASELINE.gap);
+    const r1a = row1[0]!;
+    const r1b = row1[1]!;
+    const transferButton = createButton({
       text: '调岗',
-      width: 96,
-      fontSize: 14,
+      width: r1a.width,
+      height: 48,
+      variant: 'secondary',
       color: THEME.secondary,
       parent: handle.footer,
       onClick: () => {
-        handle.close();
         const current = this.state().employees.find((e) => e.employeeId === employeeId);
         if (!current || current.status !== 'ACTIVE') {
           this.toast('该员工已进入离岗流程，不能调岗');
+          fill();
           return;
         }
+        handle.close();
         this.openTransfer(employeeId);
       },
-    }).setPosition(-100, 0);
-    createButton({
+    });
+    transferButton.setPosition(r1a.x, 30);
+    const layoffButton = createButton({
       text: '裁员',
-      width: 96,
-      fontSize: 14,
+      width: r1b.width,
+      height: 48,
+      variant: 'danger',
       color: THEME.danger,
       parent: handle.footer,
       onClick: () => {
-        handle.close();
         const current = this.state().employees.find((e) => e.employeeId === employeeId);
         if (!current || current.status !== 'ACTIVE') {
           this.toast('该员工已进入离岗流程，不能重复裁员');
+          fill();
           return;
         }
+        handle.close();
         this.openLayoffConfirm(employeeId);
       },
-    }).setPosition(0, 0);
-    createButton({
+    });
+    layoffButton.setPosition(r1b.x, 30);
+    const row2 = layoutActionRow(292, 2, BUTTON_BASELINE.gap);
+    const r2a = row2[0]!;
+    const r2b = row2[1]!;
+    const refreshButton = createButton({
+      text: '更新数据',
+      width: r2a.width,
+      height: 48,
+      variant: 'secondary',
+      color: Color.WHITE,
+      textColor: THEME.text,
+      parent: handle.footer,
+      onClick: () => {
+        fill(`已手动刷新至 ${this.detailAsOfText(this.state())}`);
+        updateHint.active = false;
+      },
+    });
+    refreshButton.setPosition(r2a.x, -30);
+    const closeButton = createButton({
       text: '关闭',
-      width: 76,
-      fontSize: 13,
+      width: r2b.width,
+      height: 48,
+      variant: 'secondary',
       color: Color.WHITE,
       textColor: THEME.text,
       parent: handle.footer,
       onClick: () => handle.close(),
-    }).setPosition(100, 0);
+    });
+    closeButton.setPosition(r2b.x, -30);
+    fill();
+
+    // R31：跨月只提示一次；不接受自动换行/跳动，玩家点“更新数据”才重取 VM
+    const refreshSession = {
+      key: snapshotKey,
+      employeeId,
+      asOfYear: s.gameYear,
+      asOfMonth: s.gameMonth,
+      notified: false,
+      notify: () => {
+        updateHint.active = true;
+        this.setLabelText(updateHint, '数据已更新：本月有新变化，点“更新数据”查看最新');
+      },
+      alive: () => !handle.closed,
+    };
+    this.detailSessions.push(refreshSession);
+    handle.onClose(() => {
+      this.detailSessions = this.detailSessions.filter((item) => item.key !== snapshotKey);
+    });
+  }
+
+  /** 统一设置 Label 文本（空串安全）；可选同步颜色/加粗。 */
+  private setLabelText(node: Node, text: string, color?: Color, bold?: boolean): void {
+    const label = node.getComponent(Label);
+    if (!label) return;
+    label.string = text;
+    if (color) label.color = color;
+    if (bold !== undefined) label.isBold = bold;
+  }
+
+  private detailAsOfText(s: GameState): string {
+    return `数据截至：第 ${s.gameYear} 年 ${s.gameMonth} 月（月结快照）`;
+  }
+
+  /** R31：已打开详情遇到新月份时只提示一次，不自动刷新内容。 */
+  private refreshDetailFreshness(): void {
+    for (const session of this.detailSessions) {
+      if (!session.alive()) continue;
+      const s = this.state();
+      if (session.notified) continue;
+      if (s.gameYear !== session.asOfYear || s.gameMonth !== session.asOfMonth) {
+        session.notified = true;
+        session.notify();
+      }
+    }
   }
 
   private openTransfer(employeeId: string): void {
@@ -3143,6 +3566,7 @@ export class AppView extends Component {
       subtitle: `${emp.name}：下月生效，当月仍按原部门计薪`,
       width: 330,
       desiredBodyHeight: 380,
+      session: { semanticKey: `transfer-targets:${s.runId}:${employeeId}:${this.contextEpoch}`, kind: 'form', owner: this.dialogOwner(employeeId) },
     });
     if (targets.length === 0) {
       createLabel({
@@ -3161,6 +3585,8 @@ export class AppView extends Component {
       createButton({
         text: `调入 ${this.deptLabel(target.type)}（${impact.toHeadcountBefore}→${impact.toHeadcountAfter} 人）`,
         width: 292,
+        height: 48,
+        variant: 'secondary',
         fontSize: 13,
         color: THEME.secondary,
         parent: handle.body,
@@ -3172,8 +3598,9 @@ export class AppView extends Component {
     }
     createButton({
       text: '取消',
-      width: 120,
-      fontSize: 13,
+      width: 240,
+      height: 48,
+      variant: 'secondary',
       color: Color.WHITE,
       textColor: THEME.text,
       parent: handle.footer,
@@ -3210,12 +3637,17 @@ export class AppView extends Component {
       desiredBodyHeight: 220,
       confirmText: '确认调岗（下月生效）',
       busyText: '处理中…',
+      session: { semanticKey: `transfer:${originRunId}:${employeeId}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner(employeeId) },
       onConfirm: async (dialog) => {
         const r = await this.facade.transferEmployee(employeeId, toDeptId, {
           commandId,
           expectedRunId: originRunId,
         });
         if (!r.ok) {
+          if (r.code === 'RUN_CHANGED') {
+            dialog.blockSubmit('本局已切换，旧调岗意图失效；请关闭窗口后在新局面重新操作。');
+            return;
+          }
           dialog.fail(r.displayMessage);
           return;
         }
@@ -3225,39 +3657,59 @@ export class AppView extends Component {
       },
     });
   }
-
   private openLayoffConfirm(employeeId: string): void {
-    const pv = this.facade.previewLayoff(employeeId, Date.now());
-    // token 与 commandId 在开框时固定：连点只产生一次补偿，超时须重新查看金额
-    const token = this.facade.createLayoffToken(pv, Date.now());
-    const commandId = nextCommandId('layoff');
+    let pv = this.facade.previewLayoff(employeeId, Date.now());
+    // token 与 commandId 在开框时固定：连点只产生一次补偿；过期必须手动重新预览
+    let token = this.facade.createLayoffToken(pv, Date.now());
+    let commandId = nextCommandId('layoff');
     const originRunId = this.state().runId;
     const capacityLoss = this.facade.getLayoffCapacityLoss(employeeId) ?? 0;
-    const insufficient = pv.cashAfterYuan < 0;
-    openConfirmDialog({
-      overlay: this.modalOverlay(),
-      viewportHeight: this.shellLayout().viewportHeight,
-      title: '确认裁员？',
-      danger: true,
-      message:
+
+    const buildMessage = (): string => {
+      const insufficient = pv.cashAfterYuan < 0;
+      return (
         `员工：${pv.name}\n任职：${pv.tenureYears} 年（${pv.tenureMonths} 个月）\n` +
         `月薪：${moneyText(pv.salaryMonthlyYuan)}\n补偿月数：${pv.severanceMonths} 个月\n\n` +
         `补偿金额：${moneyText(pv.severanceYuan)}（确认即支付）\n` +
         `当月主营产能：${capacityLoss > 0 ? `-${moneyText(capacityLoss)}/月` : '不涉及（非主营员工）'}\n` +
         `次年约节约工资：${moneyText(pv.nextYearSalarySavingYuan)}\n` +
         `裁后现金：${moneyText(pv.cashAfterYuan)}` +
-        (insufficient ? '\n现金不足以支付补偿，请先回笼资金。' : ''),
+        (insufficient ? '\n现金不足以支付补偿，请先回笼资金。' : '')
+      );
+    };
+
+    const handle = openConfirmDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '确认裁员？',
+      danger: true,
+      message: buildMessage(),
       width: 312,
       desiredBodyHeight: 220,
-      confirmEnabled: !insufficient,
+      confirmEnabled: pv.cashAfterYuan >= 0,
       confirmText: `确认支付补偿 ${moneyText(pv.severanceYuan)}`,
       busyText: '处理中…',
+      session: { semanticKey: `layoff:${originRunId}:${employeeId}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner(employeeId) },
+      onRefreshPreview: async () => {
+        pv = this.facade.previewLayoff(employeeId, Date.now());
+        token = this.facade.createLayoffToken(pv, Date.now());
+        commandId = nextCommandId('layoff');
+        return {
+          message: buildMessage(),
+          confirmText: `确认支付补偿 ${moneyText(pv.severanceYuan)}`,
+          confirmEnabled: pv.cashAfterYuan >= 0,
+        };
+      },
       onConfirm: async (dialog) => {
         const r = await this.facade.confirmLayoff(token, { commandId, expectedRunId: originRunId });
         if (!r.ok) {
-          if (r.code === 'CONFIRMATION_EXPIRED' || r.code === 'RUN_CHANGED') {
-            dialog.succeed();
-            this.toast(r.displayMessage);
+          if (r.code === 'CONFIRMATION_EXPIRED') {
+            // §23.5：过期不得自动关框；保留内容，改为手动重新预览
+            dialog.markExpired('确认已过期（超过 60 秒），金额可能变化；请点“重新预览”后再确认。');
+            return;
+          }
+          if (r.code === 'RUN_CHANGED') {
+            dialog.blockSubmit('本局已切换，旧裁员意图失效；请关闭窗口后在新局面重新操作。');
             return;
           }
           dialog.fail(r.displayMessage);
@@ -3269,6 +3721,9 @@ export class AppView extends Component {
         if (this.state().runId === originRunId) this.render();
       },
     });
+    if (pv.cashAfterYuan < 0) {
+      handle.setError('现金不足以支付补偿，请先回笼资金后再裁员。');
+    }
   }
 
   private openHireForDept(deptId: string): void {
@@ -3360,36 +3815,51 @@ export class AppView extends Component {
   // ---------------------------------------------------------------- 排行榜
 
   private renderRankTab(parent: Node): void {
-    createLabel({ text: '本地模拟排行', fontSize: 22, bold: true, color: THEME.text, parent: parent }).setPosition(0, 336);
+    createLabel({ text: '本地模拟排行', fontSize: 20, bold: true, color: THEME.text, parent: parent }).setPosition(0, 352);
 
+    const rankItems = layoutActionRow(220, 2, BUTTON_BASELINE.gap);
+    const assetsItem = rankItems[0]!;
+    const yearsItem = rankItems[1]!;
     createButton({
       text: '资产榜',
-      width: 100,
-      height: 38,
+      width: assetsItem.width,
+      height: 48,
       fontSize: 14,
       color: this.rankMode === 'assets' ? THEME.primary : THEME.divider,
       textColor: this.rankMode === 'assets' ? Color.WHITE : THEME.text,
       parent,
       onClick: () => { this.rankMode = 'assets'; this.render(); },
-    }).setPosition(-58, 315);
+    }).setPosition(assetsItem.x, 306);
     createButton({
       text: '年限榜',
-      width: 100,
-      height: 38,
+      width: yearsItem.width,
+      height: 48,
       fontSize: 14,
       color: this.rankMode === 'years' ? THEME.primary : THEME.divider,
       textColor: this.rankMode === 'years' ? Color.WHITE : THEME.text,
       parent,
       onClick: () => { this.rankMode = 'years'; this.render(); },
-    }).setPosition(58, 315);
+    }).setPosition(yearsItem.x, 306);
 
+    // §23.8：真实榜必须明确状态；配置/授权不完整时不得伪装成可用的在线排名
+    const boardId = this.rankMode === 'assets' ? this.leaderboardConfig?.assetsBoardId : this.leaderboardConfig?.yearsBoardId;
     if (this.leaderboardConfig?.enabled && this.leaderboardConsent) {
-      createButton({ text: 'TapTap公开榜', width: 138, height: 36, fontSize: 12, parent,
+      createButton({ text: '打开TapTap公开榜', width: 200, height: 48, fontSize: 12, parent,
         onClick: () => {
-          const id = this.rankMode === 'assets' ? this.leaderboardConfig?.assetsBoardId : this.leaderboardConfig?.yearsBoardId;
-          if (!id) { this.toast('真实榜单尚未配置'); return; }
-          void new TapLeaderboardProvider().open(id).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用'); });
-        } }).setPosition(0, 275);
+          if (!boardId) { this.toast('真实榜单缺少后台榜 ID'); return; }
+          void new TapLeaderboardProvider().open(boardId).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用（需后台白名单/登录态）'); });
+        } }).setPosition(0, 266);
+    } else {
+      createLabel({
+        text: this.leaderboardConfig?.enabled
+          ? '真实榜已配置，需在设置开启“公开榜单同步”'
+          : '真实榜未启用（缺后台榜 ID/白名单），以下为本地模拟',
+        fontSize: 12,
+        color: THEME.textWeak,
+        width: 300,
+        lineHeight: 17,
+        parent,
+      }).setPosition(0, 266);
     }
 
     const rows = this.rankMode === 'assets'
@@ -3401,31 +3871,32 @@ export class AppView extends Component {
       fontSize: 12,
       color: THEME.textWeak,
       parent,
-    }).setPosition(0, 245);
+    }).setPosition(0, 234);
     const playerRank = rows.findIndex((r) => r.isPlayer) + 1;
     const player = rows.find((r) => r.isPlayer);
     createLabel({
       text: player
-        ? `我方 第 ${playerRank}/${rows.length} 名｜资产 ${moneyText(player.assetsYuan)}｜经营 ${player.yearsOperated} 年`
+        ? `我方 第 ${playerRank}/${rows.length} 名\n资产 ${moneyText(player.assetsYuan)}｜经营 ${player.yearsOperated} 年`
         : '创建公司后显示我方名次',
       fontSize: 12,
       color: player ? THEME.primary : THEME.textWeak,
-      width: 245,
+      width: 210,
       parent,
-    }).setPosition(-48, 220);
+    }).setPosition(-58, 202);
     if (player && playerRank > 0) {
       createButton({
         text: '定位我方',
-        width: 92,
+        width: 84,
+        height: 48,
         fontSize: 12,
         parent,
         onClick: () => this.shell?.scrollView.scrollToOffset(new Vec2(0, Math.max(0, (playerRank - 1) * 52 - 120)), 0.25),
-      }).setPosition(132, 192);
+      }).setPosition(120, 202);
     }
 
     // Render the complete local table; the enclosing PageShell scrolls long lists.
     rows.forEach((row, i) => {
-      const y = 150 - i * 52;
+      const y = 156 - i * 52;
       createRect({
         width: 343,
         height: 46,
@@ -3434,22 +3905,29 @@ export class AppView extends Component {
         parent,
       }).setPosition(0, y);
       createLabel({ text: `${i + 1}`, fontSize: 14, bold: true, width: 26, color: i < 3 ? THEME.warning : THEME.textWeak, parent }).setPosition(-153, y);
-      createLabel({
+      const nameNode = createLabel({
         text: row.isPlayer ? `${row.name}（你）` : row.name,
         fontSize: 12,
         bold: row.isPlayer,
-        width: 128,
+        width: 108,
         align: 'left',
         color: row.isPlayer ? THEME.primary : THEME.text,
         parent,
-      }).setPosition(-43, y);
+      });
+      nameNode.setPosition(-48, y);
+      const nameLabel = nameNode.getComponent(Label);
+      if (nameLabel) {
+        nameLabel.overflow = Label.Overflow.CLAMP;
+        nameLabel.enableWrapText = false;
+      }
       const metric = this.rankMode === 'assets'
         ? moneyText(row.assetsYuan)
         : `${row.yearsOperated} 年`;
-      createLabel({ text: metric, fontSize: 12, width: 80, align: 'right', color: THEME.text, parent }).setPosition(54, y);
+      createLabel({ text: metric, fontSize: 12, width: 78, align: 'right', color: THEME.text, parent }).setPosition(62, y);
       createButton({
         text: '详情',
-        width: 44,
+        width: 56,
+        height: 48,
         fontSize: 12,
         parent,
         onClick: () => {
@@ -3460,13 +3938,18 @@ export class AppView extends Component {
             subtitle: `第 ${i + 1} 名`,
             width: 316,
             desiredBodyHeight: 220,
+            session: {
+              semanticKey: `rank-detail:${this.state().runId}:${this.rankMode}:${i}:${this.contextEpoch}`,
+              kind: 'detail',
+              owner: this.dialogOwner(),
+            },
           });
           createLabel({ text: `企业：${row.name}`, fontSize: 14, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `总资产：${moneyText(row.assetsYuan)}（现金 + 未折旧业务资产）`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `经营年限：${row.yearsOperated} 年`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
-          createButton({ text: '关闭', width: 240, height: 46, parent: dialog.footer, onClick: () => dialog.close() }).setPosition(0, 0);
+          createButton({ text: '关闭', width: 240, height: 48, parent: dialog.footer, onClick: () => dialog.close() }).setPosition(0, 0);
         },
-      }).setPosition(140, y);
+      }).setPosition(141, y);
     });
   }
 
@@ -3530,6 +4013,7 @@ export class AppView extends Component {
       title: '扩大主营业务产能',
       width: 336,
       desiredBodyHeight: 420,
+      session: { semanticKey: `invest:${s.runId}:${this.contextEpoch}`, kind: 'detail', owner: this.dialogOwner() },
     });
     const body = handle.body;
     const innerWidth = 336 - 40;
@@ -3694,6 +4178,11 @@ export class AppView extends Component {
       title: report ? `第 ${report.year} 年财务报告` : '年度财务报告',
       width: 324,
       desiredBodyHeight: 430,
+      session: {
+        semanticKey: `annual-report:${s.runId}:${selectedYear ?? 'none'}:${this.contextEpoch}`,
+        kind: 'detail',
+        owner: this.dialogOwner(),
+      },
     });
     const body = handle.body;
     const innerWidth = 324 - 40;
@@ -3702,10 +4191,14 @@ export class AppView extends Component {
       const index = years.indexOf(report.year);
       const navRow = new Node('AnnualReportYearSelector');
       navRow.parent = body;
-      navRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 46));
+      navRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
+      const navItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
+      const newer = navItems[0]!;
+      const older = navItems[1]!;
       createButton({
         text: '较新年度',
-        width: 116,
+        width: newer.width,
+        height: 48,
         fontSize: 12,
         disabled: index <= 0,
         parent: navRow,
@@ -3715,11 +4208,12 @@ export class AppView extends Component {
           this.annualReportYear = years[index - 1] ?? report.year;
           this.renderAnnualReport();
         },
-      }).setPosition(-82, 0);
+      }).setPosition(newer.x, 0);
       createLabel({ text: `第 ${report.year} 年`, fontSize: 13, bold: true, parent: navRow }).setPosition(0, 0);
       createButton({
         text: '较早年度',
-        width: 116,
+        width: older.width,
+        height: 48,
         fontSize: 12,
         disabled: index >= years.length - 1,
         parent: navRow,
@@ -3729,7 +4223,7 @@ export class AppView extends Component {
           this.annualReportYear = years[index + 1] ?? report.year;
           this.renderAnnualReport();
         },
-      }).setPosition(82, 0);
+      }).setPosition(older.x, 0);
     }
 
     if (!report) {
@@ -3744,7 +4238,7 @@ export class AppView extends Component {
       createButton({
         text: '知道了',
         width: 240,
-        height: 46,
+        height: 48,
         parent: handle.footer,
         onClick: () => handle.close(),
       }).setPosition(0, 0);
@@ -3848,7 +4342,7 @@ export class AppView extends Component {
     createButton({
       text: '关闭',
       width: 240,
-      height: 46,
+      height: 48,
       parent: handle.footer,
       onClick: () => handle.close(),
     }).setPosition(0, 0);
@@ -3857,133 +4351,221 @@ export class AppView extends Component {
   // ---------------------------------------------------------------- D04/D05 设置与关闭公司
 
   private renderSettings(): void {
-    const overlay = this.modalOverlay();
+    const s = this.state();
+    // §23.7：固定高度 560 改为“可滚动正文 + 固定操作区”，360×640 也能读到结尾
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '设置',
+      width: 330,
+      desiredBodyHeight: 430,
+      session: {
+        semanticKey: `settings:${s.runId}:${this.contextEpoch}`,
+        kind: 'notice',
+        owner: this.dialogOwner(),
+      },
+    });
+    const body = handle.body;
+    const innerWidth = 330 - 56;
     const audio = audioManager.getSettings();
-    createRect({ width: 320, height: 560, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '设置', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 198);
 
-    const toggle = (
-      y: number,
-      label: string,
-      on: boolean,
-      onToggle: () => void,
-    ): void => {
-      createLabel({ text: label, fontSize: 14, width: 180, align: 'left', parent: overlay }).setPosition(-60, y);
-      createButton({
+    const section = (text: string): void => {
+      createLabel({
+        text,
+        fontSize: 12,
+        bold: true,
+        color: THEME.textWeak,
+        width: innerWidth,
+        align: 'left',
+        parent: body,
+      });
+    };
+    const row = (): Node => {
+      const node = new Node('SettingsRow');
+      node.parent = body;
+      node.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
+      return node;
+    };
+    /** 开关就地更新：同一按钮框换文案与配色，不销毁重开弹窗。 */
+    const toggle = (label: string, on: boolean, onChange: (set: (value: boolean) => void) => void): void => {
+      const r = row();
+      createLabel({ text: label, fontSize: 13, width: innerWidth - 88, align: 'left', parent: r }).setPosition(-44, 0);
+      const button = createButton({
         text: on ? '开' : '关',
         width: 64,
-        height: 36,
-        fontSize: 14,
+        height: 48,
+        variant: 'toggle',
         color: on ? THEME.secondary : THEME.divider,
         textColor: on ? Color.WHITE : THEME.text,
-        parent: overlay,
-        onClick: onToggle,
-      }).setPosition(116, y);
+        parent: r,
+        onClick: () => onChange((value) => {
+          setButtonLabel(button, value ? '开' : '关');
+          setButtonLook(button, value ? THEME.secondary : THEME.divider, value ? Color.WHITE : THEME.text);
+        }),
+      });
+      button.setPosition(innerWidth / 2 - 32, 0);
     };
 
-    createLabel({ text: '声音', fontSize: 13, bold: true, color: THEME.textWeak, width: 260, align: 'left', parent: overlay }).setPosition(-20, 140);
-    const updateAudioSetting = (patch: Parameters<typeof audioManager.updateSettings>[0], sound: 'tap' | 'none'): void => {
-      if (!audioManager.updateSettings(patch)) {
+    section('声音');
+    toggle('总开关（关闭后全静音）', audio.masterEnabled, (set) => {
+      const a = audioManager.getSettings();
+      const next = !a.masterEnabled;
+      if (!audioManager.updateSettings({ masterEnabled: next })) {
         this.toast('声音设置保存失败，已恢复原设置');
-        this.rebuildSettings(overlay);
         return;
       }
-      if (sound === 'tap') audioManager.uiTap();
-      this.rebuildSettings(overlay);
-    };
-    toggle(100, '总开关（关闭后全静音）', audio.masterEnabled, () => {
-      const a = audioManager.getSettings();
-      updateAudioSetting({ masterEnabled: !a.masterEnabled }, 'tap');
+      set(next);
+      audioManager.uiTap();
     });
-    toggle(56, '背景音乐', audio.musicEnabled, () => {
+    toggle('背景音乐', audio.musicEnabled, (set) => {
       const a = audioManager.getSettings();
-      updateAudioSetting({ musicEnabled: !a.musicEnabled }, 'tap');
+      const next = !a.musicEnabled;
+      if (!audioManager.updateSettings({ musicEnabled: next })) {
+        this.toast('声音设置保存失败，已恢复原设置');
+        return;
+      }
+      set(next);
+      audioManager.uiTap();
     });
-    toggle(12, '操作音效/提示', audio.sfxEnabled, () => {
+    toggle('操作音效/提示', audio.sfxEnabled, (set) => {
       const a = audioManager.getSettings();
-      updateAudioSetting({ sfxEnabled: !a.sfxEnabled }, a.sfxEnabled ? 'none' : 'tap');
+      const next = !a.sfxEnabled;
+      if (!audioManager.updateSettings({ sfxEnabled: next })) {
+        this.toast('声音设置保存失败，已恢复原设置');
+        return;
+      }
+      set(next);
+      if (next) audioManager.uiTap();
     });
 
-    toggle(-30, '公开榜单同步（平台公开展示）', this.leaderboardConsent, () => {
+    section('排行榜');
+    toggle('公开榜单同步（平台公开展示）', this.leaderboardConsent && this.leaderboardConfig?.enabled === true, (set) => {
+      if (!this.leaderboardConfig?.enabled) {
+        this.toast('真实榜单配置尚未就绪（缺少后台榜 ID/白名单）');
+        return;
+      }
       const next = !this.leaderboardConsent;
-      if (next && !this.leaderboardConfig?.enabled) { this.toast('真实榜单配置尚未就绪'); return; }
       void this.platform?.set('ceo/leaderboard/consent/v1', next).then(() => {
         this.leaderboardConsent = next;
-        this.rebuildSettings(overlay);
-      }).catch(() => this.toast('榜单偏好保存失败'));
+        set(next);
+        this.toast(next ? '已开启公开榜单同步' : '已关闭公开榜单同步');
+      }).catch(() => this.toast('榜单偏好保存失败，原设置不变'));
     });
-    createLabel({ text: this.cloudStatusText, fontSize: 12, color: THEME.textWeak, width: 280, align: 'center', parent: overlay }).setPosition(0, -70);
+    createLabel({
+      text: this.leaderboardConfig?.enabled
+        ? '公开榜：已配置；开启后仅提交总资产/完成年限，本地模拟榜仍可离线使用。'
+        : '公开榜：未启用；本地模拟榜可离线使用，不冒充在线排名。',
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: innerWidth,
+      lineHeight: 18,
+      align: 'left',
+      parent: body,
+    });
 
-    createButton({
-      text: '重新查看操作指引',
-      width: 240,
-      height: 42,
-      fontSize: 13,
-      color: Color.WHITE,
-      textColor: THEME.primary,
-      parent: overlay,
-      onClick: () => {
-        overlay.destroy();
+    section('云备份');
+    createLabel({
+      text: `${this.cloudStatusText}\n云备份仅用于玩家自己的跨设备恢复，不提供运营后台查询。`,
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: innerWidth,
+      lineHeight: 18,
+      align: 'left',
+      parent: body,
+    });
+    const cloudRow = row();
+    const cloudItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
+    const cloudIds: Array<[string, () => void]> = [
+      ['备份到云', () => this.toast('云备份未就绪：需先完成平台账号绑定与云权限配置')],
+      ['恢复云档', () => this.toast('云恢复未就绪：需先完成平台账号绑定与云权限配置')],
+    ];
+    cloudIds.forEach(([text, action], index) => {
+      const item = cloudItems[index]!;
+      createButton({
+        text,
+        width: item.width,
+        height: 48,
+        variant: 'secondary',
+        color: THEME.divider,
+        textColor: THEME.text,
+        disabled: !this.cloudProfileBound,
+        parent: cloudRow,
+        onClick: action,
+      }).setPosition(item.x, 0);
+    });
+
+    section('帮助与合规');
+    const helpRow = row();
+    const helpItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
+    const helpIds: Array<[string, () => void]> = [
+      ['操作指引', () => {
+        handle.close();
         this.replayTutorial();
-      },
-    }).setPosition(0, -112);
-
-    createButton({
-      text: '隐私政策',
-      width: 240,
-      height: 40,
-      fontSize: 13,
-      color: Color.WHITE,
-      textColor: THEME.primary,
-      parent: overlay,
-      onClick: () => {
+      }],
+      ['隐私政策', () => {
         const url = getRuntimeConfig().privacyPolicyUrl;
         if (url) this.openPrivacyPolicy(url);
         else this.toast('隐私政策地址将在正式上架前配置');
-      },
-    }).setPosition(0, -154);
+      }],
+    ];
+    helpIds.forEach(([text, action], index) => {
+      const item = helpItems[index]!;
+      createButton({
+        text,
+        width: item.width,
+        height: 48,
+        variant: 'secondary',
+        color: Color.WHITE,
+        textColor: THEME.primary,
+        parent: helpRow,
+        onClick: action,
+      }).setPosition(item.x, 0);
+    });
+    createLabel({
+      text: '关闭公司将永久清除本局进度并重新创业；平台账号与合规记录不受影响。',
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: innerWidth,
+      lineHeight: 18,
+      align: 'left',
+      parent: body,
+    });
 
+    const footerItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
+    const closeCompany = footerItems[0]!;
+    const dismiss = footerItems[1]!;
     createButton({
-      text: '关闭公司并重新创业',
-      width: 240,
-      height: 42,
-      fontSize: 13,
+      text: '关闭公司',
+      width: closeCompany.width,
+      height: 48,
+      variant: 'secondary',
       color: Color.WHITE,
       textColor: THEME.danger,
-      parent: overlay,
+      parent: handle.footer,
       onClick: () => {
-        overlay.destroy();
+        handle.close();
         this.renderCloseConfirm();
       },
-    }).setPosition(0, -198);
-
+    }).setPosition(closeCompany.x, 0);
     createButton({
-      text: '取消',
-      width: 240,
-      height: 40,
-      color: THEME.textWeak,
-      parent: overlay,
-      onClick: () => overlay.destroy(),
-    }).setPosition(0, -242);
-  }
-
-  /**
-   * 设置弹窗内切换开关后重建弹窗自身（BUG-001）：
-   * 直接 this.render() 会重建整个页面并销毁弹窗，导致用户看到弹窗"消失"。
-   */
-  private rebuildSettings(overlay: Node): void {
-    this.scheduleOnce(() => {
-      if (!overlay.isValid) return;
-      overlay.destroy();
-      this.renderSettings();
-    }, 0);
+      text: '关闭',
+      width: dismiss.width,
+      height: 48,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(dismiss.x, 0);
   }
 
   /** 帮助重播（M3-05）：重新展示关键操作说明，不改变业务状态。 */
   private replayTutorial(): void {
-    const overlay = this.modalOverlay();
-    createRect({ width: 320, height: 360, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '操作指引', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 146);
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '操作指引',
+      width: 320,
+      desiredBodyHeight: 300,
+      session: { semanticKey: `tutorial:${this.contextEpoch}`, kind: 'notice', owner: this.dialogOwner() },
+    });
     createLabel({
       text:
         '公司页：实时现金/收入/利润、时间倍速、扩产与年报。\n' +
@@ -3996,58 +4578,77 @@ export class AppView extends Component {
       color: THEME.text,
       width: 272,
       lineHeight: 24,
-      parent: overlay,
-    }).setPosition(0, 20);
+      align: 'left',
+      parent: handle.body,
+    });
     createButton({
       text: '知道了',
-      width: 200,
-      height: 46,
-      parent: overlay,
-      onClick: () => overlay.destroy(),
-    }).setPosition(0, -132);
+      width: 240,
+      height: 48,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(0, 0);
   }
 
   private renderCloseConfirm(): void {
     const s = this.state();
     // 关司预览 token 在开框时固定；确认按钮只有一次意图，连点不重复清档
-    const preview = this.facade.beginCloseCompany(Date.now());
-    const { confirmationToken, expiresAtMs, oldRunId } = preview;
-    openConfirmDialog({
+    let preview = this.facade.beginCloseCompany(Date.now());
+    const buildMessage = (): string =>
+      `将永久清除本局：\n公司：${s.company?.name ?? ''}\n员工：${s.employees.length} 人\n现金：${moneyText(s.company?.cashYuan ?? 0)}\n已完成年度：${s.annualReports.length}\n\n` +
+      '此操作不可撤销，但不会注销你的平台账号。';
+    const handle = openConfirmDialog({
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
       title: '关闭公司并重来？',
       danger: true,
-      message:
-        `将永久清除本局：\n公司：${s.company?.name ?? ''}\n员工：${s.employees.length} 人\n现金：${moneyText(s.company?.cashYuan ?? 0)}\n已完成年度：${s.annualReports.length}\n\n` +
-        '此操作不可撤销，但不会注销你的平台账号。',
+      message: buildMessage(),
       width: 320,
       desiredBodyHeight: 190,
       confirmText: '永久清除本局',
       busyText: '正在清除…',
+      session: { semanticKey: `close-company:${s.runId}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner() },
+      onRefreshPreview: async () => {
+        preview = this.facade.beginCloseCompany(Date.now());
+        return {
+          message: buildMessage(),
+          confirmText: '永久清除本局',
+          confirmEnabled: this.state().runId === preview.oldRunId,
+        };
+      },
       onConfirm: async (dialog) => {
         const result = await this.facade.confirmCloseCompany(
-          { confirmationToken, expiresAtMs, oldRunId },
+          {
+            confirmationToken: preview.confirmationToken,
+            expiresAtMs: preview.expiresAtMs,
+            oldRunId: preview.oldRunId,
+          },
           Date.now(),
         );
         if (!result.ok) {
-          if (result.code === 'CONFIRMATION_EXPIRED' || result.code === 'RUN_CHANGED') {
-            // 预览已失效：关闭并让玩家重新看到最新摘要后再确认，绝不在旧凭据上重试
-            dialog.succeed();
-            this.toast(result.displayMessage);
-            if (result.code === 'CONFIRMATION_EXPIRED' && this.state().runId === oldRunId) {
-              this.renderCloseConfirm();
-            }
+          if (result.code === 'CONFIRMATION_EXPIRED') {
+            // §23.5：过期不得自动关框重开；保留原框，手动重新预览后再次确认
+            dialog.markExpired('确认已过期（超过 60 秒），本局数据可能已变化；请点“重新预览”后再确认。');
+            return;
+          }
+          if (result.code === 'RUN_CHANGED') {
+            dialog.blockSubmit('本局已切换，旧关闭意图失效；请关闭窗口后重新操作。');
             return;
           }
           dialog.fail(result.displayMessage);
           return;
         }
         dialog.succeed();
+        // 落盘成功后才推进上下文：旧快照、旧弹窗与迟到回调全部失效
         this.resetCreateStateAfterClose();
+        this.exitApplicationContext('context-invalidated');
         this.toast('公司已关闭，开始新的创业');
         this.render();
       },
     });
+    if (!handle.closed && this.state().runId !== preview.oldRunId) {
+      handle.blockSubmit('本局已切换，当前关闭预览已失效。');
+    }
   }
 
   /** 关司成功后清空创建向导临时选择（平台账号与合规记录不受影响）。 */
