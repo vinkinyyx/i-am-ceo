@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-06",
+  "verdict": "PARTIAL_NOT_READY",
+  "headAtReviewStart": "6e85b0841a5ad22890104bcac16982188814629d",
+  "headAtValidation": "3945f7ea3d2c80c074eb6cef2f23123fb6ee5514",
+  "reviewerPerformedCommitOrPush": false,
+  "concurrentCommitsObserved": [
+    "9c0e92c",
+    "3945f7e"
+  ],
+  "npmCheck": {
+    "exitCode": 0,
+    "testsPassed": 493,
+    "testsSkipped": 1,
+    "filesPassed": 64,
+    "filesSkipped": 1
+  },
+  "candidate": {
+    "releaseId": "m4-20261106-r31",
+    "version": "1.0.0",
+    "sha256": "8637011aa8f57220ad3aff2d0cc9b4413f7483bce91f942b73b65e257c1ebb26",
+    "bytes": 4627082,
+    "entries": 462,
+    "staticVerification": "PASS",
+    "frozenInputsMatched": [
+      "AGENT.md",
+      "assets/scripts/ui/AppView.ts",
+      "assets/scripts/ui/UiFactory.ts",
+      "assets/scripts/ui/dialogSessionModel.ts",
+      "assets/scripts/ui/dialogSessionModel.ts.meta",
+      "assets/scripts/ui/dialogs.ts",
+      "assets/scripts/ui/uiMetrics.ts",
+      "assets/scripts/ui/uiMetrics.ts.meta",
+      "tools/e2e/canvas-driver.cjs",
+      "tools/e2e/visual-viewports.cjs"
+    ],
+    "realDevice": "NOT_RUN",
+    "submissionReady": false
+  },
+  "independentBrowser": {
+    "artifact": "build/web-mobile",
+    "parentRetainedAndRestored": false,
+    "confirmFooterGap": 4,
+    "minGapRequired": 8,
+    "browserErrors": [],
+    "screenshotsInspected": true
+  },
+  "reportedMatrices": {
+    "checks24": "PASS_WITH_LIMITED_COVERAGE",
+    "checks28": "PASS_PRIMARY_NAVIGATION_NOT_FULL_VISUAL_QA",
+    "independentlyReranFullMatrices": false
+  },
+  "remainingLocalCode": [
+    "cloud actions are toast placeholders",
+    "cloud profile binding fixed null",
+    "leaderboard submission not wired",
+    "account epoch not advanced",
+    "async refresh and selective invalidation gaps"
+  ],
+  "officialMcpAppSelection": "NOT_SELECTED",
+  "cloudAdsRankRealRuntime": "NOT_RUN",
+  "design": {
+    "canonical": "docs/我是CEO_项目总览.md",
+    "section": "24",
+    "promptSection": "24.12",
+    "chars": 13787,
+    "subsections": [
+      "24.1",
+      "24.2",
+      "24.3",
+      "24.4",
+      "24.5",
+      "24.6",
+      "24.7",
+      "24.8",
+      "24.9",
+      "24.10",
+      "24.11",
+      "24.12",
+      "24.13"
+    ]
+  },
+  "productionImplementationChangedByReviewer": false
+}

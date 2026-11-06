@@ -1,0 +1,69 @@
+{
+  "artifact": "build/web-mobile",
+  "parentDetailOriginallyPresent": true,
+  "parentDetailWhileChild": false,
+  "parentDetailRestoredAfterCancel": false,
+  "confirmFooterGap": 4,
+  "expectedMinGap": 8,
+  "beforeResize": [
+    {
+      "name": "ModalOverlay",
+      "uuid": "Node.808",
+      "parent": "ModalLayer",
+      "w": 375,
+      "h": 812
+    },
+    {
+      "name": "DialogScroll",
+      "uuid": "Node.812",
+      "parent": "Rect",
+      "w": 298,
+      "h": 420
+    },
+    {
+      "name": "View",
+      "uuid": "Node.813",
+      "parent": "DialogScroll",
+      "w": 298,
+      "h": 420
+    },
+    {
+      "name": "DialogFooter",
+      "uuid": "Node.815",
+      "parent": "Rect",
+      "w": 298,
+      "h": 108
+    }
+  ],
+  "afterResize": [
+    {
+      "name": "ModalOverlay",
+      "uuid": "Node.808",
+      "parent": "ModalLayer",
+      "w": 375,
+      "h": 812
+    },
+    {
+      "name": "DialogScroll",
+      "uuid": "Node.812",
+      "parent": "Rect",
+      "w": 298,
+      "h": 420
+    },
+    {
+      "name": "View",
+      "uuid": "Node.813",
+      "parent": "DialogScroll",
+      "w": 298,
+      "h": 420
+    },
+    {
+      "name": "DialogFooter",
+      "uuid": "Node.815",
+      "parent": "Rect",
+      "w": 298,
+      "h": 108
+    }
+  ],
+  "browserErrors": []
+}
