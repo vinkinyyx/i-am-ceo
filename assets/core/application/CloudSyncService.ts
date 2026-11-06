@@ -81,21 +81,29 @@ export class CloudSyncService {
     operationId: string,
     facade: GameFacade,
     nowMs: number,
+    expected?: { runId: string; revision: number },
   ): Promise<CloudOperationResult<true>> {
     if (!this.ready() || !this.belongsToBoundProfile(archive)) return { kind: 'unsupported' };
+    // A24-08：下载前捕获原意图；下载/解码后仍须命中同一 run/revision，
+    // 不能用下载后的新状态“宽免”用户确认时的基线。
+    const base = expected ?? { runId: facade.getState().runId, revision: facade.getRevision() };
     const downloaded = await this.provider.download(operationId, archive, targetFilePath);
     if (downloaded.kind !== 'ok') return downloaded as CloudOperationResult<true>;
     const raw = await this.provider.readLocal(`${operationId}:read`, downloaded.value);
     if (raw.kind !== 'ok') return raw as CloudOperationResult<true>;
+    if (facade.getState().runId !== base.runId || facade.getRevision() !== base.revision) {
+      return { kind: 'unavailable', reason: 'base-changed-after-download' };
+    }
     const decoded = decodeCloudCheckpoint(raw.value, this.appId, this.environment);
     if (!decoded.ok || decoded.checkpoint.cloudProfileId !== this.profileId) {
       return { kind: 'unavailable', reason: decoded.ok ? 'account-profile-mismatch' : decoded.reason };
     }
     const archiveCheckpointId = this.metadata(archive)?.checkpointId;
     if (archiveCheckpointId !== decoded.checkpoint.checkpointId) return { kind: 'unavailable', reason: 'archive-checkpoint-mismatch' };
-    const current = facade.getState();
-    const imported = await facade.importCloudCheckpointState(decoded.checkpoint.snapshot.payload, current.runId, facade.getRevision(), nowMs);
-    return imported.ok ? { kind: 'ok', value: true } : { kind: 'unavailable', reason: imported.code };
+    const imported = await facade.importCloudCheckpointState(decoded.checkpoint.snapshot.payload, base.runId, base.revision, nowMs);
+    if (imported.ok) return { kind: 'ok', value: true };
+    const reason = imported.details && typeof imported.details.reason === 'string' ? imported.details.reason : imported.code;
+    return { kind: 'unavailable', reason };
   }
 
   private ready(): boolean {

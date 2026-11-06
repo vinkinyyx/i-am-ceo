@@ -17,10 +17,12 @@ export class LeaderboardSyncService {
   private latestTargetKey = '';
   private accountEpoch = 0;
   private inFlight: Promise<LeaderboardSyncResult> | null = null;
+  /** A24-09：同一 checkpoint 的部分失败只补未成功的一榜，不重复成功项。 */
+  private lastOutcome: { target: string; assets: boolean; years: boolean } | null = null;
 
   constructor(private readonly provider: ILeaderboardProvider, private readonly config: LeaderboardRuntimeConfig) {}
 
-  changeAccount(): void { this.accountEpoch += 1; this.latestTargetKey = ''; }
+  changeAccount(): void { this.accountEpoch += 1; this.latestTargetKey = ''; this.lastOutcome = null; }
 
   async submitCloudConfirmed(
     state: GameState,
@@ -38,9 +40,15 @@ export class LeaderboardSyncService {
     this.latestTargetKey = target;
     const epoch = this.accountEpoch;
     const score = currentCompanyLeaderboardScores(state);
+    const retry = this.lastOutcome?.target === target ? this.lastOutcome : null;
     const task = (async (): Promise<LeaderboardSyncResult> => {
       const results: Array<'synced' | 'failed'> = [];
-      for (const [id, value] of [[this.config.assetsBoardId, score.assets], [this.config.yearsBoardId, score.completedYears]] as const) {
+      const boards = [
+        [this.config.assetsBoardId, score.assets, retry?.assets === true],
+        [this.config.yearsBoardId, score.completedYears, retry?.years === true],
+      ] as const;
+      for (const [id, value, alreadySynced] of boards) {
+        if (alreadySynced) { results.push('synced'); continue; }
         if (!stillCurrent() || epoch !== this.accountEpoch || this.latestTargetKey !== target) {
           results.push('failed');
           continue;
@@ -49,6 +57,7 @@ export class LeaderboardSyncService {
         results.push(submitted.kind === 'ok' ? 'synced' : 'failed');
       }
       this.lastSubmittedAtMs = nowMs;
+      this.lastOutcome = { target, assets: results[0] === 'synced', years: results[1] === 'synced' };
       return { checkpointId, runId, assets: results[0]!, years: results[1]!, ...(results.includes('failed') ? { reason: 'partial-or-failed-submit' } : {}) };
     })();
     this.inFlight = task;

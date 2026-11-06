@@ -44,6 +44,9 @@ import { assetsLeaderboard, yearsLeaderboard } from '../simulation/leaderboard';
 import type { AutomationLogEntry, Department, DeptType, Policy, StaffingMode, SupportDeptType } from '../domain/types';
 import type { EconomyConfig } from '../config/EconomyConfig';
 import { beginAdSession, cancelAdSession, canRequestAdCoupon, grantAdCoupon, markAdPromptShown } from './AdRewardService';
+import { createCloudCheckpoint } from '../persistence/CloudSaveCodec';
+import { encodeEnvelope } from '../persistence/SaveCodec';
+import type { CloudCheckpointV1 } from '../persistence/CloudSaveTypes';
 
 export interface BootstrapResult {
   state: GameState;
@@ -66,7 +69,8 @@ function toFailure(err: unknown): CommandResult<never> {
     : err instanceof Error && err.message in GameErrorCodeLike
       ? (err.message as GameErrorCode)
       : GameErrorCode.NOT_READY;
-  return fail(code, errorMessage(code));
+  const details = err instanceof GameError ? err.details : undefined;
+  return details ? { ok: false, code, displayMessage: errorMessage(code), details: { ...details } } : fail(code, errorMessage(code));
 }
 
 const GameErrorCodeLike: Record<string, true> = Object.fromEntries(
@@ -147,9 +151,33 @@ export class GameFacade {
 
   async importCloudCheckpointState(state: GameState, expectedRunId: string, expectedRevision: number, nowMs = Date.now()): Promise<CommandResult<true>> {
     try {
-      const revision = await this.store.importCloudState(state, expectedRunId, expectedRevision, nowMs);
+      // A24-08：同 run 走普通日志提交；活跃不同 run 走显式整档替换事务（墓碑 + replace-run）。
+      const revision = await this.store.replaceWithCloudState(state, expectedRunId, expectedRevision, nowMs);
       return ok(this.store.current.runId, revision, true);
     } catch (err) { return toFailure(err); }
+  }
+
+  /** 云 backup/榜提交使用同一份冻结快照：捕获后不得再从实时 state 回读。 */
+  captureCloudCheckpoint(input: {
+    appId: string;
+    environment: 'test' | 'production';
+    cloudProfileId: string;
+    checkpointId: string;
+    parentCheckpointIds: string[];
+    resetEpoch: CloudCheckpointV1['resetEpoch'];
+    deviceInstanceId: string;
+    capturedAtMs: number;
+  }): CloudCheckpointV1 {
+    const state = this.store.current;
+    return createCloudCheckpoint({
+      ...input,
+      localRevision: this.store.currentRevision,
+      snapshot: encodeEnvelope(state, {
+        revision: this.store.currentRevision,
+        runId: state.runId,
+        resetGeneration: this.store.currentResetGeneration,
+      }),
+    });
   }
 
   getPersistenceStatus() {

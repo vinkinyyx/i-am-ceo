@@ -1383,6 +1383,40 @@ R34浏览器长跑脚本跑满30分（测量1802690ms，180×10s样本），固�
 
 本轮仅文档变更，验证章节/子项/用例、编码及git diff --check；没有重新运行源码测试/构建，不能把方案写完当接入已实现。
 
+### 11.30 本地收口实现与验证记录（2026-11-06，未提交/未打包）
+
+**结论：本地代码与单测闭环继续推进；真实平台、真机与可提审仍为 BLOCKED/NOT_RUN。** 本轮未执行 git 提交/推送、未上传、未改后台配置、未提审；未删除任何历史失败证据，未放宽既有断言。
+
+1. **UI 与弹窗（A24-02/04/07/08/09）**
+   - 确认/输入弹窗底部按钮统一 48 高，两行中心距 ±28 → 实际间距 8（修复 4）；footer 高 120，上下各留 8。
+   - `invalidateDialogs` 改为先按 owner 收集目标再连带后代，不再用 `() => true` 清空整个 registry；不同 owner 的登记不被误清。
+   - 异步重新预览增加 `refreshing` 互斥、`refreshToken` 代次与 `resetAttempt()`；异常保留原窗口并露出“重新预览”；`finish()` 递增代次使迟到回调失效。
+   - 热 resize 同步遮罩重绘、卡片尺寸/Y、DialogScroll/View/Content 锚点与位置、标题/副栏/底栏，并停止自动滚动。
+   - 员工详情 → 裁员/调岗子确认：父详情不关闭，子框登记 `parentSessionId`；取消回到同一父详情，保留员工、窗口与滚动位置；父关闭时连同后代一并释放。
+2. **云备份与真实榜接线（A24-03/05/09）**
+   - 新增 `assets/core/platform/PlayerIdentity.ts`：`IPlayerIdentityProvider` + `TapPlayerIdentityProvider` + `PlayerIdentityState`（epoch、换号 changed、scope 校验）。官方未确认稳定账号标识时返回 `unavailable`，生产保持禁用，不猜测 API、不用昵称/设备号/每设备随机值冒充账号。
+   - AppView 云初始化改为使用可信 `profileId`；云按钮从 toast 改为真实调用 `CloudSyncService`：手动备份、云档列表、冲突/关系展示、确认后整档恢复。备份前要求 `persistenceStatus==='ready'`、完成创建与首聘；checkpoint 通过 `GameFacade.captureCloudCheckpoint` 捕获。
+   - `CloudSyncService.restore` 下载前捕获 `{runId, revision}`，下载/解码后仍须命中同一基线，否则 `base-changed-after-download`；不把下载后的新状态当作宽免。
+   - `GameStore.replaceWithCloudState`：云端 run 与活跃 run 不同时走显式替换事务（基线复核 → 墓碑/关闭 run 拒绝 → `replaceWithNewRun` 日志协议 → 仅保留本机广告账本、重置离线水位），不直接写 state、不放宽旧 run 检查。
+   - 云确认成功后，用**同一冻结 checkpoint** 调 `LeaderboardSyncService.submitCloudConfirmed`；支持部分失败只补未成功一榜（`lastOutcome` 记录）、撤回同意即停止、换号 `changeAccount()` 清目标。设置页新增“补发未成功的公开榜”。
+   - 换号时 `advanceAuthEpoch()` 推进 `authEpoch`、清待补发、按旧 accountEpoch 定向失效弹窗。平台身份不可用时云上传/恢复按钮如实禁用并说明原因，而非仅 toast。
+3. **激励视频（RV）阶段：L1 本地 Fake/禁用态闭环，L2/L3 BLOCKED**
+   - 两入口、共享每日一次额度、`isEnded===true` 才发券、只免一次招聘费、月薪照付、次月到岗、首聘两人不参与、发券/券招聘幂等与持久化：沿用已通过的 `AdRewardService`/`RecruitmentService` 实现与测试，本轮未放宽。
+   - 修复广告返回后的迟到回调：点击时捕获 run/account/offerId，返回后核对；旧上下文或 offer 已变则不再重开旧招聘窗，仅提示重新打开人才页。
+   - 发券结果未决时 UI 改为“观看已完成，发券结果待核对；无需重新观看”，回前台仅调用 `retryPendingGrant` 对账原奖励，不要求重看。
+   - 配置仍 `enabled=false`、`environment=disabled`、`rewardedAdUnitId` 空；本机无真实宿主调试环境，**未实际播放、未完成真实奖励事务**。当前 App 未在官方 MCP 中选择，`check_ads_status` 与广告位无法查询；不生成带猜测 ID 的启用包。
+4. **实际验证与证据**
+   - `npm run typecheck`（core）退出 0。
+   - UI 类型检查：Creator 仍未安装，`typecheck:ui` 环境性失败；本轮用临时 `tools/typecheck/cc.stub.d.ts` 存根 + 独立 tsconfig 完成 UI 全量类型检查，退出 0（临时文件验证后删除，不进入交付）。
+   - 全量 Vitest（`--pool=forks`）：**492 passed / 9 failed / 1 skipped（502）**；9 个失败仍集中在 3 个基线环境文件：`tests/tools/releasePipeline`（8，无构建产物/补丁锚点缺失）、`tests/unit/packageHygiene`（1，缺本机 `runtime.config.json`）、`tests/tools/canvasDriver`（文件级失败，无 Playwright/构建）；与本次改动无关，未修改这些断言。
+   - 新增/更新测试：`tests/unit/playerIdentity.test.ts`（3）；`tests/integration/cloudRestoreIntent.test.ts`（3：同基线恢复、基线变化拒绝、跨账号拒绝）；`tests/integration/cloudImport.test.ts`（跨 run 显式替换保留本机券账本、墓碑拒绝）；`tests/integration/leaderboardSync.test.ts`（同 checkpoint 只补失败榜）；`tests/unit/dialogSessionModel.test.mjs`（父子取消、后代、owner 隔离、100 次开关回基线、父失效连子）。
+5. **四视口/几何/坏布局/30 秒详情复验：BLOCKED**
+   - 仓库无 `build/` 产物，且 `C:/ProgramData/cocos` 不存在，无法构建新 Web 包或运行 `tools/e2e/visual-viewports.cjs`、矩阵与 30 秒详情脚本；本轮未重跑、未宣称 PASS。四视口基线仍固定为 375×812、360×640、375×834、390×844。
+6. **候选包：BLOCKED（未生成新 releaseId）**
+   - 无 Creator 即无法从当前源码产出真实构建，不能以旧 r31 包冒充本轮候选。`m4-20261106-r31`/01（4,627,082 bytes / 462 entries / SHA256 `8637011aa8f57220ad3aff2d0cc9b4413f7483bce91f942b73b65e257c1ebb26`）仍为最后一次静态 PASS 的历史包，**不含本轮修改**。
+   - 静态包通过不等于真机通过；本轮不宣称真实接通、不宣称可提审。
+7. **本人需办理（承接 §24.11 / §24.14.9）**：官方授权并选定正确 App；确认主体与广告开通状态、提供测试设备/账号；公开隐私政策 URL；云存档与真实榜所需平台能力/白名单；备案与提审材料。无需提供密码、Token、Cookie、Secret 或证件/银行原件。
+
 ## 12. 决策台账
 
 状态含义：**LOCKED** = 玩家已确认不可自行改；**BASELINE** = 首轮测试值，可调但须同步配置/黄金/测试；**VERIFY** = 必须在真实环境核实；**DEFERRED** = 第二阶段不做。
@@ -4960,17 +4994,17 @@ Fake UI先验证0、降分、两榜部分失败、限频后补发、旧账号回
 | 原M3-12任务 | 独立验收后口径 |
 |---|---|
 | 01 清单 | 已局部实现，仍补原始overlay/owner及回调入口全清单；不要求重做三层 |
-| 02 几何 | IN_PROGRESS；确认gap4与审计盲区未闭环 |
-| 03 上下文 | IN_PROGRESS；关司路径存在，authEpoch不推进、云导入接线未完成 |
-| 04 幂等/会话 | IN_PROGRESS；外毁机制存在，定向失效/真正栈与父子补验 |
-| 05 快照/过期 | IN_PROGRESS；保持正确实现，补异步重新预览与同父会话/滚动 |
-| 06 分区 | IN_PROGRESS；五页改进保留，仍有通用footer/长文案/热resize缺口 |
-| 07 云榜广告 | IN_PROGRESS（本地代码）；平台对应子项BLOCKED/NOT_RUN，不能整项只等外部 |
-| 08 矩阵 | IN_PROGRESS；原24/28按其真实定义PASS，全矩阵未完成 |
-| 09 门禁 | 当前代码PASS；493+1不证明未覆盖路径，最终变更后按影响重测 |
-| 10 包体 | 静态PASS；新功能完成需新包，平台NOT_RUN、可提审NOT_READY |
+| 02 几何 | 代码已修：footer 统一 48 高、中心±28 → 实际间距 8；视觉复验 BLOCKED（无 Creator/构建） |
+| 03 上下文 | 本地已修：可信身份 Provider + profileId 接线 + 换号推进 authEpoch；平台身份 BLOCKED |
+| 04 幂等/会话 | 本地 PASS：owner 定向失效 + 后代连带 + 100 次开关回基线有单测 |
+| 05 快照/过期 | 本地 PASS：异步重新预览加锁/代次/异常保留窗口/旧回调失效 |
+| 06 分区 | 本地代码 PASS：热 resize 同步遮罩/卡片/滚动/锚点；视觉复验 BLOCKED |
+| 07 云榜广告 | 本地接线完成并通过测试；真实平台子项 BLOCKED/NOT_RUN |
+| 08 矩阵 | IN_PROGRESS：新增会话/父子/100次/补发断言；原浏览器矩阵本轮未重跑 |
+| 09 门禁 | 核心与 UI 存根类型检查 PASS；全量 492 passed/9 failed（3 个基线环境文件）/1 skipped |
+| 10 包体 | 无新候选（Creator 与 build 目录均不存在）→ BLOCKED；r31 仍为最后静态 PASS 包 |
 
-本轮仅验收、最小独立浏览器探针、官方只读查询和设计交接，未修改生产实现、未新建Tap ZIP、未提交/推送或平台写入。原§23.14自报结果保留历史，状态以本节与§11.28为最新复核。不删除已有通过测试，也不把发现的缺口通过放宽断言变绿。
+本轮实现与验证以 §11.30 为准；未提交/推送，未做平台写入，未删除历史证据或放宽断言。
 
 
 ### 24.14 激励视频正式接入专项：必须完成，不作为可选项（2026-11-06）

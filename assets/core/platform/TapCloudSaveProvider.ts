@@ -31,6 +31,11 @@ export class TapCloudSaveProvider implements ICloudSaveProvider {
 
   hasUnsettledNativeOperation(): boolean { return this.nativePending; }
 
+  defaultFilePath(name: string): string | null {
+    const root = this.tap()?.env?.USER_DATA_PATH;
+    return typeof root === 'string' && root.length > 0 ? `${root}/${name}` : null;
+  }
+
   capabilities(): { available: boolean; deleteAvailable: boolean } {
     const tap = this.tap();
     let manager: CloudManager | null = null;

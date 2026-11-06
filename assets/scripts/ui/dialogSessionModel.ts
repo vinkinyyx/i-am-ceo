@@ -27,6 +27,8 @@ export interface DialogSession {
   owner: DialogOwner;
   sourceRevision: number | null;
   policy: 'manual' | 'submit-result' | 'recovery';
+  /** A24-01：子确认所属的父会话（父详情不关闭，取消子框即回到同一父窗口）。 */
+  parentSessionId?: string;
   closed: boolean;
   closeReason?: DialogCloseReason;
 }
@@ -38,6 +40,7 @@ export interface RegisterDialogInput {
   owner: DialogOwner;
   sourceRevision?: number | null;
   policy?: 'manual' | 'submit-result' | 'recovery';
+  parentSessionId?: string;
 }
 
 export function sameOwner(a: DialogOwner, b: DialogOwner): boolean {
@@ -54,7 +57,8 @@ export class DialogSessionModel {
   private sessions: DialogSession[] = [];
 
   register(input: RegisterDialogInput): DialogSession | null {
-    if (this.hasSemanticKey(input.semanticKey)) return null;
+    // A24-04：同语义且同 owner 才算重复；不同 run/账号的窗口不得误合并
+    if (this.sessions.some((s) => s.semanticKey === input.semanticKey && sameOwner(s.owner, input.owner))) return null;
     const session: DialogSession = {
       id: input.id,
       kind: input.kind,
@@ -62,10 +66,44 @@ export class DialogSessionModel {
       owner: input.owner,
       sourceRevision: input.sourceRevision ?? null,
       policy: input.policy ?? 'manual',
+      parentSessionId: input.parentSessionId,
       closed: false,
     };
     this.sessions.push(session);
     return session;
+  }
+
+  /**
+   * A24-01：某会话的全部后代（子确认、孙确认）。
+   * 父关闭/失效时必须一并结束，避免子框在父消失后独立存活。
+   */
+  descendantsOf(id: string): DialogSession[] {
+    const result: DialogSession[] = [];
+    const queue = [id];
+    while (queue.length > 0) {
+      const parentId = queue.shift()!;
+      for (const session of this.sessions) {
+        if (session.parentSessionId !== parentId) continue;
+        if (result.includes(session)) continue;
+        result.push(session);
+        queue.push(session.id);
+      }
+    }
+    return result;
+  }
+
+  /** 会话的子代数量（验收断言用）。 */
+  childCount(id: string): number {
+    return this.sessions.filter((session) => session.parentSessionId === id).length;
+  }
+
+  /** 同一 owner 下按语义键查找，避免把不同 run/账号的窗口误认为同一会话。 */
+  findBySemanticKeyForOwner(key: string, owner: DialogOwner): DialogSession | null {
+    return (
+      this.sessions.find(
+        (session) => session.semanticKey === key && session.parentSessionId === undefined && sameOwner(session.owner, owner),
+      ) ?? null
+    );
   }
 
   unregisterOnce(id: string, reason: DialogCloseReason): DialogSession | null {

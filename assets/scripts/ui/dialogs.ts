@@ -17,7 +17,7 @@ import {
   input,
   isValid,
 } from 'cc';
-import { THEME } from './theme';
+import { DESIGN_HEIGHT, DESIGN_WIDTH, THEME } from './theme';
 import { SPACE_TOKENS, TEXT_TOKENS } from './textTokens';
 import { createButton, createLabel, createRect, setButtonEnabled, setButtonLabel } from './UiFactory';
 import {
@@ -54,6 +54,8 @@ export interface DialogHandle {
   readonly kind: DialogKind;
   readonly semanticKey: string;
   readonly owner: DialogOwner;
+  /** A24-01：子确认所属父会话 id；普通顶层窗口为 undefined。 */
+  readonly parentSessionId: string | undefined;
   readonly overlay: Node;
   readonly card: Node;
   /** 正文容器（Scrollable/Confirm 已装纵向 Layout；Input 为固定区） */
@@ -97,6 +99,11 @@ export interface DialogHandle {
 
 /** R31：确认/输入弹窗底部按钮统一 48 高（同基线，不再 48/44 混用）。 */
 const BUTTON_ACTION_HEIGHT = 48;
+/**
+ * A24-02：两行按钮中心距 (±28) → 实际间距 56-48 = 8，满足最小 8；
+ * 旧值 26 得到间距 4。footer 高 120 时上下各留 8。
+ */
+const FOOTER_BUTTON_OFFSET = 28;
 
 /** 弹窗会话元信息（R31）；不传时按普通展示弹窗登记。 */
 export interface DialogSessionOptions {
@@ -106,6 +113,8 @@ export interface DialogSessionOptions {
   owner?: Partial<DialogOwner>;
   policy?: 'manual' | 'submit-result' | 'recovery';
   sourceRevision?: number | null;
+  /** A24-01：子确认挂到父详情下；父窗口保持打开，取消子框即回到同一父窗口。 */
+  parentSessionId?: string;
 }
 
 const ownerDefaults: DialogOwner = { runId: null, accountEpoch: 0, contextEpoch: 0 };
@@ -149,13 +158,24 @@ export function findOpenDialog(semanticKey: string): DialogHandle | null {
 
 /** 真正上下文失效（换 run/账号/应用销毁）时强制结束旧 UI；不伪造业务取消/成功。 */
 export function invalidateDialogs(reason: DialogCloseReason = 'context-invalidated', owner?: Partial<DialogOwner>): number {
+  // A24-07：先按 owner 收集命中集合，再连带其子会话；
+  // 旧实现用 () => true 注销整个 registry，会把其它 owner 的有效登记一并清掉。
+  const targets = new Set<string>();
+  for (const handle of dialogHandles) {
+    if (handle.closed) continue;
+    if (owner && !handle.ownerMatches(owner)) continue;
+    targets.add(handle.id);
+    for (const child of registry.descendantsOf(handle.id)) targets.add(child.id);
+  }
   let count = 0;
   for (const handle of [...dialogHandles].reverse()) {
-    if (owner && !handle.ownerMatches(owner)) continue;
-    if (!handle.closed) handle.forceDispose(reason);
+    if (handle.closed || !targets.has(handle.id)) continue;
+    handle.forceDispose(reason);
     count += 1;
   }
-  registry.pruneInvalid(() => true, reason);
+  if (targets.size > 0) {
+    registry.pruneInvalid((session) => targets.has(session.id), reason);
+  }
   notifyClosed(reason);
   return count;
 }
@@ -167,10 +187,23 @@ export function pruneDialogs(): void {
   }
 }
 
+/** 视口变化（热 resize）时同步所有存活窗口的遮罩/卡片/滚动区。 */
 export function relayoutDialogs(viewportHeight: number): void {
   for (const handle of dialogHandles) {
     if (!handle.closed) handle.relayout(viewportHeight);
   }
+}
+
+/** A24-04：同语义 + 同 owner 的窗口复用，避免工厂重复建壳；不同 owner 不误合并。 */
+function reuseExistingDialog(overlay: Node, session: DialogSessionOptions | undefined): DialogHandle | null {
+  if (!session?.semanticKey) return null;
+  const owner: DialogOwner = { ...ownerDefaults, ...(session.owner ?? {}) };
+  const existing = dialogHandles.find(
+    (handle) => !handle.closed && handle.semanticKey === session.semanticKey && handle.ownerMatches(owner),
+  );
+  if (!existing) return null;
+  if (isValid(overlay, true)) overlay.destroy();
+  return existing;
 }
 
 /** 证据脚本只读快照；不包含可写测试 hook。 */
@@ -233,6 +266,9 @@ interface Scaffold {
   body: Node;
   footer: Node;
   scrollView: ScrollView | null;
+  /** A24-09：热 resize 时需同步的滚动链节点（DialogScroll → View → Content）。 */
+  scrollRoot: Node | null;
+  viewNode: Node | null;
   cardHeight: number;
   bodyHeight: number;
   width: number;
@@ -287,11 +323,15 @@ function buildScaffold(opts: ScaffoldOptions): Scaffold {
   const bodyCenterY = (DIALOG_METRICS.footerHeight - DIALOG_METRICS.titleHeight) / 2;
   let body: Node;
   let scrollView: ScrollView | null = null;
+  let scrollRoot: Node | null = null;
+  let viewNode: Node | null = null;
   if (opts.scrollable) {
     const scroll = buildScroll(card, innerWidth, geo.bodyHeight);
     scroll.root.setPosition(0, bodyCenterY);
     body = scroll.content;
     scrollView = scroll.scrollView;
+    scrollRoot = scroll.root;
+    viewNode = scroll.viewNode;
   } else {
     body = new Node('DialogBody');
     body.parent = card;
@@ -309,6 +349,8 @@ function buildScaffold(opts: ScaffoldOptions): Scaffold {
     body,
     footer,
     scrollView,
+    scrollRoot,
+    viewNode,
     cardHeight: geo.cardHeight,
     bodyHeight: geo.bodyHeight,
     width,
@@ -325,6 +367,7 @@ function buildScaffold(opts: ScaffoldOptions): Scaffold {
 /** 自建 ScrollView（修正旧工厂把 UITransform 误赋给 sv.content 的问题）。 */
 function buildScroll(parent: Node, width: number, height: number): {
   root: Node;
+  viewNode: Node;
   content: Node;
   scrollView: ScrollView;
 } {
@@ -356,7 +399,7 @@ function buildScroll(parent: Node, width: number, height: number): {
   layout.paddingLeft = 8;
   layout.paddingRight = 8;
   scrollView.content = content;
-  return { root, content, scrollView };
+  return { root, viewNode, content, scrollView };
 }
 
 // ---------------------------------------------------------------- 句柄实现
@@ -386,6 +429,10 @@ class DialogHandleImpl implements DialogHandle {
   private submitBusyText = '处理中…';
   private expiredFlag = false;
   private handledFlag = false;
+  /** A24-08：异步重新预览的去重锁与代次令牌，防止连点/迟到回调改写按钮。 */
+  private refreshing = false;
+  private refreshToken = 0;
+  readonly parentSessionId: string | undefined;
   private refreshHandler: (() => Promise<{ message: string; confirmText: string; confirmEnabled: boolean }>) | null = null;
 
   constructor(
@@ -405,6 +452,7 @@ class DialogHandleImpl implements DialogHandle {
     this.owner = { ...ownerDefaults, ...(session?.owner ?? {}) };
     this.id = `dialog-${++dialogSequence}`;
     this.semanticKey = session?.semanticKey ?? this.id;
+    this.parentSessionId = session?.parentSessionId;
 
     // 外部销毁（父层清理/场景切换）也要注销，避免残留“幽灵弹窗”阻塞后续交互
     const lifecycle = overlay.addComponent(DialogLifecycle);
@@ -418,6 +466,7 @@ class DialogHandleImpl implements DialogHandle {
       owner: this.owner,
       sourceRevision: session?.sourceRevision ?? null,
       policy: session?.policy ?? 'manual',
+      parentSessionId: this.parentSessionId,
     });
     if (!registered) {
       // 同语义弹窗已存在：不叠层，直接丢弃新壳（调用方应先 findOpenDialog 聚焦旧窗）
@@ -555,18 +604,51 @@ class DialogHandleImpl implements DialogHandle {
     return true;
   }
 
-  async refreshPreview(): Promise<boolean> {
-    if (!this.refreshHandler) return false;
+  /** A24-08：每次新的提交尝试都复位 handled，不能沿用上一次尝试的结论。 */
+  resetAttempt(): void {
     this.handledFlag = false;
-    const result = await this.refreshHandler();
-    this.setMessage(result.message);
-    this.submitIdleText = result.confirmText;
-    if (this.submitNode && isValid(this.submitNode, true)) {
-      setButtonLabel(this.submitNode, result.confirmText);
-      setButtonEnabled(this.submitNode, result.confirmEnabled);
+    this.expiredFlag = false;
+  }
+
+  /**
+   * A24-08：异步重新预览。
+   * - refreshing 锁：连点只跑一次
+   * - refreshToken：关闭或再次刷新后，迟到的旧回调不得改写按钮
+   * - try/catch：异常保留窗口并允许重试，不能卡在“处理中”
+   */
+  async refreshPreview(): Promise<boolean> {
+    if (this.closedFlag || this.refreshing || !this.refreshHandler) return false;
+    this.refreshing = true;
+    this.handledFlag = false;
+    const token = ++this.refreshToken;
+    this.guard.fail();
+    this.setBusy(true, '重新预览中…');
+    try {
+      const result = await this.refreshHandler();
+      if (this.closedFlag || token !== this.refreshToken) return false;
+      this.setMessage(result.message);
+      this.submitIdleText = result.confirmText;
+      this.setBusy(false);
+      if (this.submitNode && isValid(this.submitNode, true)) {
+        setButtonLabel(this.submitNode, result.confirmText);
+        setButtonEnabled(this.submitNode, result.confirmEnabled);
+      }
+      this.setError('预览已刷新，请再次确认');
+      return true;
+    } catch (err) {
+      if (this.closedFlag || token !== this.refreshToken) return false;
+      // 刷新失败不是业务失败：保留窗口与重试入口，不要求玩家重看视频或重进页面
+      this.expiredFlag = true;
+      this.setBusy(false);
+      if (this.submitNode && isValid(this.submitNode, true)) {
+        setButtonLabel(this.submitNode, '重新预览');
+        setButtonEnabled(this.submitNode, true);
+      }
+      this.setError(err instanceof Error ? `刷新失败：${err.message}` : '刷新失败，请重试');
+      return false;
+    } finally {
+      if (token === this.refreshToken) this.refreshing = false;
     }
-    this.setError('预览已刷新，请再次确认');
-    return true;
   }
 
   blockSubmit(message: string): void {
@@ -647,7 +729,11 @@ class DialogHandleImpl implements DialogHandle {
     this.notifyClose(reason);
   }
 
-  /** 视口变化时按同一几何模型重排，避免卡片越界。 */
+  /**
+   * 视口变化时按同一几何模型重排，避免卡片越界。
+   * A24-09：遮罩、卡片、DialogScroll/View/Content 及锚点必须一起同步；
+   * 旧实现只改 body.parent（View），Content 仍按旧高度停在旧位置。
+   */
   relayout(viewportHeight: number): void {
     if (this.closedFlag) return;
     const geo = computeDialogGeometry({
@@ -656,28 +742,73 @@ class DialogHandleImpl implements DialogHandle {
     });
     this.scaffold.cardHeight = geo.cardHeight;
     this.scaffold.bodyHeight = geo.bodyHeight;
-    paintCard(this.card, this.scaffold.width, geo.cardHeight);
-    const bodyNode = this.scrollView ? this.body.parent : this.body;
-    const bodyTransform = bodyNode?.getComponent(UITransform);
-    if (bodyTransform && bodyNode) {
-      bodyTransform.setContentSize(new Size(this.scaffold.width - 32, geo.bodyHeight));
-      bodyNode.setPosition(0, (DIALOG_METRICS.footerHeight - DIALOG_METRICS.titleHeight) / 2);
+    this.scaffold.geometry.viewportHeight = viewportHeight;
+
+    // 1) 遮罩：高屏时铺满可视高度，并重绘底色
+    const overlayHeight = Math.max(DESIGN_HEIGHT, viewportHeight);
+    const overlayTransform = this.overlay.getComponent(UITransform);
+    overlayTransform?.setContentSize(new Size(DESIGN_WIDTH, overlayHeight));
+    const overlayGraphics = this.overlay.getComponent(Graphics);
+    if (overlayGraphics) {
+      overlayGraphics.clear();
+      overlayGraphics.fillColor = new Color(0, 0, 0, 130);
+      overlayGraphics.rect(-DESIGN_WIDTH / 2, -overlayHeight / 2, DESIGN_WIDTH, overlayHeight);
+      overlayGraphics.fill();
     }
+
+    // 2) 卡片：尺寸与纵向位置（输入弹窗贴键盘上方，随视口重算）
+    paintCard(this.card, this.scaffold.width, geo.cardHeight);
+    const cardY = this.scaffold.geometry.cardY === 0 ? 0 : computeInputCardY(viewportHeight, geo.cardHeight);
+    this.scaffold.geometry.cardY = cardY;
+    this.card.setPosition(0, cardY);
+
+    // 3) 正文：滚动链三层同步（root / View / Content 锚点与位置）
+    const innerWidth = this.scaffold.width - 32;
+    const bodyCenterY = (DIALOG_METRICS.footerHeight - DIALOG_METRICS.titleHeight) / 2;
+    if (this.scaffold.scrollRoot && this.scaffold.viewNode) {
+      this.scaffold.scrollRoot.getComponent(UITransform)?.setContentSize(new Size(innerWidth, geo.bodyHeight));
+      this.scaffold.scrollRoot.setPosition(0, bodyCenterY);
+      this.scaffold.viewNode.getComponent(UITransform)?.setContentSize(new Size(innerWidth, geo.bodyHeight));
+      const contentTransform = this.body.getComponent(UITransform);
+      contentTransform?.setAnchorPoint(0.5, 1);
+      // 高度由 Layout(CONTAINER) 决定，这里只保证顶边贴合新可视区
+      this.body.setPosition(0, geo.bodyHeight / 2);
+      this.scrollView?.stopAutoScroll();
+    } else {
+      this.body.getComponent(UITransform)?.setContentSize(new Size(innerWidth, geo.bodyHeight));
+      this.body.setPosition(0, bodyCenterY);
+    }
+
+    // 4) 标题/副标题/底栏
     this.scaffold.titleNode.setPosition(0, geo.cardHeight / 2 - 28);
     this.scaffold.subtitleNode?.setPosition(0, geo.cardHeight / 2 - 52);
     this.footer.setPosition(0, -geo.cardHeight / 2 + DIALOG_METRICS.footerHeight / 2);
+    this.footer.getComponent(UITransform)?.setContentSize(new Size(innerWidth, DIALOG_METRICS.footerHeight));
   }
 
   private finish(reason: DialogCloseReason): void {
     if (this.closedFlag || this.finishing) return;
     this.finishing = true;
     this.closedFlag = true;
+    // A24-08：关闭后作废所有在途刷新回调，避免迟到结果改写已销毁窗口
+    this.refreshToken += 1;
+    this.refreshing = false;
     this.detach(reason);
+    // A24-01：父窗口关闭时一并结束其子确认，避免子框“悬空”
+    this.disposeDescendants(reason);
     if (isValid(this.overlay, true)) {
       this.overlayLifecycle.host = null;
       this.overlay.destroy();
     }
     this.notifyClose(reason);
+  }
+
+  private disposeDescendants(reason: DialogCloseReason): void {
+    for (const child of registry.descendantsOf(this.id)) {
+      const handle = dialogHandles.find((candidate) => candidate.id === child.id);
+      if (handle && !handle.closed) handle.forceDispose(reason);
+      else registry.unregisterOnce(child.id, reason);
+    }
   }
 
   private detach(reason: DialogCloseReason): void {
@@ -721,6 +852,9 @@ export interface ScrollableDialogOptions {
  * 调用方往 handle.body 添加内容，往 handle.footer 添加按钮。
  */
 export function openScrollableDialog(opts: ScrollableDialogOptions): DialogHandle {
+  // A24-04：同语义 + 同 owner 已开 → 复用旧窗，不重复叠层
+  const existing = reuseExistingDialog(opts.overlay, opts.session);
+  if (existing) return existing;
   const scaffold = buildScaffold({
     overlay: opts.overlay,
     viewportHeight: opts.viewportHeight,
@@ -764,6 +898,8 @@ export interface ConfirmDialogOptions {
  * 明确失败可同意图重试；成功调用 handle.succeed() 关闭。
  */
 export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
+  const existing = reuseExistingDialog(opts.overlay, opts.session);
+  if (existing) return existing;
   const width = opts.width ?? DIALOG_METRICS.width;
   const lineCount = opts.message.split('\n').length;
   const desiredBodyHeight = opts.desiredBodyHeight ?? Math.max(120, lineCount * 22 + 16);
@@ -804,7 +940,7 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
     parent: scaffold.footer,
     onClick: () => void runConfirm(),
   });
-  confirmButton.setPosition(0, 26);
+  confirmButton.setPosition(0, FOOTER_BUTTON_OFFSET);
 
   const cancelButton = createButton({
     text: opts.cancelText ?? '再想想（取消）',
@@ -817,7 +953,7 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
     parent: scaffold.footer,
     onClick: () => handle.cancel(),
   });
-  cancelButton.setPosition(0, -26);
+  cancelButton.setPosition(0, -FOOTER_BUTTON_OFFSET);
 
   handle.attachActions(confirmButton, cancelButton, opts.confirmText, opts.busyText ?? '处理中…');
 
@@ -829,6 +965,8 @@ export function openConfirmDialog(opts: ConfirmDialogOptions): DialogHandle {
     }
     // 状态机拦截连点：同一弹窗只发一个意图
     if (!handle.guard.begin()) return;
+    // A24-08：每次尝试都必须复位 handled，不能沿用上一轮失败的结论
+    handle.resetAttempt();
     handle.setError(null);
     handle.setBusy(true);
     try {
@@ -873,6 +1011,8 @@ export interface InputDialogOptions {
  * 输入弹窗：标签 + 字数 + 内联校验；卡片固定在上半区，键盘弹出不遮挡输入框与按钮。
  */
 export function openInputDialog(opts: InputDialogOptions): DialogHandle {
+  const existing = reuseExistingDialog(opts.overlay, opts.session);
+  if (existing) return existing;
   const width = opts.width ?? DIALOG_METRICS.width;
   const minLength = opts.minLength ?? 1;
   const cardHeight = DIALOG_METRICS.titleHeight + 132 + DIALOG_METRICS.footerHeight;
@@ -976,7 +1116,7 @@ export function openInputDialog(opts: InputDialogOptions): DialogHandle {
     parent: scaffold.footer,
     onClick: () => void submit(),
   });
-  submitButton.setPosition(0, 26);
+  submitButton.setPosition(0, FOOTER_BUTTON_OFFSET);
   const cancelButton = createButton({
     text: opts.cancelText ?? '取消',
     width: actionWidth,
@@ -987,7 +1127,7 @@ export function openInputDialog(opts: InputDialogOptions): DialogHandle {
     parent: scaffold.footer,
     onClick: () => handle.cancel(),
   });
-  cancelButton.setPosition(0, -26);
+  cancelButton.setPosition(0, -FOOTER_BUTTON_OFFSET);
   handle.attachActions(submitButton, cancelButton, opts.submitText ?? '确定', '提交中…');
 
   edit.node.on(EditBox.EventType.TEXT_CHANGED, () => {
@@ -1011,6 +1151,7 @@ export function openInputDialog(opts: InputDialogOptions): DialogHandle {
       return;
     }
     if (!handle.guard.begin()) return;
+    handle.resetAttempt();
     handle.setBusy(true);
     try {
       await opts.onSubmit(raw.trim(), handle);

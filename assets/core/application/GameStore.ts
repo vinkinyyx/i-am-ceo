@@ -158,6 +158,52 @@ export class GameStore {
     } finally { this.mutationInProgress = false; }
   }
 
+  /**
+   * A24-08：整档恢复——云端 run 与当前活跃 run 不同时的显式替换事务。
+   *
+   * 不使用 importCloudState 的宽松处理，也不直接给 state 赋值：
+   * 1) 先按调用方捕获的 run/revision 复核基线；
+   * 2) 拒绝复活本地墓碑已关闭的 run；
+   * 3) 复用 replaceWithNewRun 的墓碑 + commitReplaceRun 日志协议；
+   * 4) 仅保留本机广告账本，重置离线水位（恢复不是离线收益）。
+   */
+  async replaceWithCloudState(
+    importedState: GameState,
+    expectedRunId: string,
+    expectedRevision: number,
+    nowMs: number,
+  ): Promise<number> {
+    if (importedState.runId === expectedRunId) {
+      return this.importCloudState(importedState, expectedRunId, expectedRevision, nowMs);
+    }
+    if (!Number.isSafeInteger(nowMs) || nowMs < 0) {
+      throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'invalid-time' });
+    }
+    const tombstone = await this.repo.readTombstone();
+    if (tombstone && tombstone.oldRunId === importedState.runId) {
+      throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'closed-run-tombstone' });
+    }
+    if (this.storage.hasUnsettledNativeWrites?.()) {
+      throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'native-write-fence' });
+    }
+    if (this.state.adRewards?.activeSessionId) {
+      throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'active-ad-session' });
+    }
+    const localRewards = this.state.adRewards ? cloneGameState(this.state).adRewards : undefined;
+    await this.replaceWithNewRun((current) => {
+      if (current.runId !== expectedRunId || this.revision !== expectedRevision) {
+        throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'cloud-import-base-changed' });
+      }
+      const draft = cloneGameState(importedState);
+      if (localRewards) draft.adRewards = localRewards;
+      else delete draft.adRewards;
+      draft.lastWallClockMs = nowMs;
+      draft.offlineRemainderMs = 0;
+      return draft;
+    }, expectedRunId, nowMs);
+    return this.revision;
+  }
+
   /** 不产生持久化的只读快照（预览类接口使用）。 */
   read<T>(fn: (state: GameState) => T): T {
     return fn(this.state);

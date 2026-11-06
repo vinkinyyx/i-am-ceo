@@ -77,3 +77,64 @@ describe('R31 幂等注销与上下文失效', () => {
     expect(sameOwner(owner(), owner({ contextEpoch: 1 }))).toBe(false);
   });
 });
+
+describe('A24-01 父子窗口与 owner 隔离', () => {
+  it('子确认登记父会话，取消子框后父窗口仍在', () => {
+    const model = new DialogSessionModel();
+    model.register({ id: 'detail', kind: 'detail', semanticKey: 'employee:1', owner: owner() });
+    model.register({ id: 'layoff', kind: 'confirm', semanticKey: 'layoff:1', owner: owner(), parentSessionId: 'detail' });
+    expect(model.childCount('detail')).toBe(1);
+    expect(model.unregisterOnce('layoff', 'user-close')?.closeReason).toBe('user-close');
+    expect(model.openCount()).toBe(1);
+    expect(model.top()?.id).toBe('detail');
+  });
+
+  it('descendantsOf 递归返回子与孙', () => {
+    const model = new DialogSessionModel();
+    model.register({ id: 'detail', kind: 'detail', semanticKey: 'employee:1', owner: owner() });
+    model.register({ id: 'pick', kind: 'form', semanticKey: 'transfer-targets:1', owner: owner(), parentSessionId: 'detail' });
+    model.register({ id: 'confirm', kind: 'confirm', semanticKey: 'transfer:1', owner: owner(), parentSessionId: 'pick' });
+    expect(model.descendantsOf('detail').map((s) => s.id)).toEqual(['pick', 'confirm']);
+  });
+
+  it('不同 owner 使用相同 semanticKey 不会被误判为重复', () => {
+    const model = new DialogSessionModel();
+    expect(model.register({ id: 'a', kind: 'detail', semanticKey: 'employee:1', owner: owner() })).not.toBeNull();
+    expect(
+      model.register({ id: 'b', kind: 'detail', semanticKey: 'employee:1', owner: owner({ accountEpoch: 1 }) }),
+    ).not.toBeNull();
+    expect(model.openCount()).toBe(2);
+  });
+
+  it('findBySemanticKeyForOwner 只命中同 owner 的顶层窗口', () => {
+    const model = new DialogSessionModel();
+    model.register({ id: 'detail', kind: 'detail', semanticKey: 'employee:1', owner: owner() });
+    expect(model.findBySemanticKeyForOwner('employee:1', owner())?.id).toBe('detail');
+    expect(model.findBySemanticKeyForOwner('employee:1', owner({ runId: 'run-2' }))).toBeNull();
+  });
+
+  it('连续开关 100 次后回到基线（无残留会话）', () => {
+    const model = new DialogSessionModel();
+    for (let i = 0; i < 100; i += 1) {
+      const id = `detail-${i}`;
+      expect(model.register({ id, kind: 'detail', semanticKey: `employee:${i}`, owner: owner() })).not.toBeNull();
+      expect(model.childCount(id)).toBe(0);
+      model.register({ id: `child-${i}`, kind: 'confirm', semanticKey: `layoff:${i}`, owner: owner(), parentSessionId: id });
+      model.unregisterOnce(`child-${i}`, 'user-close');
+      model.unregisterOnce(id, 'user-close');
+      expect(model.openCount()).toBe(0);
+      expect(model.top()).toBeNull();
+    }
+    expect(model.hasBlockingModal()).toBe(false);
+    expect(model.hasDetail()).toBe(false);
+  });
+
+  it('父窗口失效时其子会话一并移除，避免子框独立存活', () => {
+    const model = new DialogSessionModel();
+    model.register({ id: 'detail', kind: 'detail', semanticKey: 'employee:1', owner: owner({ contextEpoch: 3 }) });
+    model.register({ id: 'child', kind: 'confirm', semanticKey: 'layoff:1', owner: owner({ contextEpoch: 3 }), parentSessionId: 'detail' });
+    const removed = model.invalidateOwner((o) => o.contextEpoch === 3, 'context-invalidated');
+    expect(removed.map((s) => s.id).sort()).toEqual(['child', 'detail']);
+    expect(model.openCount()).toBe(0);
+  });
+});
