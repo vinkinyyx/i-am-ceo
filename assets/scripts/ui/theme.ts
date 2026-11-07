@@ -7,6 +7,10 @@ import { Color } from 'cc';
 export const THEME = {
   primary: new Color().fromHEX('#3668B2'),
   secondary: new Color().fromHEX('#5D9F8C'),
+  /** §29.4：选中态浅蓝底，蓝色文字；不使用整块深蓝。 */
+  primarySoft: new Color().fromHEX('#E4EDFB'),
+  /** §29.3：次级按钮/行内动作的浅灰底。 */
+  chip: new Color().fromHEX('#EFF2F7'),
   bg: new Color().fromHEX('#F5F7FB'),
   card: new Color().fromHEX('#FFFFFF'),
   text: new Color().fromHEX('#273244'),

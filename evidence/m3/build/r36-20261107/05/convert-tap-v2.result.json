@@ -1,0 +1,14 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\convert-tap-v2.cjs",
+  "args": [
+    "1.1.1",
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r36-20261107\\05\\wechatgame\\wechatgame",
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r36-20261107\\05\\tap"
+  ],
+  "startedAt": "2026-11-07T13:54:50.653Z",
+  "finishedAt": "2026-11-07T13:55:01.020Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\convert-tap-v2.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\convert-tap-v2.err.log"
+}

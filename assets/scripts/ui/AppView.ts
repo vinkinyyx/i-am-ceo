@@ -5,6 +5,8 @@ import {
   Component,
   EditBox,
   Graphics,
+  Input,
+  input,
   Label,
   Mask,
   Node,
@@ -64,9 +66,10 @@ import {
   setButtonEnabled,
   setButtonLabel,
   setButtonLook,
+  setUiInteractionHook,
   stretchToParent,
 } from './UiFactory';
-import { BUTTON_BASELINE, layoutActionRow } from './uiMetrics';
+import { BUTTON_BASELINE, fitTextWithEllipsis, layoutActionRow } from './uiMetrics';
 import { THEME, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
 import { TEXT_TOKENS } from './textTokens';
 import { audioManager } from '../audio/AudioManager';
@@ -288,6 +291,8 @@ export class AppView extends Component {
   private backdrop: Node | null = null;
   /** R31：危机的“已忽略”语义键；同一 run/年份/月份只自动弹一次。 */
   private distressAckKey: string | null = null;
+  /** §29.7：音频补播手势只绑定一次（start 可能因重试执行两次）。 */
+  private audioGestureBound = false;
   /** §23.5.6：最近一次主壳渲染的 Tab；仅同 Tab 刷新才恢复滚动。 */
   private lastRenderedTab: TabId | null = null;
   /** R31：详情快照会话；跨月只提示一次“数据已更新”，手动刷新才重取 VM。 */
@@ -374,13 +379,28 @@ export class AppView extends Component {
 
     bootTrapReady();
 
-    // 首次触摸解锁音频（浏览器自动播放策略），并播放经营 BGM
-    this.node.once(Node.EventType.TOUCH_START, () => {
+    // 首次触摸/点击解锁音频（浏览器自动播放策略）；用全局 input 监听，避免首触被 BlockInputEvents/弹层吞掉
+    const unlockAudio = (): void => {
       audioManager.unlock();
-      const s = this.state();
-      if (s.phase === 'RUNNING') void audioManager.playBgm('operation');
-      else void audioManager.playBgm('startup');
+      this.syncBgm();
+    };
+    input.once(Input.EventType.TOUCH_START, unlockAudio);
+    input.once(Input.EventType.MOUSE_DOWN, unlockAudio);
+    // 弹层/BlockInputEvents 会截断全局事件；按钮入口再兜底一次，保证首触必有声音。
+    setUiInteractionHook(() => {
+      audioManager.unlock();
+      audioManager.retryIfNeeded();
     });
+    // §29.7：自动播放被拒绝或加载失败时，下一次真实点击再补一次（已成功则不会重播）
+    if (!this.audioGestureBound) {
+      this.audioGestureBound = true;
+      const retryAudio = (): void => {
+        audioManager.unlock();
+        audioManager.retryIfNeeded();
+      };
+      input.on(Input.EventType.TOUCH_END, retryAudio);
+      input.on(Input.EventType.MOUSE_UP, retryAudio);
+    }
 
     // 在线经营时钟：按真实帧时间推进（仅 RUNNING 且 speed>0 时月结）
     // 每秒保存一次真实进度，避免 5Hz 双槽事务产生过多平台存储写入。
@@ -2202,6 +2222,15 @@ export class AppView extends Component {
       this.refreshDetailFreshness();
       this.ensureDistressNotice();
     }
+    this.syncBgm();
+  }
+
+  /** §29.7：创业阶段用创业曲、经营阶段用经营曲；同一曲目只保留一条循环，不因重绘重播。 */
+  private syncBgm(): void {
+    if (!this.facade) return;
+    const phase = this.state().phase;
+    const startup = phase === 'CREATING' || phase === 'HIRING_INITIAL' || phase === 'TUTORIAL_DASHBOARD';
+    void audioManager.playBgm(startup ? 'startup' : 'operation');
   }
 
   private distressKey(s: GameState): string {
@@ -3240,23 +3269,23 @@ export class AppView extends Component {
     const vm = this.facade.getCompanyOverview();
     if (!company || !vm) return;
 
-    // R28：顶部栏 = 单行公司名（超长裁切，点按查看完整资料）+ 独立设置热区
-    createRect({ width: 375, height: 88, color: THEME.primary, radius: 0, parent: parent }).setPosition(0, 356);
+    // R28/§29.6：顶部栏避开 TapTap 胶囊（约 44 设计单位），公司名与设置同处一条标题布局
+    createRect({ width: 375, height: 100, color: THEME.primary, radius: 0, parent: parent }).setPosition(0, 350);
     const nameNode = createLabel({
       text: company.name,
       fontSize: 15,
       bold: true,
       color: Color.WHITE,
       width: 238,
-      height: 34,
-      lineHeight: 17,
+      height: 32,
+      lineHeight: 16,
       align: 'left',
       parent: parent,
     });
-    nameNode.setPosition(-38, 378);
+    nameNode.setPosition(-38, 350);
     const nameLabel = nameNode.getComponent(Label);
     if (nameLabel) {
-      // 公司名最多 20 字：允许两行，超出才裁切；不再压住副标题
+      // 公司名最多 20 字：允许两行，超出才裁切；两行行高 16，避免压住副标题
       nameLabel.overflow = Label.Overflow.CLAMP;
       nameLabel.enableWrapText = true;
     }
@@ -3265,26 +3294,26 @@ export class AppView extends Component {
       fontSize: 11,
       color: new Color(220, 230, 245),
       parent: parent,
-    }).setPosition(-38, 338);
+    }).setPosition(-38, 320);
     // 透明整块热区：长名不压设置，点按公司名查看完整档案
     createButton({
       text: '',
       width: 252,
-      height: 60,
+      height: 56,
       fontSize: 12,
       color: new Color(255, 255, 255, 0),
       parent: parent,
       onClick: () => this.renderCompanyDetail(),
-    }).setPosition(-38, 364);
+    }).setPosition(-38, 344);
     createButton({
       text: '设置',
       width: 56,
-      height: 48,
+      height: 44,
       fontSize: 12,
       color: new Color(255, 255, 255, 40),
       parent: parent,
       onClick: () => this.renderSettings(),
-    }).setPosition(145, 364);
+    }).setPosition(145, 340);
 
     // R28：现金主指标；营收/利润为已结算累计附指标（口径写在标题里，不把预计当实际）
     const cashCard = createRect({ width: 343, height: 86, color: Color.WHITE, radius: 8, parent: parent });
@@ -3394,8 +3423,9 @@ export class AppView extends Component {
       text: '扩大产能（1万起）',
       width: 158,
       height: 48,
+      visualHeight: 40,
       fontSize: 13,
-      color: THEME.secondary,
+      color: THEME.primary,
       parent: actionCard,
       onClick: () => this.renderInvestDialog(),
     }).setPosition(-83, -44);
@@ -3403,8 +3433,9 @@ export class AppView extends Component {
       text: '年度报告',
       width: 158,
       height: 48,
+      visualHeight: 40,
       fontSize: 13,
-      color: THEME.divider,
+      color: THEME.chip,
       textColor: THEME.primary,
       parent: actionCard,
       onClick: () => this.renderAnnualReport(),
@@ -3445,6 +3476,7 @@ export class AppView extends Component {
         text: '经营困难：查看救助 / 调整人员',
         width: 343,
         height: 48,
+        visualHeight: 40,
         variant: 'danger',
         parent: parent,
         onClick: () => {
@@ -3623,9 +3655,10 @@ export class AppView extends Component {
       const node = createButton({
         text: label,
         width: 52,
-        height: 48,
+        height: 44,
+        visualHeight: 32,
         fontSize: 13,
-        color: active ? THEME.primary : new Color(238, 241, 247),
+        color: active ? THEME.primary : THEME.chip,
         textColor: active ? Color.WHITE : THEME.textWeak,
         parent: wrap,
         onClick: () => void this.onSetSpeed(speed),
@@ -3659,16 +3692,8 @@ export class AppView extends Component {
   }
 
   private paintSpeedButton(node: Node, active: boolean): void {
-    const tr = node.getComponent(UITransform);
-    const g = node.getComponent(Graphics);
-    if (tr && g) {
-      g.clear();
-      g.fillColor = active ? THEME.primary : new Color(238, 241, 247);
-      g.roundRect(-tr.width / 2, -tr.height / 2, tr.width, tr.height, 8);
-      g.fill();
-    }
-    const label = node.getComponentInChildren(Label);
-    if (label) label.color = active ? Color.WHITE : THEME.textWeak;
+    // §29.3：底色可能挂在独立 ButtonBg 上，统一走按钮视觉接口，不再直接改节点 Graphics。
+    setButtonLook(node, active ? THEME.primary : THEME.chip, active ? Color.WHITE : THEME.textWeak);
   }
 
   // ---------------------------------------------------------------- 部门页
@@ -3697,9 +3722,10 @@ export class AppView extends Component {
         text: POLICY_META[p].name,
         width: 88,
         height: 44,
+        visualHeight: 32,
         fontSize: 13,
-        color: s.policy === p ? THEME.primary : THEME.divider,
-        textColor: s.policy === p ? Color.WHITE : THEME.text,
+        color: s.policy === p ? THEME.primary : THEME.chip,
+        textColor: s.policy === p ? Color.WHITE : THEME.textWeak,
         parent: parent,
         onClick: () => void this.onSetPolicy(p),
       }).setPosition(-100 + i * 100, 268);
@@ -3809,17 +3835,19 @@ export class AppView extends Component {
     createButton({
       text: deptVm.staffingMode === 'AUTO' ? '编制 自动' : '编制 手动',
       width: a0.width,
-      height: 48,
+      height: 44,
+      visualHeight: 36,
       fontSize: 12,
-      color: deptVm.staffingMode === 'AUTO' ? THEME.secondary : THEME.divider,
-      textColor: deptVm.staffingMode === 'AUTO' ? Color.WHITE : THEME.text,
+      color: deptVm.staffingMode === 'AUTO' ? THEME.primarySoft : THEME.chip,
+      textColor: deptVm.staffingMode === 'AUTO' ? THEME.primary : THEME.textWeak,
       parent: parent,
       onClick: () => void this.onToggleStaffing(dept),
     }).setPosition(a0.x, y - 52);
     createButton({
       text: '招聘',
       width: a1.width,
-      height: 48,
+      height: 44,
+      visualHeight: 40,
       fontSize: 12,
       parent: parent,
       onClick: () => this.openHireForDept(deptVm.deptId),
@@ -3827,10 +3855,11 @@ export class AppView extends Component {
     createButton({
       text: '详情',
       width: a2.width,
-      height: 48,
+      height: 44,
+      visualHeight: 36,
       fontSize: 12,
-      color: Color.WHITE,
-      textColor: THEME.text,
+      color: THEME.chip,
+      textColor: THEME.primary,
       parent: parent,
       onClick: () => this.openDeptDetail(deptVm.deptId),
     }).setPosition(a2.x, y - 52);
@@ -3871,6 +3900,7 @@ export class AppView extends Component {
       text: u.affordable ? '创建' : '余额不足',
       width: 80,
       height: 48,
+      visualHeight: 40,
       fontSize: 12,
       parent: parent,
       disabled: !u.affordable,
@@ -4230,11 +4260,16 @@ export class AppView extends Component {
       createButton({
         text: `${label} ${f.headcount}`,
         width: 80,
+        height: 44,
+        visualHeight: 32,
         fontSize: 12,
-        color: f.key === this.talentFilterKey ? THEME.primary : THEME.secondary,
+        color: f.key === this.talentFilterKey ? THEME.primary : THEME.chip,
+        textColor: f.key === this.talentFilterKey ? Color.WHITE : THEME.textWeak,
         parent: parent,
         onClick: () => {
+          if (this.talentFilterKey === f.key) return;
           this.talentFilterKey = f.key;
+          audioManager.uiSelect();
           this.render();
         },
       }).setPosition(-126 + (i % 4) * 84, 286 - Math.floor(i / 4) * 48);
@@ -4276,8 +4311,11 @@ export class AppView extends Component {
       createButton({
         text: '详情',
         width: 56,
-        height: 48,
+        height: 44,
+        visualHeight: 36,
         fontSize: 12,
+        color: THEME.chip,
+        textColor: THEME.primary,
         parent: card,
         onClick: () => {
           const row = this.talentPool?.rows[entry.index];
@@ -4836,7 +4874,15 @@ export class AppView extends Component {
   // ---------------------------------------------------------------- 排行榜
 
   private renderRankTab(parent: Node): void {
-    createLabel({ text: '本地模拟排行', fontSize: 20, bold: true, color: THEME.text, parent: parent }).setPosition(0, 352);
+    createLabel({ text: '排行榜', fontSize: 20, bold: true, color: THEME.text, width: 200, align: 'left', parent }).setPosition(-71, 352);
+
+    const boardId = this.rankMode === 'assets' ? this.leaderboardConfig?.assetsBoardId : this.leaderboardConfig?.yearsBoardId;
+    const realBoardReady = Boolean(this.leaderboardConfig?.enabled && this.leaderboardConsent);
+    // §29.4：诊断信息不进玩家主视区；未启用时只在标题右侧保留状态标签。
+    if (!realBoardReady) {
+      createRect({ width: 68, height: 22, color: THEME.chip, radius: 11, parent }).setPosition(121, 352);
+      createLabel({ text: '本地模拟', fontSize: 11, color: THEME.textWeak, width: 68, parent }).setPosition(121, 352);
+    }
 
     const rankItems = layoutActionRow(220, 2, BUTTON_BASELINE.gap);
     const assetsItem = rankItems[0]!;
@@ -4844,114 +4890,108 @@ export class AppView extends Component {
     createButton({
       text: '资产榜',
       width: assetsItem.width,
-      height: 48,
+      height: 44,
+      visualHeight: 32,
       fontSize: 14,
-      color: this.rankMode === 'assets' ? THEME.primary : THEME.divider,
-      textColor: this.rankMode === 'assets' ? Color.WHITE : THEME.text,
+      color: this.rankMode === 'assets' ? THEME.primarySoft : THEME.chip,
+      textColor: this.rankMode === 'assets' ? THEME.primary : THEME.textWeak,
       parent,
-      onClick: () => { this.rankMode = 'assets'; this.render(); },
-    }).setPosition(assetsItem.x, 306);
+      onClick: () => {
+        if (this.rankMode === 'assets') return;
+        this.rankMode = 'assets';
+        audioManager.uiSelect();
+        this.render();
+      },
+    }).setPosition(assetsItem.x, 310);
     createButton({
       text: '年限榜',
       width: yearsItem.width,
-      height: 48,
+      height: 44,
+      visualHeight: 32,
       fontSize: 14,
-      color: this.rankMode === 'years' ? THEME.primary : THEME.divider,
-      textColor: this.rankMode === 'years' ? Color.WHITE : THEME.text,
+      color: this.rankMode === 'years' ? THEME.primarySoft : THEME.chip,
+      textColor: this.rankMode === 'years' ? THEME.primary : THEME.textWeak,
       parent,
-      onClick: () => { this.rankMode = 'years'; this.render(); },
-    }).setPosition(yearsItem.x, 306);
+      onClick: () => {
+        if (this.rankMode === 'years') return;
+        this.rankMode = 'years';
+        audioManager.uiSelect();
+        this.render();
+      },
+    }).setPosition(yearsItem.x, 310);
 
-    // §23.8：真实榜必须明确状态；配置/授权不完整时不得伪装成可用的在线排名
-    const boardId = this.rankMode === 'assets' ? this.leaderboardConfig?.assetsBoardId : this.leaderboardConfig?.yearsBoardId;
-    if (this.leaderboardConfig?.enabled && this.leaderboardConsent) {
-      createButton({ text: '打开TapTap公开榜', width: 200, height: 48, fontSize: 12, parent,
+    // 真实榜已启用时单独提供入口；未启用时只保留标题标签，不再重复长说明。
+    let cursor = 310 - 22;
+    if (realBoardReady) {
+      const entryY = cursor - 12 - 22;
+      createButton({ text: '打开 TapTap 公开榜', width: 168, height: 44, visualHeight: 32, fontSize: 12, color: THEME.chip,
+        textColor: THEME.primary, parent,
         onClick: () => {
           if (!boardId) { this.toast('真实榜单缺少后台榜 ID'); return; }
           void new TapLeaderboardProvider().open(boardId).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用（需后台白名单/登录态）'); });
-        } }).setPosition(0, 266);
-    } else {
-      createLabel({
-        text: this.leaderboardConfig?.enabled
-          ? '真实榜已配置，需在设置开启“公开榜单同步”'
-          : '真实榜未启用（缺后台榜 ID/白名单），以下为本地模拟',
-        fontSize: 12,
-        color: THEME.textWeak,
-        width: 300,
-        lineHeight: 17,
-        parent,
-      }).setPosition(0, 266);
+        } }).setPosition(0, entryY);
+      cursor = entryY - 22;
     }
 
     const rows = this.rankMode === 'assets'
       ? this.facade.assetsLeaderboard()
       : this.facade.yearsLeaderboard();
-
-    createLabel({
-      text: '本地模拟企业，非真实联网排名',
-      fontSize: 12,
-      color: THEME.textWeak,
-      parent,
-    }).setPosition(0, 234);
     const playerRank = rows.findIndex((r) => r.isPlayer) + 1;
     const player = rows.find((r) => r.isPlayer);
+
+    // §29.4：摘要白卡左右分离；左侧最多两行，右侧独立“定位我方”。
+    const SUMMARY_H = 72;
+    const summaryCenter = cursor - 12 - SUMMARY_H / 2;
+    createRect({ width: 343, height: SUMMARY_H, color: Color.WHITE, radius: 12, parent }).setPosition(0, summaryCenter);
+    createLabel({
+      text: player ? `我方 第 ${playerRank}/${rows.length} 名` : '尚未创建公司',
+      fontSize: 15,
+      bold: true,
+      color: player ? THEME.primary : THEME.textWeak,
+      width: 208,
+      align: 'left',
+      parent,
+    }).setPosition(-48, summaryCenter + 14);
     createLabel({
       text: player
-        ? `我方 第 ${playerRank}/${rows.length} 名\n资产 ${moneyText(player.assetsYuan)}｜经营 ${player.yearsOperated} 年`
+        ? `总资产 ${moneyText(player.assetsYuan)}｜经营 ${player.yearsOperated} 年`
         : '创建公司后显示我方名次',
       fontSize: 12,
-      color: player ? THEME.primary : THEME.textWeak,
-      width: 210,
+      color: THEME.textWeak,
+      width: 208,
+      align: 'left',
       parent,
-    }).setPosition(-58, 202);
-    if (player && playerRank > 0) {
+    }).setPosition(-48, summaryCenter - 12);
+    const firstRowY = summaryCenter - SUMMARY_H / 2 - 12 - 24;
+    if (player) {
       createButton({
-        text: '定位我方',
-        width: 84,
-        height: 48,
-        fontSize: 12,
-        parent,
-        onClick: () => this.shell?.scrollView.scrollToOffset(new Vec2(0, Math.max(0, (playerRank - 1) * 52 - 120)), 0.25),
-      }).setPosition(120, 202);
-    }
-
-    // Render the complete local table; the enclosing PageShell scrolls long lists.
-    rows.forEach((row, i) => {
-      const y = 156 - i * 52;
-      createRect({
-        width: 343,
-        height: 46,
-        color: row.isPlayer ? new Color(224, 236, 255) : Color.WHITE,
-        radius: 6,
-        parent,
-      }).setPosition(0, y);
-      createLabel({ text: `${i + 1}`, fontSize: 14, bold: true, width: 26, color: i < 3 ? THEME.warning : THEME.textWeak, parent }).setPosition(-153, y);
-      const nameNode = createLabel({
-        text: row.isPlayer ? `${row.name}（你）` : row.name,
-        fontSize: 12,
-        bold: row.isPlayer,
-        width: 108,
-        align: 'left',
-        color: row.isPlayer ? THEME.primary : THEME.text,
-        parent,
-      });
-      nameNode.setPosition(-48, y);
-      const nameLabel = nameNode.getComponent(Label);
-      if (nameLabel) {
-        nameLabel.overflow = Label.Overflow.CLAMP;
-        nameLabel.enableWrapText = false;
-      }
-      const metric = this.rankMode === 'assets'
-        ? moneyText(row.assetsYuan)
-        : `${row.yearsOperated} 年`;
-      createLabel({ text: metric, fontSize: 12, width: 78, align: 'right', color: THEME.text, parent }).setPosition(62, y);
-      createButton({
-        text: '详情',
-        width: 56,
-        height: 48,
-        fontSize: 12,
+        text: '定位我方 ›',
+        width: 96,
+        height: 44,
+        flat: true,
+        fontSize: 13,
+        textColor: THEME.primary,
         parent,
         onClick: () => {
+          audioManager.uiTap();
+          this.scrollRankTo(firstRowY - (playerRank - 1) * 56);
+        },
+      }).setPosition(111.5, summaryCenter);
+    }
+
+    // §29.4：整行可点；不再为每行塞一个“详情”按钮。表头三列固定宽度避免长名称/大金额相撞。
+    rows.forEach((row, i) => {
+      const y = firstRowY - i * 56;
+      const rowButton = createButton({
+        text: '',
+        name: `RankRow${i + 1}`,
+        width: 343,
+        height: 48,
+        fontSize: 12,
+        color: row.isPlayer ? THEME.primarySoft : Color.WHITE,
+        parent,
+        onClick: () => {
+          audioManager.uiTap();
           const dialog = openScrollableDialog({
             overlay: this.modalOverlay(),
             viewportHeight: this.shellLayout().viewportHeight,
@@ -4968,10 +5008,45 @@ export class AppView extends Component {
           createLabel({ text: `企业：${row.name}`, fontSize: 14, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `总资产：${moneyText(row.assetsYuan)}（现金 + 未折旧业务资产）`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `经营年限：${row.yearsOperated} 年`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
-          createButton({ text: '关闭', width: 240, height: 48, parent: dialog.footer, onClick: () => dialog.close() }).setPosition(0, 0);
+          createButton({ text: '关闭', width: 108, height: 44, visualHeight: 40, parent: dialog.footer, onClick: () => dialog.close() }).setPosition(0, 0);
         },
-      }).setPosition(141, y);
+      });
+      rowButton.setPosition(0, y);
+      createLabel({ text: `${i + 1}`, fontSize: 14, bold: true, width: 26, color: i < 3 ? THEME.warning : THEME.textWeak, parent: rowButton }).setPosition(-146.5, 0);
+      const nameNode = createLabel({
+        // §29.12：CLAMP 不产生省略号，长公司名会像被切断；先按列宽截断再渲染。
+        text: fitTextWithEllipsis(row.isPlayer ? `我方 · ${row.name}` : row.name, 14, 140),
+        fontSize: 14,
+        bold: row.isPlayer,
+        width: 143,
+        align: 'left',
+        color: row.isPlayer ? THEME.primary : THEME.text,
+        parent: rowButton,
+      });
+      nameNode.setPosition(-52.5, 0);
+      const nameLabel = nameNode.getComponent(Label);
+      if (nameLabel) {
+        nameLabel.overflow = Label.Overflow.CLAMP;
+        nameLabel.enableWrapText = false;
+      }
+      const metric = this.rankMode === 'assets'
+        ? moneyText(row.assetsYuan)
+        : `${row.yearsOperated} 年`;
+      createLabel({ text: metric, fontSize: 13, width: 110, align: 'right', color: THEME.text, parent: rowButton }).setPosition(82.5, 0);
+      createLabel({ text: '›', fontSize: 14, width: 14, color: THEME.textWeak, parent: rowButton }).setPosition(152.5, 0);
     });
+  }
+
+  /** §29.4：按真实行位置与内容高度滚动，使目标行出现在可视区中部。 */
+  private scrollRankTo(rowY: number): void {
+    const shell = this.shell;
+    if (!shell) return;
+    const layout = this.shellLayout();
+    const geo = computeScrollBody(layout.bodyHeight, shell.minBottom);
+    const maxOffset = Math.max(0, geo.contentHeight - layout.bodyHeight);
+    // authoredTop 恒为 406；把目标行放到可视区中部，再按内容高度夹取。
+    const target = 406 - rowY - layout.bodyHeight / 2;
+    shell.scrollView.scrollToOffset(new Vec2(0, Math.max(0, Math.min(maxOffset, target))), 0.25);
   }
 
   /** R24：底部 Tab 锚定可视区底部（含底部 inset 抬升）；返回壳引用供几何重算。 */
@@ -5013,7 +5088,9 @@ export class AppView extends Component {
         textColor: active ? THEME.primary : THEME.textWeak,
         parent: footer,
         onClick: () => {
+          if (this.activeTab === id) return;
           this.activeTab = id;
+          audioManager.uiTap();
           this.render();
         },
       });
@@ -5206,45 +5283,50 @@ export class AppView extends Component {
       },
     });
     const body = handle.body;
-    const innerWidth = 324 - 40;
+    const innerWidth = 276;
 
     if (report) {
       const index = years.indexOf(report.year);
+      // §29.5：年份只出现在标题；左右各一个独立按钮槽位，不再用中间文字桥接导致重叠。
       const navRow = new Node('AnnualReportYearSelector');
       navRow.parent = body;
-      navRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
-      const navItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
-      const newer = navItems[0]!;
-      const older = navItems[1]!;
+      navRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 44));
+      const olderDisabled = index >= years.length - 1;
+      const newerDisabled = index <= 0;
       createButton({
-        text: '较新年度',
-        width: newer.width,
-        height: 48,
+        text: '‹ 较早年度',
+        width: 96,
+        height: 44,
+        visualHeight: 32,
         fontSize: 12,
-        disabled: index <= 0,
+        color: THEME.chip,
+        textColor: olderDisabled ? THEME.textWeak : THEME.text,
         parent: navRow,
         onClick: () => {
-          if (index <= 0) return;
-          handle.close();
-          this.annualReportYear = years[index - 1] ?? report.year;
-          this.renderAnnualReport();
-        },
-      }).setPosition(newer.x, 0);
-      createLabel({ text: `第 ${report.year} 年`, fontSize: 13, bold: true, parent: navRow }).setPosition(0, 0);
-      createButton({
-        text: '较早年度',
-        width: older.width,
-        height: 48,
-        fontSize: 12,
-        disabled: index >= years.length - 1,
-        parent: navRow,
-        onClick: () => {
-          if (index >= years.length - 1) return;
+          if (olderDisabled) return;
+          audioManager.uiSelect();
           handle.close();
           this.annualReportYear = years[index + 1] ?? report.year;
           this.renderAnnualReport();
         },
-      }).setPosition(older.x, 0);
+      }).setPosition(-innerWidth / 2 + 48, 0);
+      createButton({
+        text: '较新年度 ›',
+        width: 96,
+        height: 44,
+        visualHeight: 32,
+        fontSize: 12,
+        color: THEME.chip,
+        textColor: newerDisabled ? THEME.textWeak : THEME.text,
+        parent: navRow,
+        onClick: () => {
+          if (newerDisabled) return;
+          audioManager.uiSelect();
+          handle.close();
+          this.annualReportYear = years[index - 1] ?? report.year;
+          this.renderAnnualReport();
+        },
+      }).setPosition(innerWidth / 2 - 48, 0);
     }
 
     if (!report) {
@@ -5258,8 +5340,9 @@ export class AppView extends Component {
       });
       createButton({
         text: '知道了',
-        width: 240,
-        height: 48,
+        width: 108,
+        height: 44,
+        visualHeight: 40,
         parent: handle.footer,
         onClick: () => handle.close(),
       }).setPosition(0, 0);
@@ -5282,17 +5365,18 @@ export class AppView extends Component {
     for (const [label, value, cost] of rows) {
       const row = new Node('AnnualRow');
       row.parent = body;
-      row.addComponent(UITransform).setContentSize(new Size(innerWidth, 26));
-      createLabel({ text: label, fontSize: 12, align: 'left', color: THEME.textWeak, width: 150, parent: row })
-        .setPosition(-58, 0);
+      row.addComponent(UITransform).setContentSize(new Size(innerWidth, 34));
+      // 两列固定宽度并留 12 间距：长科目名与大金额不会互相压字。
+      createLabel({ text: label, fontSize: 13, align: 'left', color: THEME.textWeak, width: 150, parent: row })
+        .setPosition(-63, 0);
       createLabel({
         text: value === 0 ? '¥0' : moneyText(value),
-        fontSize: 12,
+        fontSize: 13,
         align: 'right',
         color: cost && value !== 0 ? THEME.danger : THEME.text,
-        width: 150,
+        width: 114,
         parent: row,
-      }).setPosition(58, 0);
+      }).setPosition(81, 0);
     }
 
     const profitColor = report.profitYuan < 0 ? THEME.danger : THEME.profit;
@@ -5362,8 +5446,9 @@ export class AppView extends Component {
 
     createButton({
       text: '关闭',
-      width: 240,
-      height: 48,
+      width: 108,
+      height: 44,
+      visualHeight: 40,
       parent: handle.footer,
       onClick: () => handle.close(),
     }).setPosition(0, 0);
@@ -5415,6 +5500,7 @@ export class AppView extends Component {
         text: on ? '开' : '关',
         width: 64,
         height: 48,
+        visualHeight: 32,
         variant: 'toggle',
         color: on ? THEME.secondary : THEME.divider,
         textColor: on ? Color.WHITE : THEME.text,
@@ -5458,6 +5544,27 @@ export class AppView extends Component {
       set(next);
       if (next) audioManager.uiTap();
     });
+    // §29.7：给玩家一个无需退出设置就能确认“到底有没有声音”的自测入口。
+    const listenRow = row();
+    createLabel({ text: '试听提示音', fontSize: 13, width: innerWidth - 88, align: 'left', parent: listenRow }).setPosition(-44, 0);
+    createButton({
+      text: '试听',
+      width: 64,
+      height: 44,
+      visualHeight: 32,
+      color: THEME.chip,
+      textColor: THEME.primary,
+      fontSize: 13,
+      parent: listenRow,
+      onClick: () => {
+        if (!audioManager.getSettings().masterEnabled || !audioManager.getSettings().sfxEnabled) {
+          this.toast('音效开关已关闭；先开启“操作音效/提示”');
+          return;
+        }
+        audioManager.uiTap();
+        this.toast('已播放试听音，请确认设备音量与开关');
+      },
+    }).setPosition(innerWidth / 2 - 32, 0);
 
     section('排行榜');
     toggle('公开榜单同步（平台公开展示）', this.leaderboardConsent && this.leaderboardConfig?.enabled === true, (set) => {

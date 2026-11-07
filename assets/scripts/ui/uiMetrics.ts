@@ -62,6 +62,22 @@ export function estimateTextWidth(text: string, fontSize: number): number {
   return Math.ceil(units * fontSize);
 }
 
+/**
+ * §29.12：单行文本按可用宽度截断并补省略号。
+ * Cocos 的 Overflow.CLAMP 只会硬裁像素，不产生「…」，长公司名会像被切断；
+ * 列表类单行 Label 必须先经过这里再赋给 Label.string。
+ */
+export function fitTextWithEllipsis(text: string, fontSize: number, maxWidth: number): string {
+  if (maxWidth <= 0) return '';
+  if (estimateTextWidth(text, fontSize) <= maxWidth) return text;
+  const chars = Array.from(text);
+  const ellipsis = '…';
+  const budget = maxWidth - estimateTextWidth(ellipsis, fontSize);
+  let end = chars.length;
+  while (end > 0 && estimateTextWidth(chars.slice(0, end).join(''), fontSize) > budget) end -= 1;
+  return end > 0 ? `${chars.slice(0, end).join('')}${ellipsis}` : ellipsis;
+}
+
 function isWideChar(ch: string): boolean {
   const code = ch.codePointAt(0) ?? 0;
   return (

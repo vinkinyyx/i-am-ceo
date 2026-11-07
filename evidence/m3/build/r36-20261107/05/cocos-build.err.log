@@ -1,0 +1,12 @@
+构建参数 mainBundleCompressionType (merge_dep) 校验失败,  compression type(undefined) is invalid for this platform!, 将会使用默认值 "merge_dep"
+构建参数 debug ("false") 校验失败, typeof debug should be boolean but get false, 将会使用默认值 false
+构建参数 md5Cache ("true") 校验失败, typeof md5Cache should be boolean but get true, 将会使用默认值 true
+Recovery window failed.
+SyntaxError: C:\Users\vinki\.CocosCreator\editor\window.json: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at _readFile (C:\ProgramData\cocos\editors\Creator\3.8.8\resources\app.asar\node_modules\fs-extra\node_modules\jsonfile\index.js:25:16)
+    at Object.startup (C:\ProgramData\cocos\editors\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\windows\protected\browser.ccc:1:3561)
+    at Object.window (C:\ProgramData\cocos\editors\Creator\3.8.8\resources\app.asar\node_modules\@editor\creator\dist\startup\protected\browser\index.ccc:1:1120)
+    at async Promise.all (index 1)
+    at launch (C:\ProgramData\cocos\editors\Creator\3.8.8\resources\app.asar\launch\dist\launch.js:1:1276)
+    at C:\ProgramData\cocos\editors\Creator\3.8.8\resources\app.asar\launch\dist\index.js:1:1208

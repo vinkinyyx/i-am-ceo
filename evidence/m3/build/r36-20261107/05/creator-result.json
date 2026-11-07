@@ -1,0 +1,17 @@
+{
+  "command": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+  "args": [
+    "--project",
+    "D:\\Workspace\\TapTap\\我是CEO",
+    "--build",
+    "platform=wechatgame;debug=false;buildPath=D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r36-20261107\\05\\wechatgame;md5Cache=true;sourceMaps=false"
+  ],
+  "platform": "wechatgame",
+  "startedAt": "2026-11-07T13:54:14.960Z",
+  "finishedAt": "2026-11-07T13:54:50.525Z",
+  "exitCode": 36,
+  "doneMarker": true,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\cocos-build.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\cocos-build.err.log"
+}

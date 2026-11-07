@@ -1,0 +1,13 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\validate-release-config.cjs",
+  "args": [
+    "diagnostic",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05"
+  ],
+  "startedAt": "2026-11-07T13:54:14.461Z",
+  "finishedAt": "2026-11-07T13:54:14.517Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\validate-release-config.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\validate-release-config.err.log"
+}

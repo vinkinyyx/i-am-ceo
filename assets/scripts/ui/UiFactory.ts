@@ -150,10 +150,19 @@ export interface ButtonOptions {
   disabled?: boolean;
   /** R31：语义变体。声明后强制同一变体同高（48），并参与几何验收。 */
   variant?: ButtonVariant;
+  /**
+   * §29.3：视觉高度与热区分开。高度仍取 max(height, 44) 作为热区，
+   * 底色与文字只占 visualHeight（例如 32–40），不缩小实际可点范围。
+   */
+  visualHeight?: number;
+  /** §29.3：文字/行内动作无底色；热区照常生效。 */
+  flat?: boolean;
 }
 
 interface ButtonVisualState {
   label: Node;
+  /** 实际绘制底色的节点；flat 时为 null。 */
+  bg: Node | null;
   color: Color;
   textColor: Color;
   width: number;
@@ -163,10 +172,19 @@ interface ButtonVisualState {
 
 const BUTTON_VISUALS = new WeakMap<Node, ButtonVisualState>();
 
+/**
+ * §29.7：任意按钮的真实点击都视为一次用户手势。
+ * 浏览器自动播放策略要求手势后才能创建/恢复音频，统一在按钮入口补一次解锁。
+ */
+let uiInteractionHook: (() => void) | null = null;
+export function setUiInteractionHook(hook: (() => void) | null): void {
+  uiInteractionHook = hook;
+}
+
 /** 重绘按钮底色；只改颜色/透明度，不改布局尺寸。 */
-function paintButton(node: Node, state: ButtonVisualState, color: Color, textColor: Color): void {
-  const graphics = node.getComponent(Graphics);
-  const tr = node.getComponent(UITransform);
+function paintButton(state: ButtonVisualState, color: Color, textColor: Color): void {
+  const graphics = state.bg?.getComponent(Graphics);
+  const tr = state.bg?.getComponent(UITransform);
   if (graphics && tr) {
     graphics.clear();
     graphics.fillColor = color;
@@ -184,7 +202,7 @@ export function setButtonEnabled(node: Node, enabled: boolean): void {
   const button = node.getComponent(Button);
   if (button) button.interactable = enabled;
   if (!state) return;
-  paintButton(node, state, enabled ? state.color : THEME.disabled, enabled ? state.textColor : THEME.textWeak);
+  paintButton(state, enabled ? state.color : THEME.disabled, enabled ? state.textColor : THEME.textWeak);
 }
 
 export function isButtonEnabled(node: Node): boolean {
@@ -200,7 +218,7 @@ export function setButtonLook(node: Node, color: Color, textColor: Color): void 
   state.color = color;
   state.textColor = textColor;
   const enabled = node.getComponent(Button)?.interactable ?? true;
-  paintButton(node, state, enabled ? color : THEME.disabled, enabled ? textColor : THEME.textWeak);
+  paintButton(state, enabled ? color : THEME.disabled, enabled ? textColor : THEME.textWeak);
 }
 
 /** 就地更新按钮文案（保持同一按钮框，不重建节点）。 */
@@ -238,20 +256,47 @@ export function createButton(opts: ButtonOptions): Node {
     name: opts.name ?? 'Button',
     width: touch.width,
     height,
-    color: opts.disabled ? THEME.disabled : (opts.color ?? THEME.primary),
+    color: new Color(0, 0, 0, 0),
     radius,
     parent: opts.parent,
   });
   // 拦截点击穿透
   node.addComponent(BlockInputEvents);
 
+  // §29.3：视觉底色与热区分离。未指定时沿用旧行为，直接在热区节点上绘制。
+  const visualHeight = opts.visualHeight === undefined
+    ? height
+    : Math.max(0, Math.min(height, opts.visualHeight));
+  let bg: Node | null = null;
+  if (!opts.flat) {
+    if (visualHeight < height) {
+      bg = createRect({
+        name: 'ButtonBg',
+        width: touch.width,
+        height: visualHeight,
+        color: opts.disabled ? THEME.disabled : (opts.color ?? THEME.primary),
+        radius,
+        parent: node,
+      });
+      bg.setPosition(Vec3.ZERO);
+    } else {
+      const graphics = node.getComponent(Graphics);
+      if (graphics) {
+        graphics.fillColor = opts.disabled ? THEME.disabled : (opts.color ?? THEME.primary);
+        graphics.roundRect(-touch.width / 2, -height / 2, touch.width, height, radius);
+        graphics.fill();
+      }
+      bg = node;
+    }
+  }
+
   // R31/V05：Label 无条件挂到 Button；支持先创建、后挂载父节点。
   const labelNode = new Node('ButtonLabel');
-  labelNode.parent = node;
+  labelNode.parent = bg ?? node;
   labelNode.setPosition(Vec3.ZERO);
   const tr = labelNode.addComponent(UITransform);
   const contentWidth = Math.max(1, touch.width - BUTTON_BASELINE.paddingX * 2);
-  tr.setContentSize(new Size(contentWidth, height));
+  tr.setContentSize(new Size(contentWidth, visualHeight > 0 ? visualHeight : height));
   const label = labelNode.addComponent(Label);
   label.string = opts.text;
   label.fontSize = opts.fontSize ?? (variant === 'compact' ? 14 : 15);
@@ -277,10 +322,11 @@ export function createButton(opts: ButtonOptions): Node {
   button.transition = Button.Transition.SCALE;
   button.zoomScale = 0.96;
   button.interactable = !opts.disabled;
-  BUTTON_VISUALS.set(node, { label: labelNode, color: fillColor, textColor, width: touch.width, height, radius });
+  BUTTON_VISUALS.set(node, { label: labelNode, bg, color: fillColor, textColor, width: touch.width, height, radius });
   node.on(Button.EventType.CLICK, () => {
     // V07：读取当前 interactable，而不是创建时的 opts.disabled 闭包。
     if (!node.getComponent(Button)?.interactable) return;
+    uiInteractionHook?.();
     opts.onClick();
   });
   return node;

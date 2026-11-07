@@ -11,6 +11,11 @@ import { AudioClip, AudioSource, Node, director, game, resources, sys } from 'cc
  */
 
 const STORAGE_KEY = 'ceo.audio.settings.v1';
+/**
+ * §29.7：音频统一挂在 resources/audio 下，代码只写相对键，由入口补前缀。
+ * 历史上漏掉 audio/ 导致所有 key 404（静默降级后表现为“完全没声音”）。
+ */
+const AUDIO_ROOT = 'audio/';
 
 export interface AudioSettings {
   masterEnabled: boolean;
@@ -53,6 +58,7 @@ export class AudioManager {
   private currentBgm: 'startup' | 'operation' | null = null;
   private loadingPaths = new Set<string>();
   private pauseReasons = new Set<string>();
+  private lastBgmSkip = '';
 
   /** 读取持久化设置（localStorage，失败用默认）。 */
   loadSettings(): AudioSettings {
@@ -80,7 +86,7 @@ export class AudioManager {
     return { ...this.settings };
   }
 
-  /** 更新一个或多个开关；总开关关闭立即静音 BGM。 */
+  /** 更新一个或多个开关；总开关关闭立即停止发声，避免短音漏出。 */
   updateSettings(patch: Partial<AudioSettings>): boolean {
     const previous = this.settings;
     this.settings = { ...this.settings, ...patch };
@@ -88,10 +94,13 @@ export class AudioManager {
       this.settings = previous;
       return false;
     }
-    if (!this.canPlayMusic()) {
+    if (!this.settings.masterEnabled) {
+      // 总开关同时压制 BGM 与已触发的 one-shot。
+      this.source?.stop();
+    } else if (!this.canPlayMusic()) {
       this.source?.pause();
     } else if (this.currentBgm) {
-      this.playBgm(this.currentBgm);
+      void this.playBgm(this.currentBgm);
     }
     return true;
   }
@@ -109,9 +118,27 @@ export class AudioManager {
     if (this.unlocked) return;
     this.unlocked = true;
     this.ensureSource();
+    console.info(`[audio] unlocked (source=${this.source ? 'ready' : 'missing'})`);
     if (this.currentBgm && this.canPlayMusic()) {
-      this.playBgm(this.currentBgm);
+      void this.playBgm(this.currentBgm);
     }
+  }
+
+  /**
+   * §29.7：首触被弹层消耗/浏览器拒绝播放时，在下一次真实点击再补一次。
+   * 只补当前曲目，不重播已成功播放的音轨。
+   */
+  retryIfNeeded(): void {
+    if (!this.unlocked) return;
+    if (!this.canPlayMusic()) return;
+    if (!this.currentBgm) return;
+    if (this.source?.playing) return;
+    void this.playBgm(this.currentBgm);
+  }
+
+  /** 自测诊断：当前是否真的有一条循环在响。 */
+  isBgmPlaying(): boolean {
+    return Boolean(this.source?.playing);
   }
 
   private ensureSource(): void {
@@ -130,6 +157,8 @@ export class AudioManager {
       resources.load(path, AudioClip, (err: Error | null, clip: AudioClip | null) => {
         this.loadingPaths.delete(path);
         if (err || !clip) {
+          // §29.7：诊断阶段保留资源键与失败阶段，便于真机日志定位。
+          console.warn(`[audio] load failed at preload: ${path}`);
           resolve(null);
           return;
         }
@@ -142,9 +171,18 @@ export class AudioManager {
   /** 播放 BGM（startup=创业启程 / operation=日常经营），循环、按开关静音。 */
   async playBgm(kind: 'startup' | 'operation'): Promise<void> {
     this.currentBgm = kind;
-    if (!this.canPlayMusic()) return;
+    if (!this.canPlayMusic()) {
+      // 自测诊断：只在状态变化时打印一次，避免每次重绘刷屏。
+      const reason = `unlocked=${this.unlocked} master=${this.settings.masterEnabled} music=${this.settings.musicEnabled} pause=[${Array.from(this.pauseReasons).join(',')}]`;
+      if (this.lastBgmSkip !== reason) {
+        this.lastBgmSkip = reason;
+        console.info(`[audio] bgm skipped: ${reason}`);
+      }
+      return;
+    }
+    this.lastBgmSkip = '';
     this.ensureSource();
-    const path = kind === 'startup' ? 'bgm/BGM_01_StartupLoop' : 'bgm/BGM_02_OfficeLoop';
+    const path = AUDIO_ROOT + (kind === 'startup' ? 'bgm/BGM_01_StartupLoop' : 'bgm/BGM_02_OfficeLoop');
     const clip = await this.preload(path);
     if (!clip || !this.source || !this.canPlayMusic() || this.currentBgm !== kind) return;
     if (this.source.clip === clip && this.source.playing) return;
@@ -153,6 +191,7 @@ export class AudioManager {
     this.source.loop = true;
     this.source.volume = 0.6;
     this.source.play();
+    console.info(`[audio] bgm start: ${path} playing=${this.source.playing}`);
   }
 
   /** 播放一次性音效/短乐（节流：同名 80ms 内不重叠）。 */
@@ -163,7 +202,7 @@ export class AudioManager {
     if ((this.lastPlayedAt.get(id) ?? -999) + 80 > now) return;
     this.lastPlayedAt.set(id, now);
 
-    const path = SFX_FILE[id];
+    const path = AUDIO_ROOT + SFX_FILE[id];
     const clip = await this.preload(path);
     if (!clip || !this.canPlaySfx()) return;
     // 短乐用独立 one-shoot，避免打断 BGM

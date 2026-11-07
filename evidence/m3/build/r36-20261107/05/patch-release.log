@@ -1,0 +1,40 @@
+PATCH_OK
+{
+  "releaseId": "r36-20261107",
+  "gameVersion": "1.1.1",
+  "copied": [
+    "logo.png",
+    "slogan.png",
+    "splash-art.png",
+    "first-screen.js"
+  ],
+  "patches": [
+    {
+      "label": "fetch-guard",
+      "matches": 1
+    },
+    {
+      "label": "init-once",
+      "matches": 1
+    },
+    {
+      "label": "boot-diag",
+      "matches": 1
+    },
+    {
+      "label": "account-guard",
+      "matches": 1
+    },
+    {
+      "label": "isdevelop",
+      "matches": 1
+    }
+  ],
+  "warnings": [],
+  "removedDuplicateLogos": [
+    "logo.89978.png"
+  ],
+  "removed": [
+    "splash.d49ca.jpg"
+  ]
+}

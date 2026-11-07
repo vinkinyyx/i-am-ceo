@@ -1,0 +1,14 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\patch-release.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r36-20261107\\05\\tap\\game",
+    "r36-20261107",
+    "1.1.1"
+  ],
+  "startedAt": "2026-11-07T13:55:01.096Z",
+  "finishedAt": "2026-11-07T13:55:01.230Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\patch-release.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r36-20261107\\05\\patch-release.err.log"
+}
