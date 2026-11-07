@@ -67,6 +67,22 @@ function makeFakeTapGame(dir) {
   fs.writeFileSync(path.join(resourcesDir, 'privacy-policy.json'), JSON.stringify([
     1, 0, 0, [], [], [[0, 'privacy-policy', { version: 2, sections: [] }]],
   ]));
+  // DEV-04 起发布包强制携带三份发布配置（disabled 也需显式声明），夹具同步
+  fs.writeFileSync(path.join(resourcesDir, 'cloud-config.json'), JSON.stringify([
+    1, 0, 0, [], [], [[0, 'cloud.config', {
+      schemaVersion: 1, enabled: false, environment: 'disabled', appId: '', policyVersion: 2,
+      minUploadIntervalMs: 65000, autoBackupIntervalMs: 120000, retainedCheckpoints: 3,
+    }]],
+  ]));
+  fs.writeFileSync(path.join(resourcesDir, 'leaderboards-config.json'), JSON.stringify([
+    1, 0, 0, [], [], [[0, 'leaderboards.config', {
+      schemaVersion: 1, enabled: false, environment: 'disabled', appId: '', policyVersion: 2,
+      assetsBoardId: '', yearsBoardId: '', calculation: 'latest',
+    }]],
+  ]));
+  fs.writeFileSync(path.join(resourcesDir, 'runtime-config.json'), JSON.stringify([
+    1, 0, 0, [], [], [[0, 'runtime.config', { authEndpoint: '', privacyPolicyUrl: '' }]],
+  ]));
 }
 
 describe('release manifest source paths', () => {
@@ -88,6 +104,32 @@ describe('release manifest source paths', () => {
 });
 
 describe('R20 patch-release.cjs', () => {
+  it('removes only an unreferenced byte-identical hashed logo while retaining required logo.png', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-pipe-logo-'));
+    const tapDir = path.join(tmp, 'game');
+    makeFakeTapGame(tapDir);
+    const logo = path.join(root, 'tools', 'splash', 'logo.png');
+    fs.copyFileSync(logo, path.join(tapDir, 'logo.89978.png'));
+    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-logo', '1.0.0']);
+    expect(r.code).toBe(0);
+    expect(fs.existsSync(path.join(tapDir, 'logo.png'))).toBe(true);
+    expect(fs.existsSync(path.join(tapDir, 'logo.89978.png'))).toBe(false);
+    expect(r.stdout).toContain('"removedDuplicateLogos": [\n    "logo.89978.png"');
+  });
+
+  it('retains a byte-identical hashed logo when any package metadata references it', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-pipe-logo-ref-'));
+    const tapDir = path.join(tmp, 'game');
+    makeFakeTapGame(tapDir);
+    fs.copyFileSync(path.join(root, 'tools', 'splash', 'logo.png'), path.join(tapDir, 'logo.89978.png'));
+    fs.writeFileSync(path.join(tapDir, 'settings.json'), JSON.stringify({ splashLogo: 'logo.89978.png' }));
+    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-logo-ref', '1.0.0']);
+    expect(r.code).toBe(0);
+    expect(fs.existsSync(path.join(tapDir, 'logo.png'))).toBe(true);
+    expect(fs.existsSync(path.join(tapDir, 'logo.89978.png'))).toBe(true);
+    expect(r.stdout).toContain('"removedDuplicateLogos": []');
+  });
+
   it('T01 补丁命中 fetch/init/boot-diag/check-version 标记', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-pipe-'));
     const tapDir = path.join(tmp, 'game');

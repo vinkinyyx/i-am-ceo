@@ -1,1 +1,0 @@
-Usage: run-cocos-build.cjs <CreatorExe> <projectRoot> <platform=wechatgame|web-mobile;...> <stdoutLog> <stderrLog> <resultJson>

@@ -87,8 +87,10 @@ export class TapCloudSaveProvider implements ICloudSaveProvider {
       summary: `第${checkpoint.summary.year}年${checkpoint.summary.month}月，员工${checkpoint.summary.employeeCount}人`,
       extra: JSON.stringify({ protocolVersion: 1, appId: checkpoint.appId, environment: checkpoint.environment,
         checkpointId: checkpoint.checkpointId, profileId: checkpoint.cloudProfileId,
-        parentCheckpointIds: checkpoint.parentCheckpointIds, resetEpoch: checkpoint.resetEpoch }),
-      playtime: Math.max(0, Math.floor(checkpoint.snapshot.payload.lastWallClockMs / 1000)),
+        parentCheckpointIds: checkpoint.parentCheckpointIds, resetEpoch: checkpoint.resetEpoch,
+        year: checkpoint.summary.year, month: checkpoint.summary.month, capturedAtMs: checkpoint.capturedAtMs }),
+      // No reliable accumulated playtime is tracked yet; an epoch timestamp is not playtime.
+      playtime: 0,
     };
     const data = encodeCloudCheckpoint(checkpoint);
     return this.writeLocal(`${operationId}:file`, filePath, data).then((written) => {

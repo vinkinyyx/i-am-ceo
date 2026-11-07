@@ -1,6 +1,0 @@
-{
-  "taskId":"TASK-M3-09-R33","status":"IN_PROGRESS","checks":6,"failed":0,"browserErrors":0,
-  "coverage":["settings opened by actual click","audio settings persisted","audio storage failure rolls back in-memory value and displays error","settings leave company save revision unchanged","tutorial replay leaves runId and revision unchanged"],
-  "report":"e2e-report.json","visualEvidence":["r33-settings.png","r33-audio-write-failure.png","r33-tutorial-replay.png"],
-  "unverified":["offline summary UI","crisis and one-time rescue UI","hide/show audio resume","single audio decode failure isolation"]
-}

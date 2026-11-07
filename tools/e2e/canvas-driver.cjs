@@ -45,12 +45,10 @@ class CanvasDriver {
 
   async findLabels(text, { exact = true, parentContains, nth = 0 } = {}) {
     return this.page.evaluate(({ text, exact, parentContains }) => {
-      // Some Cocos web builds do not expose cc.UITransform on the global `cc` object;
-      // fall back to the component list so geometry assertions do not silently read 0.
-      const uiTransformOf = (node) =>
-        node.getComponent(cc.UITransform) ||
-        node.components?.find((component) => component.constructor?.name === 'UITransform') ||
-        null;
+      // Creator release builds may expose the class as UITransformComponent and
+      // minify constructor.name. Geometry must fail closed when no real transform exists.
+      const UITransformType = cc.UITransform || cc.UITransformComponent;
+      if (!UITransformType) throw new Error('ui-transform-export-missing');
       const found = [];
       const walk = (node) => {
         if (!node.activeInHierarchy) return;
@@ -66,14 +64,11 @@ class CanvasDriver {
               if (ancestor.getComponent(cc.Button)) { targetNode = ancestor; break; }
               ancestor = ancestor.parent;
             }
-            const transform = uiTransformOf(targetNode);
+            const transform = targetNode.getComponent(UITransformType);
+            if (!transform) throw new Error(`ui-transform-component-missing:${label.string}`);
             const box = transform?.getBoundingBoxToWorld();
-            if (box) found.push({ text: label.string, x: box.x + box.width / 2, y: box.y + box.height / 2, width: box.width, height: box.height });
-            else {
-              const pos = targetNode.getWorldPosition();
-              const size = transform?.contentSize;
-              found.push({ text: label.string, x: pos.x, y: pos.y, width: size?.width ?? 1, height: size?.height ?? 1 });
-            }
+            if (!box || !(box.width > 0) || !(box.height > 0)) throw new Error(`ui-transform-bounds-invalid:${label.string}`);
+            found.push({ text: label.string, x: box.x + box.width / 2, y: box.y + box.height / 2, width: box.width, height: box.height });
           }
         }
         node.children.forEach(walk);

@@ -1,7 +1,0 @@
-{
-  "attempt": "web-mobile-isolated-build",
-  "command": "CocosCreator.exe --project <workspace> --build platform=web-mobile;debug=true;buildPath=build/e2e-web-m3-20261103-r2 --nogui",
-  "exitCode": -1,
-  "result": "FAILED",
-  "evidence": "CocosCreator exited -1 with empty stdout/stderr; no index.js emitted. Isolated output directory was not reused."
-}

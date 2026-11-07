@@ -20,6 +20,7 @@ import {
 import { DESIGN_HEIGHT, DESIGN_WIDTH, THEME } from './theme';
 import { SPACE_TOKENS, TEXT_TOKENS } from './textTokens';
 import { createButton, createLabel, createRect, setButtonEnabled, setButtonLabel } from './UiFactory';
+import { ShortContentAnchor } from './shortContentAnchor';
 import {
   ConfirmGuard,
   DIALOG_METRICS,
@@ -399,6 +400,9 @@ function buildScroll(parent: Node, width: number, height: number): {
   layout.paddingLeft = 8;
   layout.paddingRight = 8;
   scrollView.content = content;
+  const anchor = root.addComponent(ShortContentAnchor);
+  anchor.content = content;
+  anchor.viewNode = viewNode;
   return { root, viewNode, content, scrollView };
 }
 

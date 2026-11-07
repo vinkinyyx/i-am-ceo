@@ -11,7 +11,7 @@ param(
   [string]$CocosExe = 'C:\ProgramData\cocos\editors\Creator\3.8.8\CocosCreator.exe',
   [switch]$SkipBuild,
   [string]$Attempt = '01',
-  [ValidateSet('diagnostic', 'product-test-candidate')][string]$Purpose = 'diagnostic'
+  [ValidateSet('diagnostic', 'product-test-candidate', 'product-production-candidate')][string]$Purpose = 'diagnostic'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -51,6 +51,10 @@ function Run-Node($script, [string[]]$argList) {
   $result = Get-Content -LiteralPath $stepResult -Raw | ConvertFrom-Json
   if ($result.exitCode -ne 0) { Fail "node $script 退出码 $($result.exitCode)，日志：$stepLog / $stepErr" }
 }
+
+# 0.5) DEV-04 发行配置模式校验（只检查、不写外部；失败先于 Cocos 构建阻断）
+Run-Node (Join-Path $root 'tools\validate-release-config.cjs') @($Purpose, $logDir)
+if (-not (Select-String -Path (Join-Path $logDir 'validate-release-config.log') -Pattern 'CONFIG_OK' -Quiet)) { Fail '发行配置校验失败，详见 validate-release-config.log/json' }
 
 # 0) 前置：Cocos 单实例锁与路径
 if (-not $SkipBuild) {
@@ -110,7 +114,7 @@ if (-not (Test-Path $zipOut) -or (Get-Item -LiteralPath $zipOut).Length -le 0) {
 
 # 5) 最终 zip 校验 + manifest
 Write-Host '[5/5] 包校验与 manifest'
-Run-Node (Join-Path $root 'tools\verify-package.cjs') @($zipOut, $ReleaseId, $GameVersion, $logDir)
+Run-Node (Join-Path $root 'tools\verify-package.cjs') @($zipOut, $ReleaseId, $GameVersion, $logDir, $Purpose)
 if (-not (Select-String -Path (Join-Path $logDir 'verify-package.log') -Pattern 'VERIFY_OK' -Quiet)) { Fail '校验日志缺少 VERIFY_OK' }
 if ($SkipBuild) { $buildExitCode = 'not-run' } else { $buildExitCode = [string]$buildExitCode }
 Run-Node (Join-Path $root 'tools\enrich-manifest.cjs') @($root, $logDir, $ReleaseId, $Attempt, $Purpose, $buildExitCode)

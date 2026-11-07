@@ -1,0 +1,16 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\verify-package.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r33-20261107\\01\\game.zip",
+    "r33-20261107",
+    "1.0.7",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r33-20261107\\01",
+    "diagnostic"
+  ],
+  "startedAt": "2026-11-07T07:05:32.543Z",
+  "finishedAt": "2026-11-07T07:05:32.722Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r33-20261107\\01\\verify-package.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r33-20261107\\01\\verify-package.err.log"
+}

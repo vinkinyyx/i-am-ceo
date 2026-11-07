@@ -29,6 +29,21 @@ export interface ResetTombstone {
   resetAtMs: number;
 }
 
+/** Durable target for a cloud run replacement; it makes the post-tombstone point recoverable. */
+export interface PreparedRunReplacement {
+  protocolVersion: 1;
+  operationId: string;
+  ownerScope: string;
+  baseRunId: string;
+  baseRevision: number;
+  baseResetGeneration: number;
+  targetRunId: string;
+  targetRevision: 1;
+  targetResetGeneration: number;
+  targetChecksum: string;
+  preparedAtMs: number;
+}
+
 export const SAVE_KEYS = {
   slotA: 'ceo/save/a',
   slotB: 'ceo/save/b',
@@ -36,6 +51,8 @@ export const SAVE_KEYS = {
   tombstone: 'ceo/reset/tombstone',
   /** R12：有界事务日志，只存元数据，不存业务状态。 */
   transaction: 'ceo/save/transaction',
+  replaceIntent: 'ceo/save/replace-intent',
+  replaceStaging: 'ceo/save/replace-staging',
 } as const;
 
 /**
@@ -46,6 +63,8 @@ export interface SaveTransactionJournal {
   protocolVersion: 1;
   transactionId: string;
   kind: 'commit' | 'replace-run';
+  operationId?: string;
+  ownerScope?: string;
   basePointer: SavePointer | null;
   targetPointer: SavePointer;
   targetChecksum: string;

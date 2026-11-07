@@ -1,0 +1,16 @@
+{
+  "event": "game_on_show",
+  "generationBefore": 0,
+  "generationAfter": 1,
+  "verification": "unverified",
+  "showCalls": 1,
+  "pending": true,
+  "coupons": 0,
+  "result": {
+    "kind": "unavailable",
+    "reason": "owner-unconfirmed"
+  },
+  "toasts": [
+    "广告暂不可用，可继续经营"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "mode": "diagnostic-disabled",
+  "purpose": "diagnostic",
+  "errors": [],
+  "summary": {
+    "cloud": {
+      "enabled": false,
+      "environment": "disabled"
+    },
+    "leaderboards": {
+      "enabled": false,
+      "environment": "disabled"
+    },
+    "ads": {
+      "enabled": false,
+      "environment": "disabled"
+    },
+    "runtime": {
+      "authEndpointSet": false,
+      "privacyPolicyUrlSet": false
+    }
+  },
+  "checkedAt": "2026-11-07T07:04:39.426Z"
+}

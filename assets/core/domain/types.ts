@@ -320,12 +320,17 @@ export interface AdRewardState {
   grantsUsed: number;
   couponIds: string[];
   completedSessionIds: string[];
+  /** Terminal old-owner sessions that were canceled/quarantined without a reward. */
+  quarantinedSessionIds?: string[];
   activeSessionId?: string | null;
   activeSessionStartedAtMs?: number | null;
   activeRunId?: string | null;
   activeSessionReservedDayIndex?: number | null;
+  activeOwnerScope?: string | null;
   grantDayIndexes?: number[];
   consumedCouponIds?: string[];
   couponCreatedAtMsById?: Record<string, number>;
   couponRunIdById?: Record<string, string>;
+  couponOwnerScopeById?: Record<string, string>;
+  quarantinedOwnerScopeById?: Record<string, string>;
 }

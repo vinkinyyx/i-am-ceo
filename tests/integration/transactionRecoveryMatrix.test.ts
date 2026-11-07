@@ -199,7 +199,9 @@ describe('R12 A-07 close company is gated by unknown commit recovery', () => {
     storage.failSlotBeforeApplyOnce = true;
     await expect(store.replaceWithNewRun(fresh, oldRunId, 1_700_000_100_000)).rejects.toThrow();
     expect(store.getPersistenceStatus()).toBe('reset-pending');
-    expect((await store.repository().load())).toBeNull();
+    const recoveredAfterTombstone = await store.repository().load();
+    expect(recoveredAfterTombstone?.state.runId).toBe(fresh.runId);
+    expect(recoveredAfterTombstone?.state.rngCounter).toBe(fresh.rngCounter);
 
     await store.replaceWithNewRun(fresh, oldRunId, 1_700_000_100_001);
     expect(store.current.runId).toBe(fresh.runId);

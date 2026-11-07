@@ -33,6 +33,14 @@ function copyAsset(name) {
   report.copied.push(name);
 }
 
+function findFiles(dir, base = dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(dir, entry.name);
+    return entry.isDirectory() ? findFiles(file, base) : [path.relative(base, file)];
+  });
+}
+
 function applyOnce(file, pattern, replacement, label, required = true) {
   if (!fs.existsSync(file)) {
     if (required) fail(`${label}: ${path.basename(file)} not found`);
@@ -69,6 +77,26 @@ function applyOnce(file, pattern, replacement, label, required = true) {
 
 // 1) 启动资源
 for (const asset of ['logo.png', 'slogan.png', 'splash-art.png', 'first-screen.js']) copyAsset(asset);
+// Keep the verifier-required root logo.png. Remove a converter-emitted hashed copy only
+// when it is byte-identical and no text asset references that exact filename.
+const canonicalLogo = path.join(tapDir, 'logo.png');
+report.removedDuplicateLogos = [];
+if (fs.existsSync(canonicalLogo)) {
+  const canonicalHash = crypto.createHash('sha256').update(fs.readFileSync(canonicalLogo)).digest('hex');
+  const textExtensions = new Set(['.js', '.json', '.html', '.css', '.xml', '.plist', '.txt']);
+  const textFiles = findFiles(tapDir).filter((relative) => textExtensions.has(path.extname(relative).toLowerCase()));
+  for (const name of fs.readdirSync(tapDir)) {
+    if (!/^logo\.[a-f0-9]{5}\.png$/i.test(name)) continue;
+    const file = path.join(tapDir, name);
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+    if (hash !== canonicalHash) continue;
+    const referenced = textFiles.some((relative) => fs.readFileSync(path.join(tapDir, relative), 'utf8').includes(name));
+    if (!referenced) {
+      fs.unlinkSync(file);
+      report.removedDuplicateLogos.push(name);
+    }
+  }
+}
 // Do not ship the legacy flattened loading image: converters may rename it to
 // a content-hashed JPG. Runtime art and progress now live in separate layers.
 const legacySplash = path.join(splashSrc, 'splash.jpg');

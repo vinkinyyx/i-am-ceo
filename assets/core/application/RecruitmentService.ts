@@ -36,6 +36,7 @@ export interface HireInput {
   couponId?: string;
   expectedRevision?: number;
   nowMs?: number;
+  ownerScope?: string;
 }
 
 export interface HireResult {
@@ -73,7 +74,7 @@ export function previewHire(
   const mIndex = monthIndexOf(state);
   const hrDiscount = hrRecruitmentDiscountBps(cfg, activeStaffInDept(state, 'HR', mIndex));
   const nominalFee = recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
-  const couponValid = !isInitialHiring && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now());
+  const couponValid = !isInitialHiring && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now(), input.ownerScope ?? 'local');
   if (input.couponId && !couponValid) throw new Error(GameErrorCode.ALREADY_USED);
   const fee = couponValid ? 0 : nominalFee;
   const cashBefore = state.company.cashYuan;
@@ -104,7 +105,7 @@ export function hireEmployee(
   state: GameState,
   cfg: EconomyConfig,
   input: HireInput,
-  ctx: { commandId: string; expectedRunId: string },
+  ctx: { commandId: string; expectedRunId: string; ownerScope?: string },
 ): HireResult {
   ensureRunId(state, ctx.expectedRunId);
 
@@ -161,14 +162,14 @@ export function hireEmployee(
     cfg,
     activeStaffInDept(state, 'HR', mIndex),
   );
-  const useCoupon = !isInitialHiring && !!input.couponId && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now());
+  const useCoupon = !isInitialHiring && !!input.couponId && isAdCouponAvailable(state, input.couponId, input.nowMs ?? Date.now(), ctx.ownerScope ?? 'local');
   if (input.couponId && !useCoupon) throw new Error(GameErrorCode.ALREADY_USED);
   const fee = useCoupon ? 0 : recruitmentFee(candidate.salaryMonthlyYuan, hrDiscount);
   if (state.company.cashYuan < fee) {
     throw new Error(GameErrorCode.INSUFFICIENT_CASH);
   }
 
-  if (useCoupon) consumeAdCoupon(state, input.couponId, input.nowMs ?? Date.now(), ctx.expectedRunId);
+  if (useCoupon) consumeAdCoupon(state, input.couponId, input.nowMs ?? Date.now(), ctx.expectedRunId, ctx.ownerScope ?? 'local');
 
   const employeeId = candidateToEmployeeId(state, candidate.candidateId);
   const employee: Employee = {

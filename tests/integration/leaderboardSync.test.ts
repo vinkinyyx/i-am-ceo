@@ -48,4 +48,27 @@ describe('leaderboard sync fencing', () => {
     // 资产榜不重复提交，只补年限榜
     expect(provider.submitted.map((x) => x.id)).toEqual(['assets', 'years', 'years']);
   });
+
+  it('checks consent again after the first board response and does not send the second board', async () => {
+    const provider = new FakeBoard();
+    let consent = true;
+    let releaseFirst!: () => void;
+    provider.submit = async (id: string, score: number) => {
+      provider.submitted.push({ id, score });
+      if (id === 'assets') {
+        await new Promise<void>((resolve) => { releaseFirst = resolve; });
+        consent = false;
+      }
+      return { kind: 'ok' as const };
+    };
+    const service = new LeaderboardSyncService(provider, config);
+    const state = createInitialState(1_800_000_000_000, 47);
+    const submitting = service.submitCloudConfirmed(state, 'cp-revoke', 100_000, () => consent);
+    await Promise.resolve();
+    expect(provider.submitted.map((x) => x.id)).toEqual(['assets']);
+    releaseFirst();
+    const result = await submitting;
+    expect(result.reason).toBe('stale-or-consent-revoked');
+    expect(provider.submitted.map((x) => x.id)).toEqual(['assets']);
+  });
 });

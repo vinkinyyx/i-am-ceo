@@ -34,12 +34,14 @@ describe('R14-T01 取消/墓碑前失败：无任何业务写入', () => {
     // 内存仍是旧 run、旧代际
     expect(store.current.runId).toBe(oldRunId);
     expect(store.currentResetGeneration).toBe(0);
-    expect(storage.setCalls.length - writesBefore).toBe(1); // 只有失败的墓碑写尝试
+    expect(storage.setCalls.length - writesBefore).toBe(3); // staging、intent与墓碑写尝试；提交点前旧局仍可读
+    expect(storage.peek(SAVE_KEYS.tombstone)).toBeNull();
+    expect((await new SaveRepository(storage).load())?.state.runId).toBe(oldRunId);
   });
 });
 
-describe('R14-T02 墓碑后、新 run 提交失败：重载进入“重开中”安全态，旧 run 不复活', () => {
-  it('新 run 槽位写失败：墓碑已落，重启 load 为 null（可继续新 run 创建），旧 run 不被加载', async () => {
+describe('R14-T02 墓碑后、新 run 提交失败：重启从耐久目标完成原替换', () => {
+  it('新 run 槽位写失败：重启完成已批准的新 run，旧 run 不被加载', async () => {
     const storage = new ScriptedStorage();
     const { store, oldRunId } = await runningStore(storage);
     storage.onSet(SAVE_KEYS.slotA, { kind: 'reject', reason: 'io' });
@@ -50,9 +52,13 @@ describe('R14-T02 墓碑后、新 run 提交失败：重载进入“重开中”
     expect(tombstone?.oldRunId).toBe(oldRunId);
     expect(tombstone?.newResetGeneration).toBe(1);
 
-    // 重启：墓碑后的旧 run 槽位不得复活（load→null 可安全走新公司创建）
+    // 重启：墓碑后的旧 run 不复活，使用已回读确认的staging目标幂等完成替换。
     const reloaded = await new SaveRepository(storage).load();
-    expect(reloaded).toBeNull();
+    expect(reloaded?.state.runId).toBe(fresh.runId);
+    expect(reloaded?.envelope.revision).toBe(1);
+    expect(reloaded?.envelope.resetGeneration).toBe(1);
+    expect(storage.peek(SAVE_KEYS.replaceIntent)).toBeNull();
+    expect(storage.peek(SAVE_KEYS.replaceStaging)).toBeNull();
   });
 });
 

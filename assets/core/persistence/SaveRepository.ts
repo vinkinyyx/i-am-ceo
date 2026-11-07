@@ -9,6 +9,7 @@ import { utf8ByteLength } from './utf8';
 import {
   SAVE_KEYS,
   type ResetTombstone,
+  type PreparedRunReplacement,
   type SaveEnvelope,
   type SavePointer,
   type SaveTransactionJournal,
@@ -60,7 +61,7 @@ export class SaveRepository {
 
   async commit(
     state: GameState,
-    params: { revision: number; resetGeneration: number; expectedBase: SaveCommitBase | null },
+    params: { revision: number; resetGeneration: number; expectedBase: SaveCommitBase | null; operationId?: string; ownerScope?: string },
   ): Promise<SaveEnvelope> {
     if (state.runId.length === 0) throw new Error('runId required');
     const tombstone = await this.readTombstone();
@@ -112,6 +113,8 @@ export class SaveRepository {
       protocolVersion: 1,
       transactionId: `tx-${state.runId}-${params.revision}-${params.resetGeneration}`,
       kind: 'commit',
+      operationId: params.operationId ?? `commit:${state.runId}:${params.revision}`,
+      ownerScope: params.ownerScope ?? 'local',
       basePointer: pointer ?? null,
       targetPointer,
       targetChecksum: envelope.checksum,
@@ -165,8 +168,10 @@ export class SaveRepository {
       revision: number;
       resetGeneration: number;
       baseRunId: string;
-      expectedBase: SaveCommitBase;
+      expectedBase: SaveCommitBase | null;
       nowMs: number;
+      operationId?: string;
+      ownerScope?: string;
     },
   ): Promise<SaveEnvelope> {
     if (state.runId.length === 0) throw new Error('runId required');
@@ -174,7 +179,7 @@ export class SaveRepository {
 
     const pointer = await this.readPointer();
     this.assertExpectedBase(pointer, params.expectedBase);
-    if (params.expectedBase.runId !== params.baseRunId) {
+    if (params.expectedBase && params.expectedBase.runId !== params.baseRunId) {
       throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'replace-base-run-mismatch' });
     }
     // 重开新 run：固定写槽 A（墓碑保证旧 run 槽位不会被加载，稍后 clearRunSlots）
@@ -199,6 +204,8 @@ export class SaveRepository {
       protocolVersion: 1,
       transactionId: `replace-${state.runId}-${params.resetGeneration}`,
       kind: 'replace-run',
+      operationId: params.operationId ?? `replace-run:${params.baseRunId}:${params.resetGeneration}`,
+      ownerScope: params.ownerScope ?? 'local',
       basePointer: pointer ?? null,
       targetPointer,
       targetChecksum: envelope.checksum,
@@ -225,17 +232,118 @@ export class SaveRepository {
     return envelope;
   }
 
+  async prepareRunReplacement(
+    state: GameState,
+    params: { operationId: string; ownerScope: string; baseRunId: string; baseRevision: number;
+      baseResetGeneration: number; targetResetGeneration: number; preparedAtMs: number },
+  ): Promise<{ intent: PreparedRunReplacement; envelope: SaveEnvelope }> {
+    const pointer = await this.readPointer();
+    this.assertExpectedBase(pointer, params.baseRevision === 0 ? null : {
+      runId: params.baseRunId, revision: params.baseRevision, resetGeneration: params.baseResetGeneration,
+    });
+    const envelope = encodeEnvelope(state, { revision: 1, runId: state.runId, resetGeneration: params.targetResetGeneration });
+    if (utf8ByteLength(canonicalStringify(envelope)) > this.targetMaxBytes) {
+      throw new Error(`${GameErrorCode.SAVE_FAILED}:save-too-large`);
+    }
+    const intent: PreparedRunReplacement = {
+      protocolVersion: 1, operationId: params.operationId, ownerScope: params.ownerScope,
+      baseRunId: params.baseRunId, baseRevision: params.baseRevision, baseResetGeneration: params.baseResetGeneration,
+      targetRunId: state.runId, targetRevision: 1, targetResetGeneration: params.targetResetGeneration,
+      targetChecksum: envelope.checksum, preparedAtMs: params.preparedAtMs,
+    };
+    await this.storage.set(SAVE_KEYS.replaceStaging, envelope);
+    const staged = await this.storage.get<SaveEnvelope>(SAVE_KEYS.replaceStaging);
+    if (!staged || !verifyEnvelope(staged).ok || staged.checksum !== envelope.checksum) {
+      throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'replace-staging-not-confirmed' });
+    }
+    await this.storage.set(SAVE_KEYS.replaceIntent, intent);
+    const intentBack = await this.storage.get<PreparedRunReplacement>(SAVE_KEYS.replaceIntent);
+    if (!intentBack || canonicalStringify(intentBack) !== canonicalStringify(intent)) {
+      throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'replace-intent-not-confirmed' });
+    }
+    return { intent, envelope };
+  }
+
+  async clearPreparedRunReplacement(): Promise<void> {
+    await this.storage.remove(SAVE_KEYS.replaceIntent);
+    await this.storage.remove(SAVE_KEYS.replaceStaging);
+  }
+
+  async commitPreparedRunReplacement(intent: PreparedRunReplacement, envelope: SaveEnvelope): Promise<SaveEnvelope> {
+    if (!verifyEnvelope(envelope).ok || envelope.checksum !== intent.targetChecksum
+      || envelope.runId !== intent.targetRunId || envelope.revision !== intent.targetRevision
+      || envelope.resetGeneration !== intent.targetResetGeneration) {
+      throw new GameError(GameErrorCode.SAVE_CORRUPT, { reason: 'replace-staging-mismatch' });
+    }
+    const result = await this.commitReplaceRun(envelope.payload, {
+      revision: intent.targetRevision, resetGeneration: intent.targetResetGeneration,
+      baseRunId: intent.baseRunId,
+      expectedBase: intent.baseRevision === 0 ? null : {
+        runId: intent.baseRunId, revision: intent.baseRevision, resetGeneration: intent.baseResetGeneration,
+      },
+      nowMs: intent.preparedAtMs,
+      operationId: intent.operationId,
+      ownerScope: intent.ownerScope,
+    });
+    if (result.checksum !== intent.targetChecksum) throw new GameError(GameErrorCode.SAVE_CORRUPT, { reason: 'replace-commit-target-mismatch' });
+    return result;
+  }
+
   /**
    * 启动装载。返回 null 仅当“相关键均明确不存在，且无墓碑/事务歧义”=可安全新建。
    * 暂不可读（UNAVAILABLE）一律抛 SAVE_UNAVAILABLE，由启动层显示重试，绝不静默新建。
    */
   async load(): Promise<LoadedSave | null> {
+    await this.recoverPreparedRunReplacement();
     // 未完成事务优先（R12）：有 journal 时不允许盲选最高 revision
     const journal = await this.readJournal();
     if (journal) {
       return this.loadWithJournal(journal);
     }
     return this.loadCore();
+  }
+
+  private async recoverPreparedRunReplacement(): Promise<void> {
+    let intent: PreparedRunReplacement | null;
+    try { intent = await this.storage.get<PreparedRunReplacement>(SAVE_KEYS.replaceIntent); }
+    catch (err) { throw unavailable('replace-intent-read', err); }
+    if (!intent) {
+      await this.storage.remove(SAVE_KEYS.replaceStaging).catch(() => undefined);
+      return;
+    }
+    let staged: SaveEnvelope | null;
+    try { staged = await this.storage.get<SaveEnvelope>(SAVE_KEYS.replaceStaging); }
+    catch (err) { throw unavailable('replace-staging-read', err); }
+    const tombstone = await this.readTombstone();
+    const crossedCommitPoint = tombstone?.oldRunId === intent.baseRunId
+      && tombstone.newResetGeneration === intent.targetResetGeneration;
+    if (!crossedCommitPoint) {
+      await this.clearPreparedRunReplacement().catch(() => undefined);
+      return;
+    }
+    if (!staged || !verifyEnvelope(staged).ok || staged.checksum !== intent.targetChecksum
+      || staged.runId !== intent.targetRunId || staged.resetGeneration !== intent.targetResetGeneration) {
+      throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'tombstoned-replacement-target-unavailable' });
+    }
+    const journal = await this.readJournal();
+    if (journal) {
+      if (journal.kind === 'replace-run' && journal.targetPointer.runId === intent.targetRunId
+        && intent.baseRevision === 0 && !await this.storage.get<SavePointer>(SAVE_KEYS.active)) {
+        await this.storage.remove(SAVE_KEYS.transaction);
+      } else {
+      const outcome = await this.reconcileJournal(journal);
+      if (outcome === 'undecidable') throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'replacement-journal-undecidable' });
+      if (outcome === 'committed' && journal.targetPointer.runId !== intent.targetRunId) {
+        throw new GameError(GameErrorCode.SAVE_CORRUPT, { reason: 'replacement-journal-target-mismatch' });
+      }
+      }
+    }
+    const pointer = await this.readPointer();
+    if (pointer?.runId !== intent.targetRunId || pointer.revision !== intent.targetRevision
+      || pointer.resetGeneration !== intent.targetResetGeneration) {
+      await this.commitPreparedRunReplacement(intent, staged);
+    }
+    await this.clearPreparedRunReplacement().catch(() => undefined);
   }
 
   private async loadCore(): Promise<LoadedSave | null> {

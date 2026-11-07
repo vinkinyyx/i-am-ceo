@@ -1,17 +1,22 @@
 // R21：最终 zip 校验与 manifest（从最终包解包，不检查源目录）。
 // 检查：zip 可解、条目均为正斜杠、game.json/版本/平台、必需文件存在、
 //       无 Mock/测试写状态 hook、无密钥、历史重复构建残留、大小 <20MB、篡改字节失败。
-// 用法：node tools/verify-package.cjs <zipPath> <releaseId> <gameVersion> <outDir>
+// 用法：node tools/verify-package.cjs <zipPath> <releaseId> <gameVersion> <outDir> [purpose]
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
 const root = path.join(__dirname, '..');
 const { readZipEntries } = require(path.join(__dirname, 'lib', 'read-zip.cjs'));
+const { PURPOSE_TO_MODE, EXPECTED_APP_ID } = require(path.join(__dirname, 'validate-release-config.cjs'));
 
-const [zipPath, releaseId, gameVersion, outDir] = process.argv.slice(2);
+const [zipPath, releaseId, gameVersion, outDir, purpose] = process.argv.slice(2);
 if (!zipPath || !releaseId) {
   console.error('VERIFY_FAIL usage');
+  process.exit(2);
+}
+if (purpose && !PURPOSE_TO_MODE[purpose]) {
+  console.error('VERIFY_FAIL unknown purpose', purpose);
   process.exit(2);
 }
 if (!gameVersion || !/^\d+\.\d+\.\d+$/.test(gameVersion)) fail('gameVersion must match x.y.z', gameVersion);
@@ -135,7 +140,8 @@ const packagedJsonAssets = [];
 function findJsonAssets(value, entryName) {
   if (!Array.isArray(value)) return;
   if (value.length >= 3 && typeof value[1] === 'string'
-    && (value[1] === 'ads.config' || value[1] === 'privacy-policy')
+    && (value[1] === 'ads.config' || value[1] === 'privacy-policy'
+      || value[1] === 'cloud.config' || value[1] === 'leaderboards.config' || value[1] === 'runtime.config')
     && value[2] && typeof value[2] === 'object' && !Array.isArray(value[2])) {
     packagedJsonAssets.push({ name: value[1], data: value[2], entryName });
   }
@@ -167,6 +173,84 @@ if (packagedAds.length === 1 && packagedPrivacy.length === 1) {
     findings.releaseConfigErrors.push('enabled ads require a non-empty real adUnitId and privacyReviewed=true');
   }
 }
+// DEV-04 组合一致性：包内 cloud/leaderboards/runtime 必须与 ads 及构建 purpose 同模式，
+// enabled 与 environment 不得自相矛盾（运行时会静默降级，包内必须显式一致）。
+const packagedCloud = packagedJsonAssets.filter((asset) => asset.name === 'cloud.config');
+const packagedBoards = packagedJsonAssets.filter((asset) => asset.name === 'leaderboards.config');
+const packagedRuntime = packagedJsonAssets.filter((asset) => asset.name === 'runtime.config');
+if (packagedCloud.length !== 1) findings.releaseConfigErrors.push(`expected 1 packaged cloud.config JsonAsset, found ${packagedCloud.length}`);
+if (packagedBoards.length !== 1) findings.releaseConfigErrors.push(`expected 1 packaged leaderboards.config JsonAsset, found ${packagedBoards.length}`);
+if (packagedRuntime.length !== 1) findings.releaseConfigErrors.push(`expected 1 packaged runtime.config JsonAsset, found ${packagedRuntime.length}`);
+if (packagedCloud.length === 1 && packagedBoards.length === 1 && packagedRuntime.length === 1
+  && packagedAds.length === 1 && packagedPrivacy.length === 1) {
+  const cloud = packagedCloud[0].data;
+  const boards = packagedBoards[0].data;
+  const runtimeCfg = packagedRuntime[0].data;
+  const adsCfg = packagedAds[0].data;
+  const policyVersion = packagedPrivacy[0].data.version;
+  const caps = [
+    ['cloud.config', cloud],
+    ['leaderboards.config', boards],
+    ['ads.config', adsCfg],
+  ];
+  for (const [name, cfg] of caps) {
+    if (cfg.enabled === true && cfg.environment === 'disabled') {
+      findings.releaseConfigErrors.push(`packaged ${name} enabled=true with environment=disabled (runtime would silently disable)`);
+    }
+    if (cfg.enabled === false && cfg.environment !== 'disabled') {
+      findings.releaseConfigErrors.push(`packaged ${name} disabled but environment=${cfg.environment}`);
+    }
+    if (cfg.policyVersion !== policyVersion) {
+      findings.releaseConfigErrors.push(`packaged ${name} policyVersion differs from packaged privacy policy`);
+    }
+  }
+  const cloudOn = cloud.enabled === true;
+  const boardsOn = boards.enabled === true;
+  const adsOn = adsCfg.enabled === true;
+  if (cloudOn && cloud.appId !== EXPECTED_APP_ID) {
+    findings.releaseConfigErrors.push(`packaged cloud.appId must be ${EXPECTED_APP_ID}`);
+  }
+  if (boardsOn) {
+    if (boards.appId !== EXPECTED_APP_ID) {
+      findings.releaseConfigErrors.push(`packaged leaderboards.appId must be ${EXPECTED_APP_ID}`);
+    }
+    const assetsId = typeof boards.assetsBoardId === 'string' ? boards.assetsBoardId.trim() : '';
+    const yearsId = typeof boards.yearsBoardId === 'string' ? boards.yearsBoardId.trim() : '';
+    if (!assetsId || !yearsId || assetsId === yearsId) {
+      findings.releaseConfigErrors.push('packaged enabled leaderboards require two distinct non-empty board ids');
+    }
+  }
+  const endpoint = typeof runtimeCfg.authEndpoint === 'string' ? runtimeCfg.authEndpoint.trim() : '';
+  if ((cloudOn || boardsOn) && !/^https:\/\//.test(endpoint)) {
+    findings.releaseConfigErrors.push('packaged cloud/leaderboards enabled require an https authEndpoint');
+  }
+  if (!cloudOn && !boardsOn && endpoint) {
+    findings.releaseConfigErrors.push('packaged authEndpoint set but neither cloud nor leaderboards enabled');
+  }
+  if (purpose) {
+    const expectedEnv = PURPOSE_TO_MODE[purpose].expectedEnv;
+    if (purpose === 'diagnostic' && (cloudOn || boardsOn || adsOn)) {
+      findings.releaseConfigErrors.push('diagnostic purpose package must have all capabilities disabled');
+    }
+    if (expectedEnv) {
+      if (!cloudOn && !boardsOn && !adsOn) {
+        findings.releaseConfigErrors.push(`${purpose} package with all capabilities disabled is mislabeled diagnostic content`);
+      }
+      for (const [name, cfg] of caps) {
+        if (cfg.enabled === true && cfg.environment !== expectedEnv) {
+          findings.releaseConfigErrors.push(`packaged ${name} environment=${cfg.environment}, purpose requires ${expectedEnv}`);
+        }
+      }
+    }
+  }
+  findings.configMode = {
+    purpose: purpose ?? null,
+    cloud: { enabled: cloudOn, environment: cloud.environment ?? null },
+    leaderboards: { enabled: boardsOn, environment: boards.environment ?? null },
+    ads: { enabled: adsOn, environment: adsCfg.environment ?? null },
+    authEndpointSet: endpoint.length > 0,
+  };
+}
 if (!gameJs.includes(`G.__CEO_RELEASE_ID__ = ${JSON.stringify(releaseId)};`) ||
     !gameJs.includes(`gameVersion: ${JSON.stringify(gameVersion)}`) ||
     !gameJs.includes("kind: 'taptap'")) {
@@ -180,6 +264,7 @@ const sizeBytes = zipBuf.length;
 const manifest = {
   releaseId,
   gameVersion: gameVersion || parsedGameJson?.productVersion || null,
+  purpose: purpose ?? null,
   verifiedAt: new Date().toISOString(),
   projectSizeBudgetBytes: 20 * 1024 * 1024,
   zipPath: path.relative(root, zipPath),

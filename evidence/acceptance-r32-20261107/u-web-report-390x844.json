@@ -1,0 +1,92 @@
+{
+  "url": "http://127.0.0.1:8193/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "checks": [
+    {
+      "id": "U01-390x844-touch-targets-44-gap-8",
+      "status": "PASS",
+      "detail": {
+        "audits": {
+          "company": {
+            "total": 0,
+            "visible": 0,
+            "excluded": 0,
+            "tooSmall": [],
+            "violations": []
+          },
+          "department": {
+            "total": 0,
+            "visible": 0,
+            "excluded": 0,
+            "tooSmall": [],
+            "violations": []
+          },
+          "talent": {
+            "total": 0,
+            "visible": 0,
+            "excluded": 0,
+            "tooSmall": [],
+            "violations": []
+          }
+        },
+        "bad": []
+      }
+    },
+    {
+      "id": "U01-390x844-geometry-scale-consistent",
+      "status": "PASS",
+      "detail": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844,
+          "scale": 1.04,
+          "visibleH": 811.5384615384615
+        }
+      }
+    },
+    {
+      "id": "U02-detail-survives-30s-cross-month",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "year": 1,
+          "month": 1,
+          "runId": "run_134cdm7000000"
+        },
+        "after": {
+          "year": 1,
+          "month": 7,
+          "runId": "run_134cdm7000000"
+        },
+        "monthsAdvanced": 6,
+        "dialogAlive": true
+      }
+    },
+    {
+      "id": "U02-stale-hint-once-no-auto-refresh",
+      "status": "PASS",
+      "detail": {
+        "hintCount": 1
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 4,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

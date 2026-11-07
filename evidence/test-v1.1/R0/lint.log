@@ -1,4 +1,0 @@
-﻿
-> im-ceo@0.1.0 lint
-> eslint "assets/core/**/*.ts" "tests/**/*.ts"
-

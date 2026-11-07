@@ -1,0 +1,40 @@
+{
+  "task": "DEV-06",
+  "at": "2026-11-07T11:45:00+08:00",
+  "scope": "assets/resources/ui 删除 134 项（67 PNG + 67 .meta）后的资源引用审计与真实 Creator Web 构建验证",
+  "deletedClassification": {
+    "result": "deprecated-unreferenced",
+    "deletedPng": 67,
+    "deletedMeta": 67,
+    "codeReferences": 0,
+    "uuidReferencesInAssets": 0,
+    "dynamicResourceKeys": ["backgrounds/CEO_BG_SoftBlue_UI_9x20/spriteFrame"],
+    "note": "代码驱动 UI 唯一运行时图片引用为 backgrounds/CEO_BG_SoftBlue_UI_9x20.png（存在，1080x2400）；67 张被删 PNG 在 assets 代码、scene/prefab/material/animation/meta 中零文件名引用、零 UUID 引用；design/ 与 CEO_TapTap_Animated_Promo_v1/ 中同名为独立副本与历史清单，不入运行时。",
+    "action": "保留删除（不恢复）；残留 7 个空目录 folder .meta（avatars/components/departments/industries/navigation/status/time）为用户清理结果，予以保留"
+  },
+  "audioCheck": {
+    "manifest": "assets/resources/config/audio/audio_manifest.json",
+    "pathsAllExist": true,
+    "mp3Count": 16
+  },
+  "webBuild": {
+    "command": "tools/build-web.ps1 (Cocos Creator 3.8.8 CLI, platform=web-mobile)",
+    "exitCode": 36,
+    "indexMtime": "2026-11-07T11:40:21+08:00",
+    "buildLogDeletedUuidHits": 0,
+    "buildLogResourceErrors": 0,
+    "logBenignNoise": ["OTA_DATA_NOT_NEWER telemetry", "trackTimeEnd telemetry", "build-script SIGTERM on exit"]
+  },
+  "webSmoke": {
+    "url": "http://127.0.0.1:8193/",
+    "viewport": "390x844",
+    "canvasGeometry": { "width": 390, "height": 844, "scale": 1.04 },
+    "firstScreenLabels": ["《我是CEO》", "1/3 创建公司", "主营行业", "电商贸易", "软件科技", "企业服务", "隐私保护提示"],
+    "backgroundSpriteFrame": "1080x2400 loaded",
+    "requestFailures": 0,
+    "pageErrors": 0,
+    "screenshots": ["dev06-web-smoke.png", "dev06-web-smoke2.png"]
+  },
+  "preserved": ["logo 去重", "ZIP9 压缩", "release debug=false", "sourceMaps=false", "BGM/音频未改动", "纯色+九宫格 fallback 保留"],
+  "conclusion": "PASS：清理意图被尊重，运行时引用零缺失，当前 Creator Web 构建可操作，删除项已在输入清单解释为已弃用无引用"
+}

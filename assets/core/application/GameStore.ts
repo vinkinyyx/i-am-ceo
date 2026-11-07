@@ -18,6 +18,9 @@ export class GameStore {
   private readonly storage: IStorageBackend;
   private readonly repo: SaveRepository;
   private mutationInProgress = false;
+  private ownerTransitionRequested = false;
+  private ownerTransitionTail: Promise<void> = Promise.resolve();
+  private mutationWaiters: Array<() => void> = [];
   /** A failed commit may have reached storage; reload before applying any later draft. */
   private commitOutcomeUnknown = false;
   /** A confirmed/unknown reset tombstone must never fall back to the old run. */
@@ -51,15 +54,39 @@ export class GameStore {
     return this.commitOutcomeUnknown ? 'recovery-required' : 'ready';
   }
 
+  /** Account/context transitions wait for the current durable transaction and block new writes. */
+  transitionOwner<T>(transition: () => T | Promise<T>): Promise<T> {
+    const run = this.ownerTransitionTail.then(async () => {
+      this.ownerTransitionRequested = true;
+      try {
+        while (this.mutationInProgress) await new Promise<void>((resolve) => this.mutationWaiters.push(resolve));
+        if (this.commitOutcomeUnknown || this.resetPending) {
+          await this.recoverBeforeWrite(this.state.runId, this.resetPending);
+        }
+        return await transition();
+      } finally { this.ownerTransitionRequested = false; }
+    });
+    this.ownerTransitionTail = run.then(() => undefined, () => undefined);
+    return run;
+  }
+
+  private releaseMutation(): void {
+    this.mutationInProgress = false;
+    const waiters = this.mutationWaiters;
+    this.mutationWaiters = [];
+    for (const resolve of waiters) resolve();
+  }
+
   /** Explicit read/reconcile entry for UI retry. It never replays a business command. */
   async retryPersistenceRecovery(expectedRunId: string): Promise<boolean> {
+    if (this.ownerTransitionRequested) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'owner-transition-pending' });
     if (this.mutationInProgress) throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'mutation-in-progress' });
     this.mutationInProgress = true;
     try {
       await this.recoverBeforeWrite(expectedRunId);
       return true;
     } finally {
-      this.mutationInProgress = false;
+      this.releaseMutation();
     }
   }
 
@@ -76,24 +103,30 @@ export class GameStore {
    * - 持久化失败/未知：不发布 draft、不推进 revision，由 journal 保证不重复收费，
    *   下条命令前 commit 会先 reconcile 未完成事务。
    */
-  async mutate<T>(fn: (draft: GameState) => T, expectedRunId: string): Promise<{ result: T; revision: number }> {
+  async mutate<T>(fn: (draft: GameState) => T, expectedRunId: string, ownerCurrent: () => boolean = () => true,
+    operation: { operationId?: string; ownerScope?: string } = {}): Promise<{ result: T; revision: number }> {
+    if (this.ownerTransitionRequested) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'owner-transition-pending' });
     if (this.mutationInProgress) throw new Error(GameErrorCode.RESET_IN_PROGRESS);
 
     this.mutationInProgress = true;
     try {
       await this.recoverBeforeWrite(expectedRunId);
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
       const draft = cloneGameState(this.state);
       const result = fn(draft);
       if (draft.runId !== expectedRunId) {
         throw new Error(GameErrorCode.RUN_CHANGED);
       }
       const targetRevision = this.revision + 1;
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
       let envelope: Awaited<ReturnType<SaveRepository['commit']>>;
       try {
         envelope = await this.repo.commit(draft, {
           revision: targetRevision,
           resetGeneration: this.resetGeneration,
           expectedBase: this.currentBase(),
+          operationId: operation.operationId,
+          ownerScope: operation.ownerScope,
         });
       } catch (err) {
         if (err instanceof GameError && err.code === GameErrorCode.REVISION_CONFLICT) {
@@ -119,16 +152,19 @@ export class GameStore {
       this.revision = envelope.revision;
       return { result, revision: this.revision };
     } finally {
-      this.mutationInProgress = false;
+      this.releaseMutation();
     }
   }
 
   /** Import a validated same-run checkpoint as one ordinary local journal commit. */
-  async importCloudState(importedState: GameState, expectedRunId: string, expectedRevision: number, nowMs: number): Promise<number> {
+  async importCloudState(importedState: GameState, expectedRunId: string, expectedRevision: number, nowMs: number,
+    ownerCurrent: () => boolean = () => true, operation: { operationId: string; ownerScope: string } = { operationId: 'cloud-import', ownerScope: 'local' }): Promise<number> {
+    if (this.ownerTransitionRequested) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'owner-transition-pending' });
     if (this.mutationInProgress) throw new Error(GameErrorCode.RESET_IN_PROGRESS);
     this.mutationInProgress = true;
     try {
       await this.recoverBeforeWrite(expectedRunId);
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
       if (this.revision !== expectedRevision || this.state.runId !== expectedRunId
         || (this.revision > 0 && importedState.runId !== expectedRunId) || !Number.isSafeInteger(nowMs) || nowMs < 0) {
         throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'cloud-import-base-changed' });
@@ -145,9 +181,11 @@ export class GameStore {
       draft.lastWallClockMs = nowMs;
       draft.offlineRemainderMs = 0;
       const targetRevision = this.revision + 1;
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
       let envelope: Awaited<ReturnType<SaveRepository['commit']>>;
       try {
-        envelope = await this.repo.commit(draft, { revision: targetRevision, resetGeneration: this.resetGeneration, expectedBase: this.currentBase() });
+        envelope = await this.repo.commit(draft, { revision: targetRevision, resetGeneration: this.resetGeneration,
+          expectedBase: this.currentBase(), ...operation });
       } catch (err) {
         this.commitOutcomeUnknown = true;
         throw err;
@@ -155,7 +193,7 @@ export class GameStore {
       this.state = draft;
       this.revision = envelope.revision;
       return this.revision;
-    } finally { this.mutationInProgress = false; }
+    } finally { this.releaseMutation(); }
   }
 
   /**
@@ -172,36 +210,71 @@ export class GameStore {
     expectedRunId: string,
     expectedRevision: number,
     nowMs: number,
+    ownerCurrent: () => boolean = () => true,
+    operation: { operationId: string; ownerScope: string } = { operationId: `cloud-restore:${expectedRunId}:${expectedRevision}`, ownerScope: 'local' },
   ): Promise<number> {
     if (importedState.runId === expectedRunId) {
-      return this.importCloudState(importedState, expectedRunId, expectedRevision, nowMs);
+      return this.importCloudState(importedState, expectedRunId, expectedRevision, nowMs, ownerCurrent, operation);
     }
-    if (!Number.isSafeInteger(nowMs) || nowMs < 0) {
-      throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'invalid-time' });
-    }
-    const tombstone = await this.repo.readTombstone();
-    if (tombstone && tombstone.oldRunId === importedState.runId) {
-      throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'closed-run-tombstone' });
-    }
-    if (this.storage.hasUnsettledNativeWrites?.()) {
-      throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'native-write-fence' });
-    }
-    if (this.state.adRewards?.activeSessionId) {
-      throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'active-ad-session' });
-    }
-    const localRewards = this.state.adRewards ? cloneGameState(this.state).adRewards : undefined;
-    await this.replaceWithNewRun((current) => {
-      if (current.runId !== expectedRunId || this.revision !== expectedRevision) {
+    if (this.ownerTransitionRequested) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'owner-transition-pending' });
+    if (this.mutationInProgress) throw new Error(GameErrorCode.RESET_IN_PROGRESS);
+    this.mutationInProgress = true;
+    let crossedTombstone = false;
+    try {
+      await this.recoverBeforeWrite(expectedRunId);
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
+      if (this.state.runId !== expectedRunId || this.revision !== expectedRevision) {
         throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'cloud-import-base-changed' });
       }
-      const draft = cloneGameState(importedState);
-      if (localRewards) draft.adRewards = localRewards;
-      else delete draft.adRewards;
-      draft.lastWallClockMs = nowMs;
-      draft.offlineRemainderMs = 0;
-      return draft;
-    }, expectedRunId, nowMs);
-    return this.revision;
+      if (!Number.isSafeInteger(nowMs) || nowMs < 0) throw new GameError(GameErrorCode.REVISION_CONFLICT, { reason: 'invalid-time' });
+      if (this.storage.hasUnsettledNativeWrites?.()) throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'native-write-fence' });
+      if (this.state.adRewards?.activeSessionId) throw new GameError(GameErrorCode.SAVE_RECOVERY_REQUIRED, { reason: 'active-ad-session' });
+      const tombstone = await this.repo.readTombstone();
+      if (tombstone && tombstone.oldRunId === importedState.runId) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'closed-run-tombstone' });
+      const oldRunId = this.state.runId;
+      const target = cloneGameState(importedState);
+      if (this.state.adRewards) target.adRewards = cloneGameState(this.state).adRewards;
+      else delete target.adRewards;
+      target.lastWallClockMs = nowMs;
+      target.offlineRemainderMs = 0;
+      const nextGeneration = this.resetGeneration + 1;
+      const prepared = await this.repo.prepareRunReplacement(target, {
+        operationId: operation.operationId, ownerScope: operation.ownerScope,
+        baseRunId: oldRunId, baseRevision: expectedRevision, baseResetGeneration: this.resetGeneration,
+        targetResetGeneration: nextGeneration, preparedAtMs: nowMs,
+      });
+      if (!ownerCurrent()) {
+        await this.repo.clearPreparedRunReplacement().catch(() => undefined);
+        throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed-before-tombstone' });
+      }
+      this.resetPending = true;
+      await this.repo.writeTombstone({ oldRunId, newResetGeneration: nextGeneration, resetAtMs: nowMs });
+      const tombstoneBack = await this.repo.readTombstone();
+      if (!tombstoneBack || tombstoneBack.oldRunId !== oldRunId || tombstoneBack.newResetGeneration !== nextGeneration) {
+        throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'replacement-tombstone-unconfirmed' });
+      }
+      crossedTombstone = true;
+      const envelope = await this.repo.commitPreparedRunReplacement(prepared.intent, prepared.envelope);
+      this.state = envelope.payload;
+      this.revision = envelope.revision;
+      this.resetGeneration = envelope.resetGeneration;
+      this.commitOutcomeUnknown = false;
+      this.resetPending = false;
+      await this.repo.clearPreparedRunReplacement().catch(() => undefined);
+      await this.repo.clearRunSlots(oldRunId).catch(() => undefined);
+      return this.revision;
+    } catch (err) {
+      if (!crossedTombstone) {
+        try {
+          const tombstone = await this.repo.readTombstone();
+          crossedTombstone = tombstone?.oldRunId === expectedRunId
+            && tombstone.newResetGeneration === this.resetGeneration + 1;
+        } catch { crossedTombstone = true; }
+      }
+      if (crossedTombstone) this.resetPending = true;
+      else { this.resetPending = false; await this.repo.clearPreparedRunReplacement().catch(() => undefined); }
+      throw err;
+    } finally { this.releaseMutation(); }
   }
 
   /** 不产生持久化的只读快照（预览类接口使用）。 */
@@ -221,15 +294,24 @@ export class GameStore {
     newStateOrFactory: GameState | ((confirmedState: GameState) => GameState),
     oldRunId: string,
     nowMs: number,
+    ownerCurrent: () => boolean = () => true,
   ): Promise<void> {
+    if (this.ownerTransitionRequested) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'owner-transition-pending' });
     if (this.mutationInProgress) throw new Error(GameErrorCode.RESET_IN_PROGRESS);
     this.mutationInProgress = true;
     try {
+      const wasResetPending = this.resetPending;
       await this.recoverBeforeWrite(oldRunId, true);
-      if (this.state.runId !== oldRunId) throw new Error(GameErrorCode.RUN_CHANGED);
+      if (this.state.runId !== oldRunId) {
+        const tombstone = wasResetPending ? await this.repo.readTombstone() : null;
+        if (wasResetPending && tombstone?.oldRunId === oldRunId
+          && tombstone.newResetGeneration === this.resetGeneration && this.state.runId !== oldRunId) return;
+        throw new Error(GameErrorCode.RUN_CHANGED);
+      }
       const newState = typeof newStateOrFactory === 'function'
         ? newStateOrFactory(this.state)
         : newStateOrFactory;
+      if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
       if (newState.runId === oldRunId) throw new Error(GameErrorCode.RUN_CHANGED);
       const nextGeneration = this.resetGeneration + 1;
       // 1) 墓碑（先于一切新 run 写入）
@@ -238,24 +320,33 @@ export class GameStore {
         newResetGeneration: nextGeneration,
         resetAtMs: nowMs,
       };
-      this.resetPending = true;
+      let crossedTombstone = false;
       try {
+        const prepared = await this.repo.prepareRunReplacement(newState, {
+          operationId: `replace-run:${oldRunId}:${nextGeneration}`, ownerScope: 'local',
+          baseRunId: oldRunId, baseRevision: this.revision, baseResetGeneration: this.resetGeneration,
+          targetResetGeneration: nextGeneration, preparedAtMs: nowMs,
+        });
+        if (!ownerCurrent()) throw new GameError(GameErrorCode.RUN_CHANGED, { reason: 'operation-owner-changed' });
+        this.resetPending = true;
         await this.repo.writeTombstone(tombstone);
         const readBackTomb = await this.repo.readTombstone();
-        if (!readBackTomb || readBackTomb.oldRunId !== oldRunId) {
+        if (!readBackTomb || readBackTomb.oldRunId !== oldRunId || readBackTomb.newResetGeneration !== nextGeneration) {
           throw new GameError(GameErrorCode.SAVE_FAILED, { stage: 'tombstone-readback' });
         }
+        crossedTombstone = true;
 
-        // 2) 提交新 run（journal kind=replace-run；未确认前不发布内存/代际）
-        await this.repo.commitReplaceRun(newState, {
-          revision: 1,
-          resetGeneration: nextGeneration,
-          baseRunId: oldRunId,
-          expectedBase: this.currentBase()!,
-          nowMs,
-        });
+        // Durable staged target plus intent allow startup to finish after the irreversible tombstone.
+        await this.repo.commitPreparedRunReplacement(prepared.intent, prepared.envelope);
       } catch (err) {
-        this.resetPending = true;
+        if (!crossedTombstone) {
+          try {
+            const readBackTomb = await this.repo.readTombstone();
+            crossedTombstone = readBackTomb?.oldRunId === oldRunId && readBackTomb.newResetGeneration === nextGeneration;
+          } catch { crossedTombstone = true; }
+        }
+        if (crossedTombstone) this.resetPending = true;
+        else { this.resetPending = false; await this.repo.clearPreparedRunReplacement().catch(() => undefined); }
         throw err;
       }
       this.resetGeneration = nextGeneration;
@@ -263,11 +354,12 @@ export class GameStore {
       this.revision = 1;
       this.commitOutcomeUnknown = false;
       this.resetPending = false;
+      await this.repo.clearPreparedRunReplacement().catch(() => undefined);
 
       // 3) 清理旧 run 槽位（墓碑保留；失败不影响新 run 已提交事实）
       await this.repo.clearRunSlots(oldRunId).catch(() => undefined);
     } finally {
-      this.mutationInProgress = false;
+      this.releaseMutation();
     }
   }
 
@@ -302,7 +394,9 @@ export class GameStore {
     } else {
       throw new GameError(GameErrorCode.SAVE_UNAVAILABLE, { reason: 'uncertain-commit-without-base' });
     }
-    if (this.state.runId !== expectedRunId) throw new Error(GameErrorCode.RUN_CHANGED);
+    if (this.state.runId !== expectedRunId && !(allowResetRetry && loaded && loaded.state.runId !== expectedRunId)) {
+      throw new Error(GameErrorCode.RUN_CHANGED);
+    }
   }
 
   private publishLoaded(loaded: NonNullable<Awaited<ReturnType<SaveRepository['load']>>>): void {

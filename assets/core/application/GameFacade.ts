@@ -43,7 +43,7 @@ import { settleOffline } from '../simulation/offline';
 import { assetsLeaderboard, yearsLeaderboard } from '../simulation/leaderboard';
 import type { AutomationLogEntry, Department, DeptType, Policy, StaffingMode, SupportDeptType } from '../domain/types';
 import type { EconomyConfig } from '../config/EconomyConfig';
-import { beginAdSession, cancelAdSession, canRequestAdCoupon, grantAdCoupon, markAdPromptShown } from './AdRewardService';
+import { beginAdSession, cancelAdSession, canRequestAdCoupon, grantAdCoupon, markAdPromptShown, quarantineAdSession } from './AdRewardService';
 import { createCloudCheckpoint } from '../persistence/CloudSaveCodec';
 import { encodeEnvelope } from '../persistence/SaveCodec';
 import type { CloudCheckpointV1 } from '../persistence/CloudSaveTypes';
@@ -87,6 +87,7 @@ export class GameFacade {
   private readonly platform: IStorageBackend;
   private readonly cfg: EconomyConfig;
   private readonly clock = new GameClock();
+  private adOwnerScope = 'local';
 
   private constructor(platform: IStorageBackend, store: GameStore, cfg: EconomyConfig) {
     this.platform = platform;
@@ -141,18 +142,23 @@ export class GameFacade {
     return this.store.current;
   }
 
+  setAdOwnerScope(ownerScope: string): void {
+    this.adOwnerScope = ownerScope || 'local';
+  }
+
   canRequestRewardedAd(nowMs = Date.now()): boolean {
-    return canRequestAdCoupon(this.store.current, nowMs);
+    return canRequestAdCoupon(this.store.current, nowMs, this.adOwnerScope);
   }
 
   getRevision(): number {
     return this.store.currentRevision;
   }
 
-  async importCloudCheckpointState(state: GameState, expectedRunId: string, expectedRevision: number, nowMs = Date.now()): Promise<CommandResult<true>> {
+  async importCloudCheckpointState(state: GameState, expectedRunId: string, expectedRevision: number, nowMs = Date.now(), ownerCurrent: () => boolean = () => true,
+    operation: { operationId: string; ownerScope: string } = { operationId: `cloud-restore:${expectedRunId}:${expectedRevision}`, ownerScope: 'local' }): Promise<CommandResult<true>> {
     try {
       // A24-08：同 run 走普通日志提交；活跃不同 run 走显式整档替换事务（墓碑 + replace-run）。
-      const revision = await this.store.replaceWithCloudState(state, expectedRunId, expectedRevision, nowMs);
+      const revision = await this.store.replaceWithCloudState(state, expectedRunId, expectedRevision, nowMs, ownerCurrent, operation);
       return ok(this.store.current.runId, revision, true);
     } catch (err) { return toFailure(err); }
   }
@@ -184,6 +190,10 @@ export class GameFacade {
     return this.store.getPersistenceStatus();
   }
 
+  transitionOwner<T>(transition: () => T | Promise<T>): Promise<T> {
+    return this.store.transitionOwner(transition);
+  }
+
   async retryPersistenceRecovery(): Promise<boolean> {
     return this.store.retryPersistenceRecovery(this.store.current.runId);
   }
@@ -192,15 +202,18 @@ export class GameFacade {
   async markRewardPromptShown(nowMs = Date.now()): Promise<CommandResult<boolean>> {
     const runId = this.store.current.runId;
     try {
-      const { result, revision } = await this.store.mutate((draft) => markAdPromptShown(draft, nowMs), runId);
+      const ownerScope = this.adOwnerScope;
+      const { result, revision } = await this.store.mutate((draft) => markAdPromptShown(draft, nowMs, ownerScope), runId);
       return ok(this.store.current.runId, revision, result);
     } catch (err) { return toFailure(err); }
   }
 
-  async beginRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId): Promise<CommandResult<boolean>> {
+  async beginRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId,
+    ownerCurrent: () => boolean = () => true, ownerScope = this.adOwnerScope): Promise<CommandResult<boolean>> {
     const runId = expectedRunId;
     try {
-      const { result, revision } = await this.store.mutate((draft) => beginAdSession(draft, sessionId, nowMs), runId);
+      const { result, revision } = await this.store.mutate((draft) => beginAdSession(draft, sessionId, nowMs, ownerScope), runId, ownerCurrent,
+        { operationId: `ad-begin:${sessionId}`, ownerScope });
       return ok(this.store.current.runId, revision, result);
     } catch (err) { return toFailure(err); }
   }
@@ -213,11 +226,26 @@ export class GameFacade {
     } catch (err) { return toFailure(err); }
   }
 
+  async quarantineRewardedAdSession(sessionId: string, expectedRunId: string): Promise<CommandResult<'quarantined' | 'already-completed' | 'not-active'>> {
+    try {
+      if (this.store.getPersistenceStatus() !== 'ready') await this.store.retryPersistenceRecovery(this.store.current.runId);
+      const rewards = this.store.current.adRewards;
+      if (rewards?.completedSessionIds.includes(sessionId)) return ok(this.store.current.runId, this.store.currentRevision, 'already-completed');
+      if (this.store.current.runId !== expectedRunId || rewards?.activeSessionId !== sessionId) {
+        return ok(this.store.current.runId, this.store.currentRevision, 'not-active');
+      }
+      const { result, revision } = await this.store.mutate((draft) => quarantineAdSession(draft, sessionId, expectedRunId), expectedRunId);
+      return ok(this.store.current.runId, revision, result ? 'quarantined' : 'not-active');
+    } catch (err) { return toFailure(err); }
+  }
+
   /** Only the coordinator calls this after provider's explicit completed callback. */
-  async completeRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId): Promise<CommandResult<boolean>> {
+  async completeRewardedAdSession(sessionId: string, nowMs = Date.now(), expectedRunId = this.store.current.runId,
+    ownerCurrent: () => boolean = () => true, ownerScope = this.adOwnerScope): Promise<CommandResult<boolean>> {
     const runId = expectedRunId;
     try {
-        const { result, revision } = await this.store.mutate((draft) => grantAdCoupon(draft, sessionId, nowMs, runId), runId);
+      const { result, revision } = await this.store.mutate((draft) => grantAdCoupon(draft, sessionId, nowMs, runId, ownerScope), runId, ownerCurrent,
+        { operationId: `ad-grant:${sessionId}`, ownerScope });
       return ok(this.store.current.runId, revision, result);
     } catch (err) { return toFailure(err); }
   }
@@ -265,7 +293,8 @@ export class GameFacade {
     couponId?: string;
   }): CommandResult<import('./RecruitmentService').HirePreview> {
     try {
-      const result = this.store.read((s) => previewHire(s, this.cfg, input));
+      const scopedInput = { ...input, ownerScope: this.adOwnerScope };
+      const result = this.store.read((s) => previewHire(s, this.cfg, scopedInput));
       return ok(this.store.current.runId, this.store.currentRevision, result);
     } catch (err) {
       return toFailure(err);
@@ -301,7 +330,7 @@ export class GameFacade {
             && this.store.currentRevision !== input.expectedRevision) {
             throw new GameError(GameErrorCode.CONFIRMATION_EXPIRED, { reason: 'hire-preview-stale' });
           }
-          return hireEmployee(draft, this.cfg, input, ctx);
+          return hireEmployee(draft, this.cfg, { ...input, ownerScope: this.adOwnerScope }, { ...ctx, ownerScope: this.adOwnerScope });
         },
         ctx.expectedRunId,
       );

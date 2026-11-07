@@ -1,6 +1,0 @@
-{
-  "taskId":"TASK-M3-09-R35","status":"IN_PROGRESS",
-  "implemented":"Reusable CanvasDriver with actual geometry-based clicks, save readback, browser error/request tracking, and fail-on-failed-check finish behavior.",
-  "verification":["tools/e2e/r31-r32-ui.cjs used for 5 real UI checks","tools/e2e/r33-settings.cjs used for 6 real UI checks","tests/tools/canvasDriver.test.mjs: 2 passed, including deliberate FAIL and pageerror/non-favicon request failure capture"],
-  "remaining":["unified pass/fail/skip/blocked/timeout report contract","intentional covered-button detection","disabled-button detection","resource corruption detection","layout overlap negative detection","production package absence of development state-write hook"]
-}

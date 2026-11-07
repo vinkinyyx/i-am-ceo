@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PlayerIdentityState } from '@core/platform/PlayerIdentity';
+import { PlayerIdentityState, SessionPlayerIdentityProvider } from '@core/platform/PlayerIdentity';
 
 const verified = (profileId: string, epoch = 0) => ({
   kind: 'verified' as const,
@@ -42,5 +42,42 @@ describe('player identity epoch (A24-05)', () => {
     expect(result.kind).toBe('unavailable');
     expect(state.profileId).toBeNull();
     expect(state.currentEpoch).toBe(epoch + 1);
+    const unavailableEpoch = state.currentEpoch;
+    state.apply({ kind: 'unavailable', reason: 'still-unavailable' });
+    expect(state.currentEpoch).toBe(unavailableEpoch);
+  });
+});
+
+describe('B2 session-backed identity provider', () => {
+  const session = (overrides: Record<string, unknown> = {}) => ({
+    kind: 'taptap' as const,
+    expiresAtMs: 20_000,
+    profile: { profileId: 'tap_AbCdEfGhIjKlMnOp', appId: 'app-test', environment: 'test' as const, scope: 'tap-minigame-account' },
+    ...overrides,
+  });
+  const provider = (load: () => Promise<ReturnType<typeof session> | null>) =>
+    new SessionPlayerIdentityProvider(load, 'app-test', 'test', () => 10_000);
+
+  it('verified only when the server-issued profile matches scope and session is fresh', async () => {
+    const result = await provider(async () => session()).resolve();
+    expect(result).toMatchObject({ kind: 'verified', profileId: 'tap_AbCdEfGhIjKlMnOp', appId: 'app-test', environment: 'test' });
+  });
+
+  it('rejects sessions without a stable profile, expired sessions and other scopes', async () => {
+    await expect(provider(async () => session({ profile: undefined })).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'session-without-stable-profile' });
+    await expect(provider(async () => session({ expiresAtMs: 9_999 })).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'session-expired' });
+    await expect(provider(async () => session({ profile: { ...session().profile!, appId: 'other-app' } })).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'identity-scope-mismatch' });
+    await expect(provider(async () => session({ profile: { ...session().profile!, scope: 'legacy-openid' } })).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'identity-scope-unsupported' });
+    await expect(provider(async () => null).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'no-platform-session' });
+  });
+
+  it('mock sessions never become cloud identities', async () => {
+    await expect(provider(async () => session({ kind: 'mock' })).resolve())
+      .resolves.toMatchObject({ kind: 'unavailable', reason: 'not-tap-runtime' });
   });
 });

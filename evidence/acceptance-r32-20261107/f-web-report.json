@@ -1,0 +1,112 @@
+{
+  "url": "http://127.0.0.1:8193/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "checks": [
+    {
+      "id": "F01-clean-boot-running-ready",
+      "status": "PASS",
+      "detail": {
+        "runId": "run_134cdm7000000",
+        "cash": 1000000,
+        "revision": 11,
+        "phase": "RUNNING",
+        "employees": 6,
+        "persistence": "ready"
+      }
+    },
+    {
+      "id": "F01-reenter-same-run-no-regression",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "runId": "run_134cdm7000000",
+          "cash": 1000000,
+          "revision": 11,
+          "phase": "RUNNING",
+          "employees": 6,
+          "persistence": "ready"
+        },
+        "after": {
+          "runId": "run_134cdm7000000",
+          "cash": 1000000,
+          "revision": 11,
+          "phase": "RUNNING",
+          "employees": 6,
+          "persistence": "ready"
+        }
+      }
+    },
+    {
+      "id": "F01-corrupt-gate-blocks-no-auto-new-company",
+      "status": "PASS",
+      "detail": {
+        "corrupt": 1,
+        "noOverwrite": 1,
+        "retry": 1,
+        "createPage": 0
+      }
+    },
+    {
+      "id": "F01-corrupt-bytes-preserved-not-wiped",
+      "status": "PASS",
+      "detail": {
+        "kept": true,
+        "marker": 1012345
+      }
+    },
+    {
+      "id": "F01-gate-retry-still-blocked-while-corrupt",
+      "status": "PASS",
+      "detail": {
+        "gateAgain": true
+      }
+    },
+    {
+      "id": "F01-single-slot-corrupt-recovers-from-backup",
+      "status": "PASS",
+      "detail": {
+        "before": {
+          "runId": "run_134cdm7000000",
+          "cash": 1000000,
+          "revision": 12,
+          "phase": "RUNNING",
+          "employees": 6,
+          "persistence": "ready"
+        },
+        "after": {
+          "runId": "run_134cdm7000000",
+          "cash": 1000000,
+          "revision": 12,
+          "phase": "RUNNING",
+          "employees": 6,
+          "persistence": "ready"
+        }
+      }
+    },
+    {
+      "id": "F01-after-fixture-restore-boots-clean",
+      "status": "PASS",
+      "detail": {
+        "runId": "run_134cdm7000000",
+        "cash": 1000000,
+        "revision": 11,
+        "phase": "RUNNING",
+        "employees": 6,
+        "persistence": "ready"
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 7,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

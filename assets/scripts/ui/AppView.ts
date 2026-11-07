@@ -36,6 +36,7 @@ import { loadEconomyConfig } from '../platform/loadConfig';
 import { loadRuntimeConfig } from '../platform/loadRuntimeConfig';
 import { getRuntimeConfig } from '../platform/runtimeConfig';
 import { AuthService } from '../../core/platform/AuthService';
+import type { IdentityRefreshReason } from '../../core/platform/AuthService';
 import { acceptPrivacy, hasAcceptedPrivacy } from '../../core/platform/privacyConsent';
 import { PRIVACY_POLICY_TEXT } from '../../core/platform/privacyPolicyText';
 import { GameError } from '../../core/domain/errors';
@@ -76,9 +77,11 @@ import { AdRewardCoordinator } from '../ads/AdRewardCoordinator';
 import { loadCloudConfig, loadLeaderboardConfig } from '../platform/loadExternalServiceConfig';
 import type { CloudRuntimeConfig } from '../../core/persistence/CloudSaveTypes';
 import type { LeaderboardRuntimeConfig } from '../../core/platform/externalServiceConfig';
-import { CloudSyncService } from '../../core/application/CloudSyncService';
+import { CloudSyncService, type CloudRestorePreview, type PendingCreate } from '../../core/application/CloudSyncService';
+import { compareCloudHeads, type CloudHeadRelation } from '../../core/application/CloudConflict';
 import { LeaderboardSyncService } from '../../core/application/LeaderboardSyncService';
-import { PlayerIdentityState, TapPlayerIdentityProvider } from '../../core/platform/PlayerIdentity';
+import { PlayerIdentityState, SessionPlayerIdentityProvider } from '../../core/platform/PlayerIdentity';
+import type { PlayerIdentityResult } from '../../core/platform/PlayerIdentity';
 import { TapCloudSaveProvider } from '../../core/platform/TapCloudSaveProvider';
 import { TapLeaderboardProvider } from '../../core/platform/TapLeaderboardProvider';
 import type { CloudArchiveRef, CloudCheckpointV1 } from '../../core/persistence/CloudSaveTypes';
@@ -167,6 +170,8 @@ export class AppView extends Component {
   private platform: ReturnType<typeof createPlatform> | null = null;
   private auth: AuthService | null = null;
   private authed = false;
+  /** B2：登录单飞，避免隐私同意后的并行初始化触发两次 tap.login/换票。 */
+  private loginInFlight: Promise<void> | null = null;
   private root!: Node;
   /** TASK-M3-12-03：稳定分层——render 只清 PageLayer，月结/弹窗不互毁。 */
   private pageLayer!: Node;
@@ -190,6 +195,7 @@ export class AppView extends Component {
   private rankMode: 'assets' | 'years' = 'assets';
   private leaderboardConfig: LeaderboardRuntimeConfig | null = null;
   private leaderboardConsent = false;
+  private leaderboardConsentEpoch = 0;
   private cloudConfig: CloudRuntimeConfig | null = null;
   private cloudStatusText = '云备份尚未检查';
   private cloudSync: CloudSyncService | null = null;
@@ -198,6 +204,7 @@ export class AppView extends Component {
   private identity: PlayerIdentityState | null = null;
   private leaderboardSync: LeaderboardSyncService | null = null;
   private cloudArchives: CloudArchiveRef[] = [];
+  private cloudArchiveOwner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number } | null = null;
   private cloudBusy = false;
   /** A24-09：同一冻结 checkpoint 的部分失败待补发（内存内，重启后重新备份）。 */
   private pendingLeaderboard: {
@@ -210,6 +217,9 @@ export class AppView extends Component {
   } | null = null;
   /** R31：只有平台返回稳定账号标识后，云上传/恢复才允许启用；不猜昵称/设备号。 */
   private cloudProfileBound = false;
+  /** A1：云档预览前由用户明确暂停；记录暂停前倍速，取消/恢复后由用户显式选择是否继续。 */
+  private cloudPausedForPreview = false;
+  private cloudPausedFromSpeed: GameSpeed = 1;
   private annualReportYear: number | null = null;
   private pendingOffer: CandidateOffer | null = null;
   /** R24：主壳布局引用——热 resize 时只重算几何，不重建内容（保 Tab/滚动/输入）。 */
@@ -263,6 +273,16 @@ export class AppView extends Component {
   private contextEpoch = 0;
   /** R31：账号代际；登录/登出/换号后旧弹窗不得继续提交。 */
   private authEpoch = 0;
+  /** DEV-02：前台代际；每次回到前台递增，作为权威刷新 singleflight key 与迟到丢弃依据。 */
+  private foregroundGeneration = 0;
+  /** DEV-02：当前前台代际的平台身份确认状态（缓存 TTL 不能证明平台未换号）。 */
+  private identityVerification: 'unverified' | 'verifying' | 'verified' | 'unavailable' = 'unverified';
+  /** DEV-02：最近一次 verified 对应的前台代际。 */
+  private verifiedGeneration = 0;
+  /** DEV-02：当前代际共享的身份刷新（防止 UI 侧重入；网络层 singleflight 在 AuthService）。 */
+  private identityRefreshInFlight: Promise<void> | null = null;
+  /** DEV-02：最近一次成功云备份时的 authEpoch；确认换号后首次备份必须明确归属当前账号。 */
+  private lastBackupAuthEpoch = -1;
   private bootStarted = false;
   private clockScheduled = false;
   private backdrop: Node | null = null;
@@ -321,8 +341,13 @@ export class AppView extends Component {
       const code = loadResult.kind === 'unavailable'
         ? (loadResult.reason === 'timeout' ? 'SAVE_UNAVAILABLE_TIMEOUT' : 'SAVE_UNAVAILABLE')
         : 'SAVE_CORRUPT';
+      // 闸门 UI 依赖分层节点（modalOverlay 需要 modalLayer）：先建根再渲染，
+      // 否则 try/catch 静默吞掉后玩家只看到 8s 看门狗的"引擎卡死"误报。
+      this.buildRoot();
       this.renderSaveGateError(code, 'save', loadResult.kind);
       boot.fail('BOOT_SAVE_GATE', 'save', `${loadResult.kind}:${loadResult.message}`);
+      // 闸门是本次启动的终态界面：撤销看门狗，避免误报覆盖恢复入口。
+      bootTrapReady();
       return;
     }
     this.facade = loadResult.facade;
@@ -374,7 +399,14 @@ export class AppView extends Component {
       this.adForegroundEligibleSinceMs = 0;
       // R15：保存提示只跟随真实提交结果，不在 onHide 无条件声称“已自动保存”
     });
-    platform.onShow(() => this.onReturnForeground());
+    platform.onShow(() => {
+      // DEV-02：回到前台推进前台代际；旧代际的身份确认资格作废，敏感操作按新代际重新确认。
+      this.foregroundGeneration += 1;
+      if (this.identityVerification === 'verified' && this.verifiedGeneration !== this.foregroundGeneration) {
+        this.identityVerification = 'unverified';
+      }
+      void this.onReturnForeground();
+    });
     } catch (err) {
       const stage = boot.snapshot().stage;
       const code = err instanceof GameError ? err.code : 'BOOT_FAILED';
@@ -505,7 +537,15 @@ export class AppView extends Component {
    */
   private async ensurePlatformLogin(silent: boolean): Promise<void> {
     if (!this.auth) return;
-    if (this.authed) return;
+    // B2：authed 只是上次结果，进入云/身份流程前必须复验会话（过期或作用域不符则重新登录）。
+    if (this.authed && await this.auth.hasValidSession()) return;
+    if (this.loginInFlight) { await this.loginInFlight; return; }
+    this.loginInFlight = this.doPlatformLogin(silent).finally(() => { this.loginInFlight = null; });
+    await this.loginInFlight;
+  }
+
+  private async doPlatformLogin(silent: boolean): Promise<void> {
+    if (!this.auth) return;
     try {
       const session = await this.auth.ensureAuthenticated();
       this.authed = true;
@@ -708,7 +748,20 @@ export class AppView extends Component {
     if (!this.facade || !this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
     const config = await loadAdsConfig();
     const provider = new TapRewardedAdProvider(config.enabled, config.rewardedAdUnitId);
-    this.adCoordinator = new AdRewardCoordinator(provider, this.facade);
+    this.adCoordinator = new AdRewardCoordinator(provider, this.facade, () => {
+      const authEpoch = this.authEpoch;
+      const contextEpoch = this.contextEpoch;
+      const profileId = this.identity?.profileId ?? null;
+      return () => this.authEpoch === authEpoch && this.contextEpoch === contextEpoch
+        && (this.identity?.profileId ?? null) === profileId;
+    }, () => this.adRewardOwnerScope(), () => {
+      // DEV-02：身份核对中/网络未知 → owner 未确认，pending 保留待核对；
+      // 已绑定平台身份但当前前台代际尚未确认 → 同样按未知处理；其余为 confirmed。
+      if (this.identityVerification === 'verifying' || this.identityVerification === 'unavailable') return 'unknown';
+      if (this.identity?.profileId
+        && (this.identityVerification !== 'verified' || this.verifiedGeneration !== this.foregroundGeneration)) return 'unknown';
+      return 'confirmed';
+    });
     try { await this.adCoordinator.recoverInterruptedSession(); }
     catch { if (this.facade.getPersistenceStatus() !== 'ready') this.renderPersistenceRecovery(); }
   }
@@ -716,20 +769,146 @@ export class AppView extends Component {
   private async setupLeaderboardAfterConsent(): Promise<void> {
     if (!this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
     this.leaderboardConfig = await loadLeaderboardConfig();
-    this.leaderboardConsent = await this.platform.get<boolean>('ceo/leaderboard/consent/v1').catch(() => false) === true;
-    this.leaderboardSync = new LeaderboardSyncService(new TapLeaderboardProvider(), this.leaderboardConfig);
+    const consent = await this.platform.get<boolean>('ceo/leaderboard/consent/v1').catch(() => false) === true;
+    if (consent !== this.leaderboardConsent) this.leaderboardConsentEpoch += 1;
+    this.leaderboardConsent = consent;
+    this.leaderboardSync ??= new LeaderboardSyncService(new TapLeaderboardProvider(), this.leaderboardConfig);
   }
 
   /**
    * A24-05：账号代际推进。换号后旧弹窗/旧榜单/旧云操作凭 epoch 失效，
    * 不把新账号的档写回旧上下文。
    */
-  private advanceAuthEpoch(): void {
-    const previous = this.authEpoch;
-    this.authEpoch += 1;
-    this.leaderboardSync?.changeAccount();
-    this.pendingLeaderboard = null;
-    invalidateDialogs('context-invalidated', { accountEpoch: previous });
+  private async advanceAuthEpoch(): Promise<void> {
+    const transition = () => {
+      const previous = this.authEpoch;
+      this.authEpoch += 1;
+      this.facade?.setAdOwnerScope(this.adRewardOwnerScope());
+      this.leaderboardSync?.changeAccount();
+      this.pendingLeaderboard = null;
+      invalidateDialogs('context-invalidated', { accountEpoch: previous });
+    };
+    if (this.facade) await this.facade.transitionOwner(transition);
+    else transition();
+  }
+
+  /**
+   * DEV-02：把身份解析结果原子应用到经营上下文。
+   * identity.apply、authEpoch 推进、券 owner scope、榜换号、待补榜清理、旧弹窗失效
+   * 在同一 transitionOwner 回调内完成；回调内不得再获取同一门（嵌套等待）。
+   * 明显无变化（同账号重复确认/本就无身份）时不占切换门，避免打扰经营写入。
+   */
+  private async applyIdentityAtomically(identityResult: PlayerIdentityResult): Promise<PlayerIdentityResult> {
+    const identity = this.identity;
+    if (!identity) return { kind: 'unavailable', reason: 'identity-missing' };
+    const currentProfileId = identity.profileId;
+    const noChange = (identityResult.kind === 'verified' && identityResult.profileId === currentProfileId)
+      || (identityResult.kind === 'unavailable' && currentProfileId === null);
+    if (noChange) return identity.apply(identityResult);
+    let result: PlayerIdentityResult = identityResult;
+    const transition = () => {
+      const beforeEpoch = identity.currentEpoch;
+      result = identity.apply(identityResult);
+      if (identity.currentEpoch !== beforeEpoch) {
+        const previous = this.authEpoch;
+        this.authEpoch += 1;
+        this.facade?.setAdOwnerScope(this.adRewardOwnerScope());
+        this.leaderboardSync?.changeAccount();
+        this.pendingLeaderboard = null;
+        this.cloudArchives = [];
+        this.cloudArchiveOwner = null;
+        invalidateDialogs('context-invalidated', { accountEpoch: previous });
+      }
+    };
+    if (this.facade) await this.facade.transitionOwner(transition);
+    else transition();
+    return result;
+  }
+
+  /**
+   * DEV-02：统一身份门。云备份/云恢复/旧未决核对/榜单提交/补榜等敏感操作前必须 await。
+   * 返回 true：当前前台代际已用新平台登录态确认账号（有稳定 profileId），可按 owner 外发；
+   * 返回 false：未确认（网络未知/无可信账号/代际已切换）——阻断外发，本地经营不受影响。
+   * 非真机（编辑器/Web 预览）无真实平台账号可核对，沿用已注入/绑定的本地身份。
+   */
+  private async ensureVerifiedIdentity(reason: IdentityRefreshReason): Promise<boolean> {
+    if (this.platform?.getEnvironment() !== 'TAPTAP') {
+      return !!this.identity?.profileId && this.cloudProfileBound;
+    }
+    if (!this.auth || !this.identity || !this.cloudConfig) return false;
+    const generation = this.foregroundGeneration;
+    if (this.identityVerification === 'verified' && this.verifiedGeneration === generation
+      && this.cloudProfileBound && this.identity.profileId) return true;
+    if (this.identityRefreshInFlight) await this.identityRefreshInFlight;
+    else await this.performIdentityRefresh(generation, reason);
+    return this.identityVerification === 'verified'
+      && this.verifiedGeneration === this.foregroundGeneration
+      && !!this.identity?.profileId
+      && this.cloudProfileBound;
+  }
+
+  /** DEV-02：按前台代际执行一次权威身份确认；同代际 UI 层共享，网络层 singleflight 在 AuthService。 */
+  private async performIdentityRefresh(generation: number, reason: IdentityRefreshReason): Promise<void> {
+    const auth = this.auth;
+    const identity = this.identity;
+    const config = this.cloudConfig;
+    if (!auth || !identity || !config) return;
+    this.identityVerification = 'verifying';
+    const environment = config.environment === 'production' ? 'production' : 'test';
+    const flight = (async () => {
+      const result = await auth.refreshCurrentIdentity({
+        reason,
+        generation,
+        stillCurrent: () => this.foregroundGeneration === generation,
+      });
+      // 前台代际已切换：结果丢弃，由新代际自行重新确认。
+      if (this.foregroundGeneration !== generation) return;
+      if (result.kind === 'verified') {
+        const resolved = await new SessionPlayerIdentityProvider(
+          () => auth.currentSession().catch(() => null),
+          config.appId,
+          environment,
+        ).resolve();
+        if (resolved.kind === 'verified') {
+          const previousEpoch = identity.currentEpoch;
+          const applied = await this.applyIdentityAtomically(resolved);
+          if (applied.kind === 'verified' || applied.kind === 'changed') {
+            if (identity.currentEpoch !== previousEpoch && this.platform) {
+              // 确认换号/首绑：云服务改绑新 profile；旧云列表与归属已在切换回调内清空。
+              this.cloudProvider = new TapCloudSaveProvider();
+              this.cloudSync = new CloudSyncService(this.cloudProvider, this.platform, config,
+                config.appId, environment, identity.profileId);
+              if (applied.kind === 'changed') {
+                this.cloudStatusText = '云备份：已切换账号；首次备份需确认归属当前账号';
+              }
+            }
+            this.identityVerification = 'verified';
+            this.verifiedGeneration = generation;
+            this.cloudProfileBound = true;
+            return;
+          }
+        }
+        // 已登录但无稳定 profile（marker 会话/旧服务端）：未知而非换号——保留最近已确认身份，仅禁用云榜外发。
+        this.identityVerification = 'unavailable';
+        this.cloudProfileBound = false;
+        return;
+      }
+      if (result.kind === 'superseded') {
+        if (this.foregroundGeneration === generation) this.identityVerification = 'unverified';
+        return;
+      }
+      // 网络未知/平台不可用：阻断外发，不清旧绑定、不产生账号切换副作用。
+      this.identityVerification = 'unavailable';
+    })();
+    this.identityRefreshInFlight = flight.finally(() => { this.identityRefreshInFlight = null; });
+    await this.identityRefreshInFlight;
+  }
+
+  private adRewardOwnerScope(): string {
+    const profileId = this.identity?.profileId;
+    if (!this.cloudConfig || !profileId) return 'local';
+    const environment = this.cloudConfig.environment === 'production' ? 'production' : 'test';
+    return `${this.cloudConfig.appId}/${environment}/${profileId}`;
   }
 
   private async setupCloudAfterConsent(): Promise<void> {
@@ -737,14 +916,27 @@ export class AppView extends Component {
     this.cloudConfig = await loadCloudConfig();
     const environment = this.cloudConfig.environment === 'production' ? 'production' : 'test';
     // A24-05：身份只来自可信来源；开发者 OAuth / 昵称 / 设备号 / 随机每设备 ID 都不是账号。
-    this.identity = new PlayerIdentityState(this.cloudConfig.appId, environment);
-    const identity = this.identity.apply(await new TapPlayerIdentityProvider().resolve());
-    if (identity.kind === 'changed') this.advanceAuthEpoch();
+    if (!this.identity || this.identity.appId !== this.cloudConfig.appId
+      || this.identity.environment !== environment) {
+      if (this.identity) await this.advanceAuthEpoch();
+      this.identity = new PlayerIdentityState(this.cloudConfig.appId, environment);
+    }
+    // B2：云作用域先登记到 AuthService，缓存会话若属于其他 app/环境会被拒绝并重新换票。
+    this.auth?.setExpectedScope(this.cloudConfig.appId, environment);
+    await this.ensurePlatformLogin(true);
+    // DEV-02：身份应用与 epoch/券scope/榜换号/旧弹窗失效在同一 owner 切换内完成。
+    const identity = await this.applyIdentityAtomically(await new SessionPlayerIdentityProvider(
+      () => this.auth?.currentSession() ?? Promise.resolve(null),
+      this.cloudConfig.appId,
+      environment,
+    ).resolve());
     this.cloudProfileBound = identity.kind === 'verified';
+    // DEV-02：启动身份基于缓存会话，不等于平台当前账号；敏感操作前由统一身份门强制刷新。
+    this.identityVerification = 'unverified';
+    this.lastBackupAuthEpoch = this.authEpoch;
     this.cloudProvider = new TapCloudSaveProvider();
     this.cloudSync = new CloudSyncService(this.cloudProvider, this.platform, this.cloudConfig,
       this.cloudConfig.appId, environment, this.identity.profileId);
-    this.leaderboardSync?.changeAccount();
     const status = await this.cloudSync.status();
     this.cloudProfileBound = status.profileId !== null;
     if (!this.cloudConfig.enabled) this.cloudStatusText = '云备份：未启用（当前进度只保存在本机）';
@@ -758,12 +950,20 @@ export class AppView extends Component {
   // ---------------------------------------------------------------- A24-08 云备份/恢复
 
   private async ensureCloudDeviceId(): Promise<string> {
-    const existing = await this.platform!.get<string>('ceo/cloud/device-instance/v1').catch(() => null);
+    const key = this.cloudScopeKey('device-instance');
+    const existing = await this.platform!.get<string>(key).catch(() => null);
     if (typeof existing === 'string' && existing.length > 0) return existing;
     // 仅用于 checkpoint 分支溯源，不是玩家身份。
     const generated = `dev-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e9).toString(36)}`;
-    await this.platform!.set('ceo/cloud/device-instance/v1', generated).catch(() => undefined);
+    await this.platform!.set(key, generated).catch(() => undefined);
     return generated;
+  }
+
+  private cloudScopeKey(name: string): string {
+    const appId = this.cloudConfig?.appId ?? 'unconfigured';
+    const environment = this.cloudConfig?.environment === 'production' ? 'production' : 'test';
+    const profileId = this.identity?.profileId ?? 'unbound';
+    return `ceo/cloud/v2/${encodeURIComponent(appId)}/${environment}/${encodeURIComponent(profileId)}/${name}`;
   }
 
   private cloudFailureText(result: { kind: string; reason?: string }): string {
@@ -771,6 +971,7 @@ export class AppView extends Component {
       case 'upload-rate-limited': return '距上次云备份不足 1 分钟，请稍后再试';
       case 'prior-create-needs-platform-reconciliation': return '上次上传结果未确认，请先打开“恢复云档”核对，避免重复创建';
       case 'account-switch-pending-create': return '账号已切换且有未决上传，请在本机核对后再操作';
+      case 'legacy-create-needs-manual-reconciliation': return '旧版云上传结果无法确认所属账号，请先在原账号与设备核对，当前不会重放上传';
       case 'base-changed-after-download': return '下载期间本机已变化，请重新预览云档后再恢复';
       case 'closed-run-tombstone': return '该云档属于本机已关闭的公司，不能恢复';
       case 'active-ad-session': return '广告奖励会话进行中，请稍后再恢复';
@@ -783,23 +984,42 @@ export class AppView extends Component {
     }
   }
 
-  private async backupToCloud(): Promise<void> {
+  private async backupToCloud(allowNewCheckpointWithLegacy = false): Promise<void> {
     const sync = this.cloudSync;
     const facade = this.facade;
     const config = this.cloudConfig;
     if (!sync || !facade || !config) { this.toast('云备份尚未初始化'); return; }
     if (this.cloudBusy) { this.toast('云备份正在进行中'); return; }
+    const syncStatus = await sync.status();
+    if (syncStatus.legacyPending && !allowNewCheckpointWithLegacy) {
+      this.showLegacyCloudReconciliation(syncStatus.legacyPending); return;
+    }
+    // DEV-02：统一身份门——缓存 TTL 不能证明平台未换号，备份前必须确认当前平台账号。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) {
+      this.toast('平台账号暂时无法确认，本次云备份未发起；进度仍保存在本机'); return;
+    }
     if (!this.cloudProfileBound || !this.identity?.profileId) { this.toast('云备份需平台可信账号；当前未提供，进度仍保存在本机'); return; }
     if (facade.getPersistenceStatus() !== 'ready') { this.toast('存档写入未确认，暂不能上传'); return; }
     const state = facade.getState();
     if (!state.company || state.phase === 'CREATING' || state.onboarding.initialHiresCompleted < 2) {
       this.toast('完成公司创建与首聘后才能备份'); return;
     }
+    // DEV-02：确认换号后首次备份必须明确归属当前账号；玩家未确认前不自动备份。
+    if (this.lastBackupAuthEpoch !== this.authEpoch) {
+      this.confirmFirstBackupToCurrentAccount(allowNewCheckpointWithLegacy);
+      return;
+    }
     this.cloudBusy = true;
     try {
+      const owner = { authEpoch: this.authEpoch, contextEpoch: this.contextEpoch,
+        profileId: this.identity.profileId, runId: state.runId, revision: facade.getRevision() };
+      const ownerCurrent = () => this.isCloudOwnerCurrent(owner);
       const nowMs = Date.now();
       const deviceId = await this.ensureCloudDeviceId();
-      const chain = await this.platform!.get<string[]>('ceo/cloud/chain/v1').catch(() => null);
+      if (!ownerCurrent()) { this.toast('账号或本机进度已变化，本次备份未继续'); return; }
+      const chainKey = this.cloudScopeKey('chain');
+      const chain = await this.platform!.get<string[]>(chainKey).catch(() => null);
+      if (!ownerCurrent()) { this.toast('账号或本机进度已变化，本次备份未继续'); return; }
       const parents = Array.isArray(chain) ? chain.filter((id) => typeof id === 'string').slice(-2) : [];
       const checkpoint = facade.captureCloudCheckpoint({
         appId: config.appId,
@@ -813,7 +1033,8 @@ export class AppView extends Component {
       });
       const path = this.cloudProvider?.defaultFilePath?.(`ceo-cloud-${checkpoint.checkpointId.replace(/[^A-Za-z0-9]/g, '')}.json`);
       if (!path) { this.toast('平台未提供可写存档目录，本次未上传'); return; }
-      const result = await sync.backup(checkpoint, path, `backup:${checkpoint.checkpointId}`, nowMs);
+      const result = await sync.backup(checkpoint, path, `backup:${checkpoint.checkpointId}`, nowMs, ownerCurrent,
+        { allowNewCheckpointWithLegacy });
       if (result.kind !== 'ok') {
         this.cloudStatusText = result.kind === 'unknown'
           ? '云备份：上次结果待核对，请先核对云档'
@@ -821,13 +1042,45 @@ export class AppView extends Component {
         this.toast(this.cloudFailureText(result));
         return;
       }
-      await this.platform!.set('ceo/cloud/chain/v1', [...parents, checkpoint.checkpointId].slice(-2)).catch(() => undefined);
-      this.cloudStatusText = '云备份：已完成；可用同一冻结档提交公开榜';
-      this.toast(`云备份成功：第${checkpoint.summary.year}年${checkpoint.summary.month}月`);
+      if (!ownerCurrent()) { this.toast('云备份已返回，但账号或本机进度变化；结果保留在原账号，请重新核对'); return; }
+      await this.platform!.set(chainKey, [...parents, checkpoint.checkpointId].slice(-2)).catch(() => undefined);
+      this.lastBackupAuthEpoch = this.authEpoch;
+      this.cloudStatusText = allowNewCheckpointWithLegacy
+        ? '云备份：已另建独立新档；旧未决记录仍保持隔离'
+        : '云备份：已完成；可用同一冻结档提交公开榜';
+      this.toast(allowNewCheckpointWithLegacy
+        ? `已另建新云档：第${checkpoint.summary.year}年${checkpoint.summary.month}月（未重发旧上传）`
+        : `云备份成功：第${checkpoint.summary.year}年${checkpoint.summary.month}月`);
       await this.submitLeaderboardReceipt(checkpoint);
     } finally {
       this.cloudBusy = false;
     }
+  }
+
+  /**
+   * DEV-02：确认换号后的首次云备份。本机公司保留，但上传前必须明确归属当前账号；
+   * 玩家取消则 lastBackupAuthEpoch 保持旧值，后续任何（自动/手动）备份仍会先询问。
+   */
+  private confirmFirstBackupToCurrentAccount(allowNewCheckpointWithLegacy: boolean): void {
+    const state = this.facade?.getState();
+    const yearText = state ? `第${state.gameYear}年${state.gameMonth}月` : '当前进度';
+    openConfirmDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '备份到当前账号',
+      message: '检测到平台账号已切换。确认后会把当前本机公司'
+        + `（${yearText}）备份到当前账号的云空间；不会改动云端可能存在的其他账号数据，也不会删除本机进度。`,
+      confirmText: '将当前本机公司备份到当前账号',
+      cancelText: '暂不备份',
+      session: { semanticKey: `first-backup:${this.authEpoch}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner() },
+      onConfirm: (dialog) => {
+        dialog.succeed();
+        // 用户确认即完成本 epoch 的归属授权；先落 epoch 再重进备份流程，
+        // 否则 lastBackupAuthEpoch 仍旧值会无限重复弹确认、永远走不到上传。
+        this.lastBackupAuthEpoch = this.authEpoch;
+        void this.backupToCloud(allowNewCheckpointWithLegacy).then(() => this.render());
+      },
+      onCancel: () => undefined,
+    });
   }
 
   /** A24-09：只有云确认成功回执的同一冻结快照才驱动两榜；同意/身份/epoch 任一失效即停止。 */
@@ -835,10 +1088,14 @@ export class AppView extends Component {
     const sync = this.leaderboardSync;
     if (!sync || !this.leaderboardConfig) return;
     if (!this.leaderboardConsent) return; // 同意与开榜都不隐含；撤回即不再外发
+    // DEV-02：榜单外发同样过统一身份门（备份流程已过时瞬时返回）。
+    if (!(await this.ensureVerifiedIdentity('leaderboard'))) return;
     const epoch = this.authEpoch;
     const runId = checkpoint.snapshot.runId;
+    const consentEpoch = this.leaderboardConsentEpoch;
     const stillCurrent = (): boolean =>
-      this.authEpoch === epoch && this.identity?.profileId === checkpoint.cloudProfileId
+      this.leaderboardConsent && this.leaderboardConsentEpoch === consentEpoch
+      && this.authEpoch === epoch && this.identity?.profileId === checkpoint.cloudProfileId
       && this.facade.getState().runId === runId;
     const result = await sync.submitCloudConfirmed(checkpoint.snapshot.payload, checkpoint.checkpointId, Date.now(), stillCurrent);
     if (result.assets === 'skipped' && result.years === 'skipped') {
@@ -865,12 +1122,16 @@ export class AppView extends Component {
     const sync = this.leaderboardSync;
     if (!pending || !sync) { this.toast('没有待补发的榜单'); return; }
     if (!this.leaderboardConsent) { this.toast('公开榜同意已撤回，停止补发'); return; }
+    // DEV-02：补榜前确认当前平台账号；未确认不补发也不丢弃（上下文校验仍按原 epoch）。
+    if (!(await this.ensureVerifiedIdentity('leaderboard'))) { this.toast('平台账号暂时无法确认，请稍后再试'); return; }
     if (this.authEpoch !== pending.epoch || this.facade.getState().runId !== pending.runId) {
       this.pendingLeaderboard = null;
       this.toast('上下文已变化，旧榜单结果不再补发');
       return;
     }
-    const stillCurrent = (): boolean => this.authEpoch === pending.epoch && this.facade.getState().runId === pending.runId;
+    const consentEpoch = this.leaderboardConsentEpoch;
+    const stillCurrent = (): boolean => this.leaderboardConsent && this.leaderboardConsentEpoch === consentEpoch
+      && this.authEpoch === pending.epoch && this.facade.getState().runId === pending.runId;
     const result = await sync.submitCloudConfirmed(pending.snapshot, pending.checkpointId, Date.now(), stillCurrent);
     if (result.assets === 'synced' && result.years === 'synced') {
       this.pendingLeaderboard = null;
@@ -885,16 +1146,247 @@ export class AppView extends Component {
     const sync = this.cloudSync;
     if (!sync) { this.toast('云备份尚未初始化'); return; }
     if (this.cloudBusy) { this.toast('云操作进行中'); return; }
+    const syncStatus = await sync.status();
+    if (syncStatus.legacyPending) { this.showLegacyCloudReconciliation(syncStatus.legacyPending); return; }
+    // DEV-02：统一身份门——先确认当前平台账号再谈暂停/预览，避免暂停后才发现账号未确认。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) { this.toast('平台账号暂时无法确认，请稍后再试'); return; }
+    if (!this.cloudProfileBound || !this.identity?.profileId) { this.toast('云恢复需平台可信账号；当前未提供'); return; }
+    // A1：正在经营时先让用户明确选择暂停/保持；不偷偷停经营，也不假装暂停。
+    if (this.facade.getState().speed > 0) { this.renderCloudPreviewChoice(); return; }
+    await this.openCloudRestoreList();
+  }
+
+  /** A1：云档预览前的三选一（暂停并预览 / 保持经营 / 返回）。 */
+  private renderCloudPreviewChoice(): void {
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '恢复云档前选择时钟状态', width: 330, desiredBodyHeight: 240,
+      session: { semanticKey: `cloud-pause-choice:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner() },
+    });
+    createLabel({
+      text: '经营正在运行，月结会改变本机进度，使云档预览的基线失效。\n\n'
+        + '暂停经营并预览：先暂停并确认写入本机存档，再读取云档；取消预览后仍保持暂停。\n\n'
+        + '保持经营并预览：不暂停时钟；若期间本机变化，确认会被安全拒绝，需要暂停后重新预览。',
+      fontSize: 13, color: THEME.text, width: 292, lineHeight: 20, align: 'left', parent: handle.body,
+    });
+    createButton({
+      text: '暂停经营并预览', width: 270, height: 48, parent: handle.body,
+      onClick: () => {
+        handle.close();
+        void (async () => {
+          if (!(await this.pauseForCloudPreview())) return;
+          await this.openCloudRestoreList();
+        })();
+      },
+    });
+    createButton({
+      text: '保持经营并预览', width: 270, height: 48, variant: 'secondary',
+      color: THEME.divider, textColor: THEME.text, parent: handle.footer,
+      onClick: () => { handle.close(); void this.openCloudRestoreList(); },
+    }).setPosition(0, 28);
+    createButton({
+      text: '返回', width: 270, height: 48, variant: 'secondary',
+      color: THEME.divider, textColor: THEME.text, parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(0, -28);
+  }
+
+  /**
+   * A1：显式暂停并等待持久化成功。失败时不假装暂停、也不沿用旧基线。
+   * 已暂停时直接返回 true（不覆盖用户原本的暂停选择）。
+   */
+  private async pauseForCloudPreview(): Promise<boolean> {
+    const facade = this.facade;
+    if (!facade) return false;
+    const before = facade.getState();
+    if (before.speed !== 0) {
+      const r = await facade.setSpeed(0, { commandId: nextCommandId('speed'), expectedRunId: before.runId });
+      if (!r.ok) { this.toast(r.displayMessage); return false; }
+      this.cloudPausedForPreview = true;
+      this.cloudPausedFromSpeed = before.speed;
+      audioManager.speedChange();
+    }
+    if (facade.getState().speed !== 0) { this.toast('暂停未生效，本次不打开云档预览'); return false; }
+    if (facade.getPersistenceStatus() !== 'ready') {
+      this.toast('暂停写入未确认，请先在存档恢复提示中重试后再预览');
+      return false;
+    }
+    for (const btn of this.speedButtons) this.paintSpeedButton(btn.node, btn.speed === 0);
+    return true;
+  }
+
+  /** A1：预览取消/列表关闭后保持暂停，并提供明确的“继续经营”。 */
+  private offerResumeAfterCloudPreview(): void {
+    if (!this.cloudPausedForPreview) return;
+    if (this.facade.getState().speed !== 0) { this.cloudPausedForPreview = false; return; }
+    this.renderCloudResumeNotice('已关闭云档预览，经营保持暂停');
+  }
+
+  private renderCloudResumeNotice(message: string): void {
+    const target: GameSpeed = this.cloudPausedFromSpeed === 0 ? 1 : this.cloudPausedFromSpeed;
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '经营已暂停', width: 320, desiredBodyHeight: 150,
+      session: { semanticKey: `cloud-resume:${this.contextEpoch}`, kind: 'notice', owner: this.dialogOwner() },
+    });
+    createLabel({
+      text: `${message}。\n当前时间：暂停（不会在后台自动恢复倍速）。\n继续经营可恢复 ${this.speedLabel(target)}；也可保持暂停稍后手动切换。`,
+      fontSize: 13, color: THEME.text, width: 284, lineHeight: 20, align: 'left', parent: handle.body,
+    });
+    createButton({
+      text: `继续经营（${this.speedLabel(target)}）`, width: 270, height: 48, parent: handle.footer,
+      onClick: () => {
+        handle.close();
+        this.cloudPausedForPreview = false;
+        void this.onSetSpeed(target);
+      },
+    }).setPosition(0, 28);
+    createButton({
+      text: '保持暂停', width: 270, height: 48, variant: 'secondary',
+      color: Color.WHITE, textColor: THEME.textWeak, parent: handle.footer,
+      onClick: () => { this.cloudPausedForPreview = false; handle.close(); },
+    }).setPosition(0, -28);
+  }
+
+  private async openCloudRestoreList(): Promise<void> {
+    const sync = this.cloudSync;
+    if (!sync) { this.toast('云备份尚未初始化'); return; }
+    if (this.cloudBusy) { this.toast('云操作进行中'); return; }
+    const syncStatus = await sync.status();
+    if (syncStatus.legacyPending) { this.showLegacyCloudReconciliation(syncStatus.legacyPending); return; }
+    // DEV-02：统一身份门（已确认时瞬时返回）。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) { this.toast('平台账号暂时无法确认，请稍后再试'); return; }
     if (!this.cloudProfileBound || !this.identity?.profileId) { this.toast('云恢复需平台可信账号；当前未提供'); return; }
     this.cloudBusy = true;
     try {
-      const result = await sync.list(`list:${Date.now().toString(36)}`);
+      const owner = { authEpoch: this.authEpoch, contextEpoch: this.contextEpoch,
+        profileId: this.identity.profileId, runId: this.facade!.getState().runId, revision: this.facade!.getRevision() };
+      const result = await sync.list(`list:${Date.now().toString(36)}`, () => this.isCloudOwnerCurrent(owner));
       if (result.kind !== 'ok') { this.toast(this.cloudFailureText(result)); return; }
+      if (!this.isCloudOwnerCurrent(owner)) { this.toast('账号或本机进度已变化，请重新打开云档列表'); return; }
       this.cloudArchives = result.value;
+      this.cloudArchiveOwner = owner;
       this.renderCloudArchiveList();
     } finally {
       this.cloudBusy = false;
     }
+  }
+
+  /**
+   * A2：旧全局 pending 的出口。
+   * - 核对只读（list/download/本地校验），绝不重放旧 create、绝不删除旧云档；
+   * - 另建新备份必须由玩家明确确认，创建独立 checkpoint，旧记录继续隔离。
+   */
+  private showLegacyCloudReconciliation(pending: PendingCreate): void {
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '旧云上传待核对', width: 330, desiredBodyHeight: 300,
+      session: { semanticKey: `legacy-cloud-pending:${pending.operationId}`, kind: 'form', owner: this.dialogOwner() },
+    });
+    createLabel({
+      text: `操作编号：${pending.operationId}\n存档编号：${pending.checkpointId}\n记录时间：${new Date(pending.createdAtMs).toLocaleString('zh-CN')}\n\n`
+        + '旧版记录没有可校验的账号与环境范围，因此系统不会自动按当前账号重放上传，也不会删除云档或记录。\n'
+        + '“核对旧备份”只读取当前账号可见的云档，并校验 app/环境/账号/存档编号；全程不会创建新云档。',
+      fontSize: 13, color: THEME.text, width: 292, lineHeight: 20, align: 'left', parent: handle.body,
+    });
+    createButton({
+      text: '核对旧备份（只读）', width: 270, height: 48, parent: handle.body,
+      onClick: () => { handle.close(); void this.reconcileLegacyCloud(pending); },
+    });
+    createButton({
+      text: '保留旧未决，另建新备份', width: 270, height: 48, variant: 'secondary',
+      color: THEME.divider, textColor: THEME.text, parent: handle.body,
+      onClick: () => { handle.close(); this.confirmNewBackupDespiteLegacy(pending); },
+    });
+    createButton({
+      text: '关闭', width: 270, height: 48, variant: 'secondary',
+      color: THEME.divider, textColor: THEME.text, parent: handle.body,
+      onClick: () => handle.close(),
+    });
+  }
+
+  private async reconcileLegacyCloud(pending: PendingCreate): Promise<void> {
+    const sync = this.cloudSync;
+    const facade = this.facade;
+    if (!sync || !facade || this.cloudBusy) { this.toast('云服务暂不可用或正在处理其他操作'); return; }
+    // DEV-02：旧未决核对是只读操作，但核对结论会绑定到身份；先过统一身份门。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) { this.toast('平台账号暂时无法确认，请稍后再核对'); return; }
+    if (!this.identity?.profileId) { this.toast('核对旧备份需要平台可信账号'); return; }
+    const owner = { authEpoch: this.authEpoch, contextEpoch: this.contextEpoch, profileId: this.identity.profileId };
+    this.cloudBusy = true;
+    try {
+      const path = this.cloudProvider?.defaultFilePath?.(`ceo-legacy-reconcile-${Date.now().toString(36)}.json`) ?? 'ceo-legacy-reconcile.json';
+      const result = await sync.reconcileLegacyPending(pending, path, Date.now(),
+        () => this.isCloudIdentityCurrent(owner));
+      this.renderLegacyReconcileOutcome(pending, result);
+      if (result.kind === 'ok') {
+        const status = await sync.status();
+        this.cloudStatusText = status.pendingCheckpointId
+          ? '云备份：上次结果待核对，请先点“恢复云档”核对，勿重复上传'
+          : '云备份：已绑定账号，可手动备份/恢复';
+      }
+    } finally {
+      this.cloudBusy = false;
+    }
+  }
+
+  private renderLegacyReconcileOutcome(
+    pending: PendingCreate,
+    result: { kind: string; reason?: string; value?: { archiveCheckpointId?: string } },
+  ): void {
+    let title = '核对结果';
+    let message: string;
+    if (result.kind === 'ok') {
+      title = '已核对，未重发上传';
+      message = `当前账号下唯一匹配到原存档：\n${result.value?.archiveCheckpointId ?? pending.checkpointId}\n\n`
+        + '该记录已登记为“已确认”，原始 legacy 记录已清理；旧云档保留未删除。\n本次核对 create=0。';
+    } else if (result.kind === 'missing' && result.reason === 'legacy-create-not-found') {
+      title = '未查到该云档';
+      message = `当前账号列表中没有找到存档 ${pending.checkpointId}。\n\n`
+        + '“没有查到”不等于原上传失败：可能是原上传属于其他账号、已过期或平台未返回。系统不会重发旧上传，也不会删除记录。\n本次核对 create=0。';
+    } else if (result.kind === 'missing') {
+      title = '旧记录已不存在';
+      message = '本机已没有该 legacy 记录（可能已被其他流程清理），本次未创建任何云档。';
+    } else if (result.reason === 'duplicate-checkpoint-metadata') {
+      title = '存在重复记录';
+      message = '当前账号下发现多条相同存档编号的云档，无法确认唯一归属，已保持隔离。\n本次核对 create=0。';
+    } else if (result.reason === 'legacy-account-mismatch') {
+      title = '属于其他账号';
+      message = '该云档属于其他账号范围，不能迁移到当前账号；原记录继续隔离，未创建新档。';
+    } else if (result.reason === 'legacy-scope-mismatch') {
+      title = '应用或环境不一致';
+      message = '该云档的 app/环境与当前配置不一致，已拒绝迁移；未创建新档。';
+    } else if (String(result.reason ?? '').startsWith('legacy-list-')) {
+      title = '列表读取失败';
+      message = '暂时无法读取云档列表，未确认旧上传结果。原记录继续保持隔离，未创建新档。可稍后重试核对。';
+    } else {
+      title = '校验未通过';
+      message = `下载或校验未通过（${result.reason ?? result.kind}）。原记录继续保持隔离，未创建新档。`;
+    }
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title, width: 324, desiredBodyHeight: 240,
+      session: { semanticKey: `legacy-reconcile:${pending.operationId}:${result.kind}:${result.reason ?? ''}`, kind: 'notice', owner: this.dialogOwner() },
+    });
+    createLabel({ text: message, fontSize: 13, color: THEME.text, width: 286, lineHeight: 20, align: 'left', parent: handle.body });
+    createButton({ text: '知道了', width: 260, height: 48, parent: handle.footer, onClick: () => handle.close() }).setPosition(0, 0);
+  }
+
+  private confirmNewBackupDespiteLegacy(pending: PendingCreate): void {
+    openConfirmDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '另建新备份',
+      message: `旧未决记录（${pending.operationId}）会继续保留，系统不会重试旧上传，也不会删除旧云档。\n\n`
+        + '确认后会基于当前本机进度创建全新的 checkpoint 与 operation；它可能与旧云档并存。'
+        + `若距上次备份不足 1 分钟，会先提示稍后再试。\n\n旧存档可能已经存在于云端，本次不是“重试旧上传”。`,
+      confirmText: '确认另建新备份', cancelText: '取消',
+      session: { semanticKey: `legacy-new-backup:${pending.operationId}:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner() },
+      onConfirm: (dialog) => {
+        dialog.succeed();
+        void this.backupToCloud(true).then(() => this.render());
+      },
+      onCancel: () => undefined,
+    });
   }
 
   private archiveMeta(ref: CloudArchiveRef): { checkpointId?: string; year?: number; month?: number; capturedAtMs?: number; parents?: string[] } | null {
@@ -945,61 +1437,252 @@ export class AppView extends Component {
       createButton({
         text: '恢复此档',
         width: 270, height: 44, variant: 'secondary', color: THEME.divider, textColor: THEME.text, parent: handle.body,
-        onClick: () => { handle.close(); this.confirmCloudRestoreShell(ref); },
+        onClick: () => { handle.close(); void this.prepareCloudRestore(ref, this.cloudArchiveOwner); },
       });
     }
     createButton({
-      text: '关闭', width: 260, height: 48, parent: handle.footer, onClick: () => handle.close(),
+      text: '关闭', width: 260, height: 48, parent: handle.footer,
+      onClick: () => { handle.close(); this.offerResumeAfterCloudPreview(); },
     }).setPosition(0, 0);
   }
 
-  private confirmCloudRestoreShell(ref: CloudArchiveRef): void {
-    const meta = this.archiveMeta(ref);
+  private async prepareCloudRestore(
+    ref: CloudArchiveRef,
+    owner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number } | null,
+  ): Promise<void> {
+    if (!owner || !this.isCloudIdentityCurrent(owner)) { this.toast('账号或本机进度已变化，请重新打开云档列表'); return; }
+    // DEV-02：预览生成前确认当前平台账号（列表已过时瞬时返回）。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) { this.toast('平台账号暂时无法确认，请重新打开云档列表'); return; }
+    const out = await this.downloadCloudPreview(ref, owner);
+    if (!out.ok) {
+      if (out.reason === 'base-changed-after-download') {
+        this.renderCloudPreviewExpired(() => {
+          void (async () => {
+            if (this.facade.getState().speed > 0 && !(await this.pauseForCloudPreview())) return;
+            await this.prepareCloudRestore(ref, owner);
+          })();
+        });
+        return;
+      }
+      if (out.reason === 'owner-changed') { this.toast('账号已变化，请重新打开云档列表'); return; }
+      this.toast(this.cloudFailureText({ kind: 'unavailable', reason: out.reason }));
+      return;
+    }
+    this.confirmCloudRestoreShell(ref, out.preview, out.owner, out.relation);
+  }
+
+  /** 下载并校验云档；基线以调用时的 run/revision 为准，下载后再由确认步骤做 CAS 复核。 */
+  private async downloadCloudPreview(
+    ref: CloudArchiveRef,
+    owner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number },
+  ): Promise<
+    | { ok: true; preview: CloudRestorePreview; owner: typeof owner; relation: CloudHeadRelation }
+    | { ok: false; reason: string }
+  > {
+    const sync = this.cloudSync;
+    const facade = this.facade;
+    if (!sync || !facade) return { ok: false, reason: 'unavailable' };
+    if (this.cloudBusy) return { ok: false, reason: 'busy' };
+    const liveOwner = { ...owner, runId: facade.getState().runId, revision: facade.getRevision() };
+    // 保持经营时 revision 会随每次 tick 推进：下载期间只校验身份与局面，
+    // 基线由 prepareRestore 在下载完成那一刻捕获（之后的变化交给确认步骤拒绝）。
+    const ownerCurrent = () => this.isCloudIdentityCurrent(liveOwner)
+      && this.facade?.getState().runId === liveOwner.runId;
+    this.cloudBusy = true;
+    const path = this.cloudProvider?.defaultFilePath?.(`ceo-restore-preview-${Date.now().toString(36)}.json`) ?? 'ceo-restore-preview.json';
+    let prepared: Awaited<ReturnType<CloudSyncService['prepareRestore']>>;
+    try {
+      prepared = await sync.prepareRestore(ref, path, `restore-preview:${Date.now().toString(36)}`, facade,
+        undefined, ownerCurrent,
+        { authEpoch: liveOwner.authEpoch, contextEpoch: liveOwner.contextEpoch });
+    } finally { this.cloudBusy = false; }
+    if (prepared.kind !== 'ok') {
+      const reason = prepared.kind === 'unavailable' || prepared.kind === 'unknown' ? prepared.reason ?? prepared.kind : prepared.kind;
+      return { ok: false, reason };
+    }
+    if (!ownerCurrent()) return { ok: false, reason: 'owner-changed' };
+    const relation = await this.cloudHeadRelation(prepared.value);
+    if (!ownerCurrent()) return { ok: false, reason: 'owner-changed' };
+    const settledOwner = { ...liveOwner, runId: prepared.value.base.runId, revision: prepared.value.base.revision };
+    return { ok: true, preview: prepared.value, owner: settledOwner, relation };
+  }
+
+  /** A1：保持经营导致基线失效时保留窗口，只提供“暂停并重新预览”或关闭。 */
+  private renderCloudPreviewExpired(onRetry: () => void): void {
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(), viewportHeight: this.shellLayout().viewportHeight,
+      title: '预览基线已失效', width: 320, desiredBodyHeight: 170,
+      session: { semanticKey: `cloud-preview-expired:${this.contextEpoch}`, kind: 'confirm', owner: this.dialogOwner() },
+    });
+    createLabel({
+      text: '保持经营期间本机进度已变化（月结/操作），旧预览不能安全确认。\n\n'
+        + '系统不会把基线直接改成最新版本。可暂停经营后重新读取云档；本次不会导入任何内容。',
+      fontSize: 13, color: THEME.text, width: 284, lineHeight: 20, align: 'left', parent: handle.body,
+    });
+    createButton({
+      text: '暂停并重新预览', width: 270, height: 48, parent: handle.footer,
+      onClick: () => { handle.close(); onRetry(); },
+    }).setPosition(0, 28);
+    createButton({
+      text: '关闭', width: 270, height: 48, variant: 'secondary',
+      color: Color.WHITE, textColor: THEME.textWeak, parent: handle.footer,
+      onClick: () => { handle.close(); this.offerResumeAfterCloudPreview(); },
+    }).setPosition(0, -28);
+  }
+
+  private async cloudHeadRelation(preview: CloudRestorePreview): Promise<CloudHeadRelation> {
+    const chain = await this.platform?.get<string[]>(this.cloudScopeKey('chain')).catch(() => null);
+    const validChain = Array.isArray(chain) ? chain.filter((id) => typeof id === 'string') : [];
+    const localHead = validChain.length > 0 ? validChain[validChain.length - 1]! : null;
+    const graph = new Map<string, readonly string[]>();
+    for (const ref of this.cloudArchives) {
+      const meta = this.archiveMeta(ref);
+      if (meta?.checkpointId) graph.set(meta.checkpointId, meta.parents ?? []);
+    }
+    graph.set(preview.checkpoint.checkpointId, preview.checkpoint.parentCheckpointIds);
+    return compareCloudHeads(localHead, preview.checkpoint.checkpointId, graph);
+  }
+
+  private confirmCloudRestoreShell(
+    ref: CloudArchiveRef,
+    preview: CloudRestorePreview,
+    owner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number },
+    relation: CloudHeadRelation,
+  ): void {
+    let currentPreview = preview;
+    let currentOwner = owner;
+    let currentRelation = relation;
+    const checkpoint = preview.checkpoint;
+    const buildMessage = () => {
+      const cp = currentPreview.checkpoint;
+      return `云档第${cp.summary.year}年${cp.summary.month}月｜现金${moneyText(cp.summary.cashYuan)}｜资产${moneyText(cp.summary.assetsYuan)}｜员工${cp.summary.employeeCount}人\n`
+        + `存档时间：${new Date(cp.capturedAtMs).toLocaleString('zh-CN')}\n分支关系：${this.cloudHeadRelationText(currentRelation)}\n\n`
+        + '确认后整档替换本机经营；不合并现金/员工。本机广告券与消费账本保留，恢复不产生离线收益。'
+        + '若本机期间变化，确认会被安全拒绝，可“暂停并重新预览”。';
+    };
     openConfirmDialog({
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
       title: '恢复云档',
-      message: `将用该云档整档替换本机经营。\n\n不合并现金/员工；本机广告券与消费账本保留；恢复不产生离线收益。\n\n若本机期间发生变化，会要求重新预览。`,
+      message: buildMessage(),
       confirmText: '确认整档替换',
       cancelText: '取消',
       session: {
-        semanticKey: `cloud-restore:${meta?.checkpointId ?? ref.uuid}:${this.contextEpoch}`,
+        semanticKey: `cloud-restore:${checkpoint.checkpointId}:${this.contextEpoch}`,
         kind: 'confirm',
         owner: this.dialogOwner(),
       },
-      onConfirm: (dialog) => this.confirmCloudRestore(dialog, ref),
+      // A1：基线失效后保留窗口；重新预览一定先暂停并等待持久化成功，再以新基线下发。
+      onRefreshPreview: async () => {
+        if (!this.isCloudIdentityCurrent(currentOwner)) throw new Error('账号已变化，请关闭后重新打开云档列表');
+        if (this.facade.getState().speed > 0) {
+          const paused = await this.pauseForCloudPreview();
+          if (!paused) throw new Error('暂停经营失败，未重新读取云档');
+        }
+        const out = await this.downloadCloudPreview(ref, currentOwner);
+        if (!out.ok) {
+          throw new Error(`重新预览失败：${this.cloudFailureText({ kind: 'unavailable', reason: out.reason })}`);
+        }
+        currentPreview = out.preview;
+        currentOwner = out.owner;
+        currentRelation = out.relation;
+        return { message: buildMessage(), confirmText: '确认整档替换', confirmEnabled: true };
+      },
+      onConfirm: (dialog) => this.confirmCloudRestore(dialog, currentPreview, currentOwner),
+      onCancel: () => this.offerResumeAfterCloudPreview(),
     });
   }
 
-  private async confirmCloudRestore(dialog: import('./dialogs').DialogHandle, ref: CloudArchiveRef): Promise<void> {
+  private cloudHeadRelationText(relation: CloudHeadRelation): string {
+    switch (relation) {
+      case 'same': return '与本机云档相同';
+      case 'cloud-descends-from-local': return '云档沿本机已知父链更新';
+      case 'local-descends-from-cloud': return '本机云头沿此档已知父链更新';
+      case 'conflict': return '检测到分支冲突';
+      default: return '父链信息不足，无法判定';
+    }
+  }
+
+  private isCloudOwnerCurrent(owner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number }): boolean {
+    return this.isCloudIdentityCurrent(owner)
+      && this.facade?.getState().runId === owner.runId
+      && this.facade.getRevision() === owner.revision;
+  }
+
+  private isCloudIdentityCurrent(owner: { authEpoch: number; contextEpoch: number; profileId: string }): boolean {
+    return this.authEpoch === owner.authEpoch && this.contextEpoch === owner.contextEpoch
+      && this.identity?.profileId === owner.profileId;
+  }
+
+  private async confirmCloudRestore(dialog: import('./dialogs').DialogHandle, preview: CloudRestorePreview,
+    owner: { authEpoch: number; contextEpoch: number; profileId: string; runId: string; revision: number }): Promise<void> {
     const sync = this.cloudSync;
     if (!sync || !this.facade) { dialog.fail('云服务尚未初始化'); return; }
-    const base = { runId: this.facade.getState().runId, revision: this.facade.getRevision() };
-    const epoch = this.authEpoch;
-    const path = this.cloudProvider?.defaultFilePath?.(`ceo-restore-${Date.now().toString(36)}.json`) ?? 'ceo-restore.json';
-    const result = await sync.restore(ref, path, `restore:${Date.now().toString(36)}`, this.facade, Date.now(), base);
+    // DEV-02：确认恢复是敏感外发，先过统一身份门；未确认明确失败可重试，不静默放行。
+    if (!(await this.ensureVerifiedIdentity('cloud'))) { dialog.fail('平台账号暂时无法确认，请稍后重试'); return; }
+    if (!this.isCloudOwnerCurrent(owner)) {
+      // 运行中本机进度推进只影响 revision：旧预览必须作废，但身份/局面仍有效，
+      // 给出“暂停并重新预览”这条明确出口；身份或局面变化才要求重开列表。
+      if (this.isCloudIdentityCurrent(owner) && this.facade.getState().runId === owner.runId) {
+        dialog.markExpired('本机经营已变化，旧预览与当前进度不一致；请暂停并重新预览', '暂停并重新预览');
+      } else {
+        dialog.markExpired('账号或本机进度已变化，请重新打开云档预览');
+      }
+      return;
+    }
+    const ownerCurrent = () => this.isCloudOwnerCurrent(owner);
+    const result = await sync.confirmRestore(preview, this.facade, Date.now(), ownerCurrent);
     if (result.kind !== 'ok') {
       const reason = result.kind === 'unavailable' || result.kind === 'unknown' ? result.reason : '';
-      if (reason === 'base-changed-after-download') { dialog.markExpired('本机经营已变化，请关闭后重新打开云档预览'); return; }
+      if (reason === 'base-changed-after-download') {
+        dialog.markExpired('本机经营已变化，旧预览与当前进度不一致；请暂停并重新预览', '暂停并重新预览');
+        return;
+      }
+      if (result.kind === 'unknown') { dialog.blockSubmit('恢复提交结果待核对；请读取本机存档确认后再继续'); return; }
       dialog.fail(this.cloudFailureText(result));
       return;
     }
-    if (this.authEpoch !== epoch) { dialog.blockSubmit('账号已切换，本次恢复结果不应用到新账号'); return; }
+    const receipt = result.value;
+    if (!this.isCloudIdentityCurrent(owner)) {
+      dialog.succeed();
+      this.toast('恢复已提交到原账号；当前账号已切换，请切回原账号核对');
+      return;
+    }
+    if (this.facade.getState().runId !== receipt.appliedRunId || this.facade.getRevision() !== receipt.appliedRevision) {
+      dialog.blockSubmit('恢复提交结果待核对；请重新读取本机存档后继续');
+      return;
+    }
     dialog.succeed();
     this.pendingLeaderboard = null;
+    const restoredSpeed = this.facade.getState().speed;
     this.exitApplicationContext('context-invalidated');
     this.adForegroundEligibleSinceMs = 0;
     this.adFirstEligibleRunId = null;
     this.render();
+    // A1：恢复后强制停在暂停状态，由用户显式决定是否继续，避免“以为仍在自动运行”。
+    if (restoredSpeed !== 0) {
+      const paused = await this.facade.setSpeed(0, { commandId: nextCommandId('speed'), expectedRunId: this.facade.getState().runId });
+      if (!paused.ok) {
+        this.toast('已恢复云档，但暂停时钟未确认；请手动检查倍速');
+        return;
+      }
+      this.render();
+    }
+    this.cloudPausedForPreview = true;
+    if (restoredSpeed !== 0) this.cloudPausedFromSpeed = restoredSpeed;
     this.toast('已恢复云档；本机广告券与账本保留');
+    this.renderCloudResumeNotice('云档已恢复，经营已暂停');
   }
 
   private async maybeShowDailyRewardPrompt(): Promise<void> {
     if (!this.facade || !this.adCoordinator || this.facade.getState().phase !== 'RUNNING') return;
+    if (!this.adCoordinator.canStart()) return;
     if (this.adCoordinator.hasActiveSession()) return;
     // R31：以弹窗会话栈为准，不再按 ModalLayer 子节点名猜测；任何窗口在场都不叠加
     if (hasOpenDialog()) return;
-    if (!this.facade.canRequestRewardedAd() || (this.facade.getState().adRewards?.couponIds.length ?? 0) > 0) return;
+    const adState = this.facade.getState();
+    if (!this.facade.canRequestRewardedAd()
+      || (adState.adRewards?.couponIds ?? []).some((id) => isAdCouponAvailable(adState, id, Date.now(), this.adRewardOwnerScope()))) return;
     const marked = await this.facade.markRewardPromptShown();
     if (marked.ok && marked.payload) this.renderRewardPrompt('完整观看可领1张免招聘费券，仅免一次招聘费，月薪照常支付，下月到岗；每天最多领取1次，7天内使用。');
   }
@@ -1095,8 +1778,8 @@ export class AppView extends Component {
         this.fgClock.markSettled(now);
         return;
       }
-      // 回到前台静默重验平台会话（过期则后台刷新，不打断单机玩法）
-      void this.ensurePlatformLogin(true);
+      // 回到前台按当前代际 singleflight 刷新权威身份（不打断单机玩法；失败仅阻断云/榜外发）
+      const identityReady = this.ensureVerifiedIdentity('foreground').catch(() => false);
       if (elapsedMs <= 0) {
         this.fgClock.markSettled(now);
         this.lastFrameMs = now;
@@ -1112,8 +1795,9 @@ export class AppView extends Component {
       this.pendingForegroundSettlement = false;
       if (this.adCoordinator?.hasPendingGrant()) {
         // 24.14.3.6：观看已完成但发券未决 → 回前台只补核对原奖励，不重看视频、不重复发券。
-        void this.adCoordinator.request().then((r) => {
-          if (r.kind === 'completed') { this.toast('广告奖励已补发'); this.render(); }
+        // DEV-02：补发核对必须等当前代际身份确认结束；owner 未知时协调器保留 pending 后续再核。
+        void identityReady.then(() => this.adCoordinator?.request()).then((r2) => {
+          if (r2?.kind === 'completed') { this.toast('广告奖励已补发'); this.render(); }
         }).catch(() => undefined);
       }
       this.fgClock.markSettled(now);
@@ -1240,6 +1924,11 @@ export class AppView extends Component {
       return;
     }
     const state = this.facade.getState();
+    if (!this.adCoordinator.canStart()) {
+      this.adForegroundEligibleSinceMs = 0;
+      this.adFirstEligibleRunId = null;
+      return;
+    }
     if (state.phase !== 'RUNNING' || state.onboarding.initialHiresCompleted < 2 || this.adCoordinator.hasActiveSession()) {
       this.adForegroundEligibleSinceMs = 0;
       this.adFirstEligibleRunId = null;
@@ -1257,6 +1946,7 @@ export class AppView extends Component {
 
   private isAdForegroundEligible(): boolean {
     if (!this.facade || !this.adCoordinator) return false;
+    if (!this.adCoordinator.canStart()) return false;
     const state = this.facade.getState();
     return state.phase === 'RUNNING' && state.onboarding.initialHiresCompleted >= 2
       && this.adFirstEligibleRunId === state.runId && this.adForegroundEligibleSinceMs > 0
@@ -4049,7 +4739,7 @@ export class AppView extends Component {
   private renderHireDialog(offer: CandidateOffer, deptId: string): void {
     const s = this.state();
     const storedCouponId = s.adRewards?.couponIds[0];
-    const couponId = isAdCouponAvailable(s, storedCouponId) ? storedCouponId : undefined;
+    const couponId = isAdCouponAvailable(s, storedCouponId, Date.now(), this.adRewardOwnerScope()) ? storedCouponId : undefined;
     const overlay = this.modalOverlay();
     createRect({ width: 340, height: 470, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
     createLabel({ text: '招聘候选人', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 206);
@@ -4093,7 +4783,8 @@ export class AppView extends Component {
         void this.refreshHire(deptId);
       },
     }).setPosition(-60, -206);
-    if (this.adCoordinator && !couponId && this.facade.canRequestRewardedAd()) {
+    if (this.adCoordinator && (this.adCoordinator.canStart() || this.adCoordinator.hasPendingGrant())
+      && !couponId && this.facade.canRequestRewardedAd()) {
       createButton({
         text: '自愿看视频领免招聘费券',
         width: 224,
@@ -4775,11 +5466,20 @@ export class AppView extends Component {
         return;
       }
       const next = !this.leaderboardConsent;
+      const previous = this.leaderboardConsent;
+      this.leaderboardConsent = next;
+      this.leaderboardConsentEpoch += 1;
       void this.platform?.set('ceo/leaderboard/consent/v1', next).then(() => {
-        this.leaderboardConsent = next;
         set(next);
         this.toast(next ? '已开启公开榜单同步' : '已关闭公开榜单同步');
-      }).catch(() => this.toast('榜单偏好保存失败，原设置不变'));
+      }).catch(() => {
+        if (this.leaderboardConsent === next) {
+          this.leaderboardConsent = previous;
+          this.leaderboardConsentEpoch += 1;
+          set(previous);
+        }
+        this.toast('榜单偏好保存失败，原设置不变');
+      });
     });
     createLabel({
       text: this.leaderboardConfig?.enabled

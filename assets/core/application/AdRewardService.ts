@@ -10,7 +10,7 @@ const empty = (): AdRewardState => ({ version: 2, maxObservedDayIndex: -1, reque
   localDay: '', promptsShown: 0, grantsUsed: 0, couponIds: [], completedSessionIds: [],
   activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null,
   activeSessionReservedDayIndex: null, grantDayIndexes: [], consumedCouponIds: [],
-  couponCreatedAtMsById: {}, couponRunIdById: {} });
+  couponCreatedAtMsById: {}, couponRunIdById: {}, couponOwnerScopeById: {}, quarantinedOwnerScopeById: {} });
 const validNow = (nowMs: number): boolean => Number.isSafeInteger(nowMs) && nowMs >= 0;
 const dayIndex = (nowMs: number): number => Math.floor((nowMs + UTC8_MS) / DAY_MS);
 const dayKey = (index: number): string => new Date(index * DAY_MS).toISOString().slice(0, 10);
@@ -30,79 +30,104 @@ function viewFor(s: GameState, nowMs: number): AdRewardState {
 
 export function adQuotaForDay(s: GameState, nowMs: number): AdRewardState { return viewFor(s, nowMs); }
 
-export function markAdPromptShown(s: GameState, nowMs: number): boolean {
+export function markAdPromptShown(s: GameState, nowMs: number, ownerScope = 'local'): boolean {
   if (!validNow(nowMs)) return false;
   const current = viewFor(s, nowMs);
-  if (current.promptsShown >= 1 || current.grantsUsed >= 1 || hasAvailableCoupon(s, current, nowMs)) return false;
+  if (current.promptsShown >= 1 || current.grantsUsed >= 1 || hasAvailableCoupon(s, current, nowMs, undefined, ownerScope)) return false;
   s.adRewards = { ...withLegacyCouponExpiry(current, nowMs), promptsShown: current.promptsShown + 1 };
   return true;
 }
 
-export function canRequestAdCoupon(s: GameState, nowMs: number): boolean {
+export function canRequestAdCoupon(s: GameState, nowMs: number, ownerScope = 'local'): boolean {
   if (!validNow(nowMs) || s.phase !== 'RUNNING' || s.onboarding.initialHiresCompleted < 2) return false;
   const current = viewFor(s, nowMs);
-  if (current.activeSessionId || current.grantsUsed >= 1 || hasAvailableCoupon(s, current, nowMs)) return false;
+  if (current.activeSessionId || current.grantsUsed >= 1 || hasAvailableCoupon(s, current, nowMs, undefined, ownerScope)) return false;
   if ((current.requestsUsed ?? 0) >= MAX_REQUESTS_PER_DAY) return false;
   return current.lastRequestAtMs == null || nowMs - current.lastRequestAtMs >= REQUEST_COOLDOWN_MS;
 }
 
-export function beginAdSession(s: GameState, sessionId: string, nowMs: number): boolean {
-  if (!sessionId || !canRequestAdCoupon(s, nowMs)) return false;
+export function beginAdSession(s: GameState, sessionId: string, nowMs: number, ownerScope = 'local'): boolean {
+  if (!sessionId || !canRequestAdCoupon(s, nowMs, ownerScope)) return false;
   const current = viewFor(s, nowMs);
   s.adRewards = { ...withLegacyCouponExpiry(current, nowMs), requestsUsed: (current.requestsUsed ?? 0) + 1, lastRequestAtMs: nowMs,
     activeSessionId: sessionId, activeSessionStartedAtMs: nowMs, activeRunId: s.runId,
-    activeSessionReservedDayIndex: dayIndex(nowMs) };
+    activeSessionReservedDayIndex: dayIndex(nowMs), activeOwnerScope: ownerScope };
   return true;
 }
 
 export function cancelAdSession(s: GameState, sessionId: string, expectedRunId = s.runId): void {
   const current = stateOf(s);
   if (s.runId === expectedRunId && current.activeSessionId === sessionId && current.activeRunId === expectedRunId) {
-    s.adRewards = { ...current, activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null, activeSessionReservedDayIndex: null };
+    s.adRewards = { ...current, activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null, activeSessionReservedDayIndex: null, activeOwnerScope: null };
   }
 }
 
+/** Terminally isolate one unresolved old-owner session without releasing daily request quota. */
+export function quarantineAdSession(s: GameState, sessionId: string, expectedRunId: string): boolean {
+  const current = stateOf(s);
+  if (!sessionId || s.runId !== expectedRunId || current.activeSessionId !== sessionId || current.activeRunId !== expectedRunId) return false;
+  const quarantined = [...(current.quarantinedSessionIds ?? []).filter((id) => id !== sessionId), sessionId].slice(-32);
+  const ownerScopes = { ...(current.quarantinedOwnerScopeById ?? {}) };
+  ownerScopes[sessionId] = current.activeOwnerScope ?? 'local';
+  s.adRewards = { ...current, quarantinedSessionIds: quarantined, quarantinedOwnerScopeById: keepRecentEntries(ownerScopes, 32),
+    activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null, activeSessionReservedDayIndex: null, activeOwnerScope: null };
+  return true;
+}
+
 /** Award only after explicit native isEnded=true; transaction caller persists this draft atomically. */
-export function grantAdCoupon(s: GameState, sessionId: string, nowMs: number, expectedRunId = s.runId): boolean {
+export function grantAdCoupon(s: GameState, sessionId: string, nowMs: number, expectedRunId = s.runId, ownerScope = 'local'): boolean {
   if (!validNow(nowMs) || s.runId !== expectedRunId) return false;
   const current = withLegacyCouponExpiry(viewFor(s, nowMs), nowMs);
   if (!sessionId) return false;
   if (current.completedSessionIds.includes(sessionId)) return true;
-  if (current.activeSessionId !== sessionId || current.activeRunId !== expectedRunId || current.grantsUsed >= 1 || hasAvailableCoupon(s, current, nowMs)) return false;
+  if (current.activeSessionId !== sessionId || current.activeRunId !== expectedRunId
+    || (current.activeOwnerScope ?? 'local') !== ownerScope || current.grantsUsed >= 1
+    || hasAvailableCoupon(s, current, nowMs, undefined, ownerScope)) return false;
   const reservedDay = current.activeSessionReservedDayIndex ?? dayIndex(nowMs);
   const created = keepRecentEntries(current.couponCreatedAtMsById ?? {}, 31);
   const couponRuns = keepRecentEntries(current.couponRunIdById ?? {}, 31);
+  const couponScopes = keepRecentEntries(current.couponOwnerScopeById ?? {}, 31);
   created[sessionId] = nowMs;
   couponRuns[sessionId] = expectedRunId;
-  const grantDays = [...new Set([...(current.grantDayIndexes ?? []), reservedDay])].slice(-32);
+  couponScopes[sessionId] = ownerScope;
+  // Avoid Set iteration in Creator's minified web runtime, where its collection
+  // shim is not iterable and would persist the Set object instead of day indexes.
+  const grantDays = [...(current.grantDayIndexes ?? [])];
+  if (!grantDays.includes(reservedDay)) grantDays.push(reservedDay);
+  if (grantDays.length > 32) grantDays.splice(0, grantDays.length - 32);
   s.adRewards = { ...current, grantsUsed: grantDays.includes(current.maxObservedDayIndex ?? dayIndex(nowMs)) ? 1 : 0, grantDayIndexes: grantDays,
     couponIds: [...current.couponIds, sessionId].slice(-1), completedSessionIds: [...current.completedSessionIds, sessionId].slice(-32),
     couponCreatedAtMsById: created, couponRunIdById: couponRuns,
-    activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null, activeSessionReservedDayIndex: null };
+    couponOwnerScopeById: couponScopes,
+    activeSessionId: null, activeSessionStartedAtMs: null, activeRunId: null, activeSessionReservedDayIndex: null, activeOwnerScope: null };
   return true;
 }
 
-export function isAdCouponAvailable(s: GameState, couponId: string | undefined, nowMs = Date.now()): boolean {
-  return !!couponId && validNow(nowMs) && hasAvailableCoupon(s, stateOf(s), nowMs, couponId);
+export function isAdCouponAvailable(s: GameState, couponId: string | undefined, nowMs = Date.now(), ownerScope = 'local'): boolean {
+  return !!couponId && validNow(nowMs) && hasAvailableCoupon(s, stateOf(s), nowMs, couponId, ownerScope);
 }
 
-export function consumeAdCoupon(s: GameState, couponId?: string, nowMs = Date.now(), expectedRunId = s.runId): boolean {
-  if (!couponId || s.runId !== expectedRunId || !isAdCouponAvailable(s, couponId, nowMs)) throw new Error(GameErrorCode.ALREADY_USED);
+export function consumeAdCoupon(s: GameState, couponId?: string, nowMs = Date.now(), expectedRunId = s.runId, ownerScope = 'local'): boolean {
+  if (!couponId || s.runId !== expectedRunId || !isAdCouponAvailable(s, couponId, nowMs, ownerScope)) throw new Error(GameErrorCode.ALREADY_USED);
   const current = stateOf(s);
   const created = { ...(current.couponCreatedAtMsById ?? {}) };
   const couponRuns = { ...(current.couponRunIdById ?? {}) };
   delete created[couponId]; delete couponRuns[couponId];
+  const couponScopes = { ...(current.couponOwnerScopeById ?? {}) };
+  delete couponScopes[couponId];
   s.adRewards = { ...current, couponIds: current.couponIds.filter((id) => id !== couponId),
-    couponCreatedAtMsById: created, couponRunIdById: couponRuns,
-    consumedCouponIds: [...new Set([...(current.consumedCouponIds ?? []), couponId])].slice(-128) };
+    couponCreatedAtMsById: created, couponRunIdById: couponRuns, couponOwnerScopeById: couponScopes,
+    consumedCouponIds: [...(current.consumedCouponIds ?? []).filter((id) => id !== couponId), couponId].slice(-128) };
   return true;
 }
 
-function hasAvailableCoupon(s: GameState, state: AdRewardState, nowMs: number, onlyId?: string): boolean {
+function hasAvailableCoupon(s: GameState, state: AdRewardState, nowMs: number, onlyId?: string, ownerScope = 'local'): boolean {
   return state.couponIds.some((id) => {
     if (onlyId && id !== onlyId) return false;
     const owner = state.couponRunIdById?.[id];
     if (owner && owner !== s.runId) return false;
+    const couponOwner = state.couponOwnerScopeById?.[id] ?? 'local';
+    if (couponOwner !== ownerScope) return false;
     const created = state.couponCreatedAtMsById?.[id];
     // Legacy v1 coupons remain attached to their current run during migration;
     // their first transactional write records a stable creation timestamp.

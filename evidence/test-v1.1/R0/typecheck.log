@@ -1,4 +1,0 @@
-﻿
-> im-ceo@0.1.0 typecheck
-> tsc -p tsconfig.core.json --noEmit
-

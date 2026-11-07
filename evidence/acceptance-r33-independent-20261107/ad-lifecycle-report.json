@@ -1,0 +1,39 @@
+{
+  "url": "http://127.0.0.1:8196/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "checks": [
+    {
+      "id": "actual-show-before-close-settles-single-grant",
+      "status": "FAIL",
+      "detail": {
+        "event": "game_on_show",
+        "generationBefore": 0,
+        "generationAfter": 1,
+        "verification": "unverified",
+        "showCalls": 1,
+        "pending": true,
+        "coupons": 0,
+        "result": {
+          "kind": "unavailable",
+          "reason": "owner-unconfirmed"
+        },
+        "toasts": [
+          "广告暂不可用，可继续经营"
+        ]
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 0,
+    "FAIL": 1,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "FAIL",
+  "exitCode": 1
+}

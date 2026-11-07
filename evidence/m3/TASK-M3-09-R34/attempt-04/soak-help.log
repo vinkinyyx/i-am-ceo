@@ -1,1 +1,0 @@
-Usage: node tools/e2e/soak-performance.cjs --url <URL> --minutes 30 --out <new-directory> [--warmup-minutes 2] [--sample-seconds 10]

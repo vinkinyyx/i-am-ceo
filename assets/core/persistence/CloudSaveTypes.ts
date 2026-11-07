@@ -45,7 +45,7 @@ export interface CloudArchiveRef {
 
 export type CloudOperationResult<T> =
   | { kind: 'ok'; value: T }
-  | { kind: 'missing' }
+  | { kind: 'missing'; reason?: string }
   | { kind: 'unsupported' }
   | { kind: 'unavailable'; code?: number; reason: string }
   | { kind: 'unknown'; operationId: string; reason: string };

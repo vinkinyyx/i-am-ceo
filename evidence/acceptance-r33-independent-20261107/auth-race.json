@@ -1,0 +1,12 @@
+{
+  "delayed": {
+    "old": "superseded",
+    "current": "verified",
+    "memory": "tap_profileB",
+    "disk": "tap_profileA"
+  },
+  "superseded": {
+    "result": "superseded",
+    "disk": "tap_profileA"
+  }
+}

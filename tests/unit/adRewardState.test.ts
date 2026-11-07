@@ -26,7 +26,11 @@ describe('ad reward state', () => {
     expect(grantAdCoupon(state, 's1', 1_700_000_000_000)).toBe(true);
     expect(grantAdCoupon(state, 's1', 1_700_000_000_000)).toBe(true);
     expect(state.adRewards?.couponIds).toEqual(['s1']);
+    expect(state.adRewards?.grantDayIndexes).toEqual([Math.floor((1_700_000_000_000 + 8 * 60 * 60_000) / 86_400_000)]);
+    expect(state.adRewards?.grantsUsed).toBe(1);
     expect(consumeAdCoupon(state, 's1', 1_700_000_000_000)).toBe(true);
+    expect(state.adRewards?.consumedCouponIds).toEqual(['s1']);
+    expect(canRequestAdCoupon(state, 1_700_000_000_000)).toBe(false);
     expect(() => consumeAdCoupon(state, 's1', 1_700_000_000_000)).toThrow('ALREADY_USED');
   });
 

@@ -34,14 +34,52 @@ export interface IPlayerIdentityProvider {
 }
 
 /**
- * 普通 Tap 小游戏宿主：当前工程未取得官方文档确认的稳定账号标识能力。
- * 不调用任何猜测性 API；返回不可用，云备份/真实榜在生产保持禁用。
+ * B2：来自“服务端换票会话”的身份来源。
+ *
+ * 只有 AuthService 已拿到服务端签发的账号档案（profileId/appId/environment/scope）
+ * 且会话未过期、作用域与本构建一致时，才返回 verified；否则一律 unavailable。
+ * 不读取昵称、设备号、登录 code 或 sessionToken 作为身份。
  */
-export class TapPlayerIdentityProvider implements IPlayerIdentityProvider {
+export interface AuthSessionSnapshot {
+  kind: 'taptap' | 'mock';
+  expiresAtMs: number;
+  profile?: {
+    profileId: string;
+    appId: string;
+    environment: 'test' | 'production';
+    scope: string;
+  };
+}
+
+export class SessionPlayerIdentityProvider implements IPlayerIdentityProvider {
   readonly scope: PlayerScope = 'tap-minigame-account';
 
+  constructor(
+    private readonly loadSession: () => Promise<AuthSessionSnapshot | null>,
+    private readonly appId: string,
+    private readonly environment: 'test' | 'production',
+    private readonly now: () => number = () => Date.now(),
+  ) {}
+
   async resolve(): Promise<PlayerIdentityResult> {
-    return { kind: 'unavailable', reason: 'official-stable-account-id-unconfirmed' };
+    const session = await this.loadSession().catch(() => null);
+    if (!session) return { kind: 'unavailable', reason: 'no-platform-session' };
+    if (session.kind !== 'taptap') return { kind: 'unavailable', reason: 'not-tap-runtime' };
+    if (!session.profile) return { kind: 'unavailable', reason: 'session-without-stable-profile' };
+    if (!(session.expiresAtMs > this.now())) return { kind: 'unavailable', reason: 'session-expired' };
+    const profile = session.profile;
+    if (profile.scope !== 'tap-minigame-account') return { kind: 'unavailable', reason: 'identity-scope-unsupported' };
+    if (profile.appId !== this.appId || profile.environment !== this.environment) {
+      return { kind: 'unavailable', reason: 'identity-scope-mismatch' };
+    }
+    return {
+      kind: 'verified',
+      profileId: profile.profileId,
+      scope: 'tap-minigame-account',
+      appId: this.appId,
+      environment: this.environment,
+      epoch: 0,
+    };
   }
 }
 
@@ -52,7 +90,7 @@ export class PlayerIdentityState {
   private profile: VerifiedPlayerIdentity | null = null;
   private epoch = 0;
 
-  constructor(private readonly appId: string, private readonly environment: 'test' | 'production') {}
+  constructor(readonly appId: string, readonly environment: 'test' | 'production') {}
 
   get current(): VerifiedPlayerIdentity | null { return this.profile; }
   get currentEpoch(): number { return this.epoch; }
@@ -61,12 +99,16 @@ export class PlayerIdentityState {
   apply(result: PlayerIdentityResult): PlayerIdentityResult {
     if (result.kind !== 'verified') {
       if (result.kind === 'unavailable') {
+        const hadVerifiedProfile = this.profile !== null;
         this.profile = null;
-        this.epoch += 1;
+        if (hadVerifiedProfile) this.epoch += 1;
       }
       return result;
     }
     if (result.appId !== this.appId || result.environment !== this.environment) {
+      const hadVerifiedProfile = this.profile !== null;
+      this.profile = null;
+      if (hadVerifiedProfile) this.epoch += 1;
       return { kind: 'unavailable', reason: 'identity-scope-mismatch' };
     }
     const previous = this.profile?.profileId ?? null;

@@ -1,0 +1,32 @@
+{
+  "verdict": "PARTIAL",
+  "localReadyToIntegrate": false,
+  "gates": {
+    "coreTypes": "PASS",
+    "uiTypes": "PASS",
+    "lint": "PASS",
+    "passed": 629,
+    "skipped": 1
+  },
+  "findings": {
+    "authCacheWrite": "auth-race.json",
+    "adForegroundLifecycle": "ad-lifecycle-report.json"
+  },
+  "gameZip": {
+    "version": "1.0.7",
+    "purpose": "diagnostic",
+    "bytes": 3805281,
+    "entries": 144,
+    "sha256": "1beb08563e5ba11a36e64643538f7d1834ac076d0baafccdee02ea0e0555e7ba",
+    "static": "VERIFY_OK",
+    "frozenInputCount": 550,
+    "currentMissingFolderMetadata": 7
+  },
+  "functionZip": {
+    "bytes": 9629,
+    "entries": 5,
+    "sha256": "b91e46ba132eceb2ea50dc4f8a9afce8843cb8401a3fa74aff4562b7e57a254c",
+    "sourceMatch": true
+  },
+  "liveAcceptance": "NOT_RUN"
+}

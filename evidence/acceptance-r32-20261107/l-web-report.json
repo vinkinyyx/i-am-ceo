@@ -1,0 +1,455 @@
+{
+  "url": "http://127.0.0.1:8193/",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "checks": [
+    {
+      "id": "L01-two-boards-same-checkpoint",
+      "status": "PASS",
+      "detail": {
+        "creates": [
+          {
+            "op": "backup:run_134cdm7000000:11:mw60vpst",
+            "checkpointId": "run_134cdm7000000:11:mw60vpst",
+            "profileId": "profile-a"
+          }
+        ],
+        "calls": [
+          {
+            "boardId": "board-assets",
+            "value": 1000000
+          },
+          {
+            "boardId": "board-years",
+            "value": 0
+          }
+        ],
+        "outcome": {
+          "target": "run_134cdm7000000:11:mw60vpst:run_134cdm7000000",
+          "assets": true,
+          "years": true
+        },
+        "targetKey": "run_134cdm7000000:11:mw60vpst:run_134cdm7000000",
+        "runId": "run_134cdm7000000",
+        "pending": null
+      }
+    },
+    {
+      "id": "L01-empty-boards-no-submit-backup-ok",
+      "status": "PASS",
+      "detail": {
+        "creates": 1,
+        "calls": 0,
+        "pending": null
+      }
+    },
+    {
+      "id": "L01-partial-failure-pending-carries-failed-side-only",
+      "status": "PASS",
+      "detail": {
+        "checkpointId": "run_134cdm7000000:11:mw60vufb",
+        "calls": [
+          "board-assets",
+          "board-years"
+        ],
+        "pending": {
+          "assets": true,
+          "years": false,
+          "checkpointId": "run_134cdm7000000:11:mw60vufb"
+        }
+      }
+    },
+    {
+      "id": "L01-retry-resubmits-only-failed-board-same-checkpoint",
+      "status": "PASS",
+      "detail": {
+        "assetCalls": 1,
+        "yearCalls": 2,
+        "outcome": {
+          "assets": true,
+          "years": true
+        }
+      }
+    },
+    {
+      "id": "L01-consent-withdrawn-no-leaderboard-submit",
+      "status": "PASS",
+      "detail": {
+        "creates": 1,
+        "calls": 0
+      }
+    },
+    {
+      "id": "L01-retry-blocked-when-consent-withdrawn",
+      "status": "PASS",
+      "detail": {
+        "calls": 0,
+        "pending": {
+          "assets": false,
+          "years": false,
+          "checkpointId": "cp-any",
+          "runId": "run_134cdm7000000"
+        }
+      }
+    },
+    {
+      "id": "L01-account-switch-clears-pending-and-latest",
+      "status": "PASS",
+      "detail": {
+        "beforeSwitch": {
+          "epoch": 0,
+          "targetKey": "run_134cdm7000000:11:mw60vz2t:run_134cdm7000000",
+          "pending": true
+        },
+        "afterSwitch": {
+          "epoch": 1,
+          "targetKey": "",
+          "pending": null,
+          "profileId": "profile-b",
+          "calls": 2
+        }
+      }
+    },
+    {
+      "id": "L01-no-stale-receipt-replay-after-switch",
+      "status": "PASS",
+      "detail": {
+        "before": 2,
+        "after": 2
+      }
+    },
+    {
+      "id": "L01-reset-new-run-drops-stale-pending",
+      "status": "PASS",
+      "detail": {
+        "runBefore": {
+          "runId": "run_134cdm7000000",
+          "calls": 2
+        },
+        "afterReset": {
+          "runId": "run_3zu3ja000001",
+          "pending": {
+            "checkpointId": "run_134cdm7000000:11:mw60w15p",
+            "snapshot": {
+              "phase": "RUNNING",
+              "runId": "run_134cdm7000000",
+              "seed": 312539190,
+              "rngCounter": 0,
+              "initializedCapital": true,
+              "gameYear": 1,
+              "gameMonth": 1,
+              "progressMsInMonth": 0,
+              "speed": 0,
+              "lastWallClockMs": 1793663260419,
+              "lastSettledMonthKey": null,
+              "offlineRemainderMs": 0,
+              "onboarding": {
+                "stepId": "TUT-03",
+                "completedSteps": [
+                  "TUT-03",
+                  "TUT-04",
+                  "TUT-05"
+                ],
+                "skipped": false,
+                "lastKnownStep": "TUT-03",
+                "tutorialVersion": 1,
+                "initialHiresCompleted": 2
+              },
+              "company": {
+                "companyId": "co_biy7ah000000",
+                "name": "超长测试公司名称用于换行验证是否不缩字体",
+                "industry": "TRADE",
+                "foundedYear": 1,
+                "cashYuan": 1000000,
+                "initialCapitalYuan": 300000,
+                "paidInCapitalYuan": 300000,
+                "businessAssetBookYuan": 0,
+                "businessCapacityInvestmentYuan": 0,
+                "businessCapacityBonusBps": 0,
+                "marketDemandIndexBps": 10000
+              },
+              "ceo": {
+                "name": "吴思源",
+                "trait": "STEADY",
+                "businessSkill": 50,
+                "managementSkill": 50,
+                "financeSkill": 50
+              },
+              "employees": [
+                {
+                  "employeeId": "emp_base_1",
+                  "name": "梁思远",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_1h6ho9p000000",
+                  "skill": 87,
+                  "potential": 60,
+                  "teamwork": 81,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 7645,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_base_1",
+                  "candidateId": "cand_emp_base_1"
+                },
+                {
+                  "employeeId": "emp_base_2",
+                  "name": "宋刚",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_1h6ho9p000000",
+                  "skill": 72,
+                  "potential": 63,
+                  "teamwork": 69,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 5328,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_base_2",
+                  "candidateId": "cand_emp_base_2"
+                },
+                {
+                  "employeeId": "emp_hr_1",
+                  "name": "人事员戊",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_hr_0001",
+                  "skill": 60,
+                  "potential": 60,
+                  "teamwork": 60,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 5000,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_hr_1",
+                  "candidateId": "cand_emp_hr_1"
+                },
+                {
+                  "employeeId": "emp_proc_1",
+                  "name": "采购员甲",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_proc_0001",
+                  "skill": 60,
+                  "potential": 60,
+                  "teamwork": 60,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 5000,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_proc_1",
+                  "candidateId": "cand_emp_proc_1"
+                },
+                {
+                  "employeeId": "emp_mkt_1",
+                  "name": "市场员丙",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_mkt_0001",
+                  "skill": 60,
+                  "potential": 60,
+                  "teamwork": 60,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 5000,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_mkt_1",
+                  "candidateId": "cand_emp_mkt_1"
+                },
+                {
+                  "employeeId": "emp_cs_1",
+                  "name": "客服员乙",
+                  "avatarId": "avatar_02",
+                  "departmentId": "dp_cs_0001",
+                  "skill": 60,
+                  "potential": 60,
+                  "teamwork": 60,
+                  "personality": "STEADY",
+                  "salaryMonthlyYuan": 5000,
+                  "hiredAtMonthIndex": 0,
+                  "effectiveFromMonthIndex": 0,
+                  "dismissedAtMonthIndex": null,
+                  "status": "ACTIVE",
+                  "hireCommandId": "hire_emp_cs_1",
+                  "candidateId": "cand_emp_cs_1"
+                }
+              ],
+              "departments": [
+                {
+                  "deptId": "dp_1h6ho9p000000",
+                  "type": "BUSINESS",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                },
+                {
+                  "deptId": "dp_hr_0001",
+                  "type": "HR",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                },
+                {
+                  "deptId": "dp_proc_0001",
+                  "type": "PROCUREMENT",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                },
+                {
+                  "deptId": "dp_mkt_0001",
+                  "type": "MARKETING",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                },
+                {
+                  "deptId": "dp_cs_0001",
+                  "type": "CUSTOMER_SERVICE",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                },
+                {
+                  "deptId": "dp_fin_0001",
+                  "type": "FINANCE",
+                  "enabled": true,
+                  "staffingMode": "LOCKED",
+                  "targetCount": 0,
+                  "createdMonthIndex": 0,
+                  "setupPaid": true
+                }
+              ],
+              "offers": [
+                {
+                  "offerId": "offer_dxv597000000",
+                  "deptId": "dp_1h6ho9p000000",
+                  "generatedForIndex": 13,
+                  "expiresAtMonthIndex": 9007199254740991,
+                  "offerSequence": 0,
+                  "candidates": [
+                    {
+                      "candidateId": "cand_1s2qlux000001",
+                      "name": "梁思远",
+                      "avatarId": "avatar_06",
+                      "skill": 87,
+                      "potential": 60,
+                      "teamwork": 81,
+                      "personality": "STEADY",
+                      "salaryMonthlyYuan": 7645,
+                      "archetype": "A"
+                    },
+                    {
+                      "candidateId": "cand_y6gzv7000002",
+                      "name": "孙思远",
+                      "avatarId": "avatar_01",
+                      "skill": 63,
+                      "potential": 81,
+                      "teamwork": 59,
+                      "personality": "BOLD",
+                      "salaryMonthlyYuan": 5596,
+                      "archetype": "B"
+                    },
+                    {
+                      "candidateId": "cand_s15nl4000003",
+                      "name": "宋刚",
+                      "avatarId": "avatar_05",
+                      "skill": 72,
+                      "potential": 63,
+                      "teamwork": 69,
+                      "personality": "STEADY",
+                      "salaryMonthlyYuan": 5328,
+                      "archetype": "C"
+                    }
+                  ]
+                }
+              ],
+              "policy": "STEADY",
+              "monthlyLedgersRolling": [],
+              "annualReports": [],
+              "pendingEntries": [
+                {
+                  "entryId": "je_w9cmno000001",
+                  "monthKey": "run_134cdm7000000:1:1",
+                  "category": "RECRUITMENT",
+                  "amountYuan": -7645,
+                  "isCash": true,
+                  "alreadyPaid": true,
+                  "refId": "hire_mvzc3y7q_2"
+                },
+                {
+                  "entryId": "je_9uhmyz000002",
+                  "monthKey": "run_134cdm7000000:1:1",
+                  "category": "RECRUITMENT",
+                  "amountYuan": -5328,
+                  "isCash": true,
+                  "alreadyPaid": true,
+                  "refId": "hire_mvzc44qi_1"
+                }
+              ],
+              "eventHistory": [],
+              "annualEvents": [],
+              "botCompanies": [],
+              "consecutiveProfitableYears": 0,
+              "target3YearsAchieved": false,
+              "rescueCapitalUsed": false,
+              "cashRisk": "NORMAL",
+              "autoHireCountByYear": {},
+              "automationLogs": [],
+              "yearOpenCashYuan": {
+                "1": 300000
+              },
+              "executedCommandIds": [
+                "create_mvzc3wus_1",
+                "hire_mvzc3y7q_2",
+                "hire_mvzc44qi_1",
+                "start_mvzc46py_2"
+              ]
+            },
+            "runId": "run_134cdm7000000",
+            "epoch": 0,
+            "assets": true,
+            "years": false
+          },
+          "calls": 2
+        }
+      }
+    },
+    {
+      "id": "L01-retry-after-reset-no-upload",
+      "status": "PASS",
+      "detail": {
+        "calls": 2,
+        "pending": null,
+        "noPending": true
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 10,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

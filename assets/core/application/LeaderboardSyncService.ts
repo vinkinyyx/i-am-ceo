@@ -50,10 +50,12 @@ export class LeaderboardSyncService {
       for (const [id, value, alreadySynced] of boards) {
         if (alreadySynced) { results.push('synced'); continue; }
         if (!stillCurrent() || epoch !== this.accountEpoch || this.latestTargetKey !== target) {
-          results.push('failed');
-          continue;
+          return { checkpointId, runId, assets: 'skipped', years: 'skipped', reason: 'stale-or-consent-revoked' };
         }
         const submitted = await this.provider.submit(id, value);
+        if (!stillCurrent() || epoch !== this.accountEpoch || this.latestTargetKey !== target) {
+          return { checkpointId, runId, assets: 'skipped', years: 'skipped', reason: 'stale-or-consent-revoked' };
+        }
         results.push(submitted.kind === 'ok' ? 'synced' : 'failed');
       }
       this.lastSubmittedAtMs = nowMs;
