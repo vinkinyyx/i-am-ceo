@@ -1,0 +1,157 @@
+{
+  "url": "http://127.0.0.1:8153/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "§29.12-text-ellipsis-when-clipped",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.12-button-text-within-bounds",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.4-rank-no-label-overlap",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.3-visual-smaller-than-hit-area",
+      "status": "PASS",
+      "detail": [
+        {
+          "node": "Button",
+          "hit": 44,
+          "visual": 32
+        },
+        {
+          "node": "Button",
+          "hit": 44,
+          "visual": 32
+        }
+      ]
+    },
+    {
+      "id": "§29.4-rank-row-opens-detail",
+      "status": "PASS",
+      "detail": [
+        {
+          "text": "企业：超长测试公司名称用于换行验证是否不缩字体",
+          "x": 49.5,
+          "y": 494.79999999999995,
+          "w": 276,
+          "h": 45.200000000000045
+        },
+        {
+          "text": "总资产：¥1,000,000（现金 + 未折旧业务资产）",
+          "x": 49.5,
+          "y": 460.86,
+          "w": 276,
+          "h": 23.940000000000055
+        },
+        {
+          "text": "经营年限：2 年",
+          "x": 49.5,
+          "y": 426.91999999999996,
+          "w": 276,
+          "h": 23.940000000000055
+        }
+      ]
+    },
+    {
+      "id": "§29.4-rank-locate-uses-real-row",
+      "status": "PASS",
+      "detail": {
+        "playerRow": {
+          "text": "我方 · 超长测试公司…",
+          "x": 187.5,
+          "y": 518,
+          "width": 343,
+          "height": 48
+        },
+        "visibleH": 812
+      }
+    },
+    {
+      "id": "§29.5-annual-no-label-overlap",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.5-year-only-in-title",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.8-small-viewport-rank-no-overlap",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "§29.7-audio-assets-in-build",
+      "status": "PASS",
+      "detail": [
+        "build\\web-mobile\\assets\\resources\\native\\00\\00d9bd02-ccc1-4420-b29e-2bcbd97f0e6a.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\0f\\0fcb9616-fae0-4a78-91a5-b419e3f7d7a9.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\1c\\1ceab98d-04c2-4099-a794-5123a1d696cf.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\20\\208af423-b909-4d18-94ad-d232e658663f.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\4c\\4c6f731d-d0af-4504-b593-f3e7a6d6eefc.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\5b\\5b09275e-05d3-4243-9b99-a7b267fb2b43.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\69\\69c77acf-3c28-452d-a746-2df2813c038c.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\72\\725172cd-0d22-48ab-9225-30b6c5279143.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\77\\77087e91-dea3-426d-9f22-0dd1f38244d2.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\a7\\a78e7177-aa82-476f-a041-0caa98e23f31.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\c7\\c7930016-a800-4639-9e88-cc9909474d3b.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\e1\\e13d0402-6b6e-4de7-aa16-b82aebf92a67.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\e2\\e2432044-89f7-4519-8c75-e62848004c58.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\e7\\e7f782ff-500b-4bba-8a70-c643a9154a68.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\f2\\f2478ff3-8c0f-469d-bf6c-e8f941929b25.mp3",
+        "build\\web-mobile\\assets\\resources\\native\\fd\\fd052b86-9e21-41e4-9eca-6b5c201fb15c.mp3"
+      ]
+    },
+    {
+      "id": "§29.7-audio-loaded-or-blocked",
+      "status": "PASS",
+      "detail": {
+        "audioSourceExport": true,
+        "audioNodes": [
+          {
+            "node": "AudioManager",
+            "components": [
+              "AudioSource"
+            ]
+          }
+        ],
+        "sources": [
+          {
+            "node": "AudioManager",
+            "clip": "BGM_02_OfficeLoop",
+            "playing": true,
+            "loop": true,
+            "volume": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "id": "§29.7-no-audio-http-failures",
+      "status": "PASS",
+      "detail": []
+    }
+  ],
+  "checkCounts": {
+    "PASS": 12,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

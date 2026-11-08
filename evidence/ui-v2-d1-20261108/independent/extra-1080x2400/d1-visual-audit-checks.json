@@ -1,0 +1,378 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "id": "ui05-company-icons-loaded",
+      "status": "PASS",
+      "detail": {
+        "SettingsIcon": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ],
+        "CompanyBanner": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          }
+        ],
+        "CashIcon": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ],
+        "ProfitIcon": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ],
+        "TabIcon": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          },
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          },
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          },
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "ui05-tab-icons-loaded",
+      "status": "PASS",
+      "detail": [
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        },
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        },
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        },
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        }
+      ]
+    },
+    {
+      "id": "ui09-annual-deco-loaded",
+      "status": "PASS",
+      "detail": {
+        "AnnualDeco": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          }
+        ],
+        "LedgerIcon": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "ui09-annual-bridge-actually-visible",
+      "status": "FAIL",
+      "detail": {
+        "bridgeVisible": false,
+        "fixedFooter": true
+      }
+    },
+    {
+      "id": "ui06-dept-banner-scene-loaded",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "ui06-dept-icons-loaded",
+      "status": "PASS",
+      "detail": 6
+    },
+    {
+      "id": "ui16-hire-avatars-present",
+      "status": "PASS",
+      "detail": {
+        "HireBanner": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          }
+        ],
+        "HireAvatar0": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false,
+            "fallbackActive": false,
+            "imageHasFrame": true
+          }
+        ],
+        "HireAvatar1": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false,
+            "fallbackActive": false,
+            "imageHasFrame": true
+          }
+        ],
+        "HireAvatar2": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false,
+            "fallbackActive": false,
+            "imageHasFrame": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "ui16-hire-fee-readback",
+      "status": "PASS",
+      "detail": 3
+    },
+    {
+      "id": "ui16-hire-confirm-fee",
+      "status": "PASS",
+      "detail": [
+        "确认支付 ¥5,734"
+      ]
+    },
+    {
+      "id": "ui07-talent-avatars-real",
+      "status": "PASS",
+      "detail": [
+        {
+          "empName": "梁思远（主营业务）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "宋刚（主营业务）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "人事员戊（人力资源）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "采购员甲（采购）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "市场员丙（市场）",
+          "fallbackActive": true,
+          "imageHasFrame": false
+        },
+        {
+          "empName": "客服员乙（客服）",
+          "fallbackActive": true,
+          "imageHasFrame": false
+        }
+      ]
+    },
+    {
+      "id": "ui07-talent-avatars-fallback",
+      "status": "PASS",
+      "detail": [
+        {
+          "empName": "梁思远（主营业务）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "宋刚（主营业务）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "人事员戊（人力资源）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "采购员甲（采购）",
+          "fallbackActive": false,
+          "imageHasFrame": true
+        },
+        {
+          "empName": "市场员丙（市场）",
+          "fallbackActive": true,
+          "imageHasFrame": false
+        },
+        {
+          "empName": "客服员乙（客服）",
+          "fallbackActive": true,
+          "imageHasFrame": false
+        }
+      ]
+    },
+    {
+      "id": "ui07-avatar-consistency-after-tab-switch",
+      "status": "PASS",
+      "detail": {
+        "before": [
+          {
+            "empName": "梁思远（主营业务）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "宋刚（主营业务）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "人事员戊（人力资源）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "采购员甲（采购）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "市场员丙（市场）",
+            "fallbackActive": true,
+            "imageHasFrame": false
+          },
+          {
+            "empName": "客服员乙（客服）",
+            "fallbackActive": true,
+            "imageHasFrame": false
+          }
+        ],
+        "after": [
+          {
+            "empName": "梁思远（主营业务）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "宋刚（主营业务）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "人事员戊（人力资源）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "采购员甲（采购）",
+            "fallbackActive": false,
+            "imageHasFrame": true
+          },
+          {
+            "empName": "市场员丙（市场）",
+            "fallbackActive": true,
+            "imageHasFrame": false
+          },
+          {
+            "empName": "客服员乙（客服）",
+            "fallbackActive": true,
+            "imageHasFrame": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "ui08-rank-medals-loaded",
+      "status": "PASS",
+      "detail": [
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        },
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        },
+        {
+          "activeInHierarchy": true,
+          "hasFrame": true
+        }
+      ]
+    },
+    {
+      "id": "ui08-rank-self-badge-loaded",
+      "status": "PASS",
+      "detail": {
+        "self": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ],
+        "title": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "main-flow-no-browser-errors",
+      "status": "PASS",
+      "detail": []
+    },
+    {
+      "id": "fallback-rank-labels-survive",
+      "status": "PASS",
+      "detail": {
+        "medals": [
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          },
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          },
+          {
+            "activeInHierarchy": true,
+            "hasFrame": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "fallback-avatar01-neutral",
+      "status": "PASS",
+      "detail": {
+        "empName": "梁思远（主营业务）",
+        "fallbackActive": true,
+        "imageHasFrame": false
+      }
+    },
+    {
+      "id": "fallback-no-uncaught-errors",
+      "status": "PASS",
+      "detail": []
+    }
+  ],
+  "passCount": 17,
+  "total": 18
+}

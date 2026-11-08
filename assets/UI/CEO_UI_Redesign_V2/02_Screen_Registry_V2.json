@@ -1,0 +1,1408 @@
+[
+  {
+    "id": "UI-01",
+    "name": "启动页 / 继续游戏",
+    "group": "B01 创建及引导",
+    "route": "S00 /boot",
+    "kind": "场景",
+    "priority": "P0",
+    "scene": "清晨城市办公楼外景；无角色强制占位。",
+    "structure": [
+      "顶部：游戏Logo与简短标语",
+      "中部：创业大楼纵深插画，留出Logo与开始区",
+      "底部：新游戏/继续经营、设置或隐私入口、平台状态说明",
+      "加载态在同一布局显示进度条，不单独烘焙数字"
+    ],
+    "data": [
+      "hasSave；loadStatus；accountStatus；privacyStatus；saveHealth；appVersion"
+    ],
+    "actions": [
+      "新游戏→UI-02",
+      "继续游戏→读取当前有效存档→UI-05或UI-14",
+      "加载失败→UI-27",
+      "隐私入口→平台政策文本"
+    ],
+    "states": [
+      "无档/有档/加载中/存档待恢复/平台认证失败/断网本地可玩"
+    ],
+    "rule": "不可因登录失败或读档异常自动开新档；仅用户显式选择创建；Loading数值动态绘制。",
+    "assets": [
+      "ILL-S01",
+      "BRD-01",
+      "DEC-01",
+      "STA-01"
+    ]
+  },
+  {
+    "id": "UI-02",
+    "name": "创建公司",
+    "group": "B01 创建及引导",
+    "route": "S01 /onboarding/company",
+    "kind": "场景",
+    "priority": "P0",
+    "scene": "三张行业小场景：电商贸易/软件科技/企业服务；创业桌面氛围。",
+    "structure": [
+      "顶部：步骤1/3与返回",
+      "中部：三行业插画卡（单选，明确获利方式）",
+      "下部：3条随机公司名卡、换一批、自定义输入与校验",
+      "固定底部：下一步"
+    ],
+    "data": [
+      "industryOptions；3 nameSuggestions；customName；selectedName；validation"
+    ],
+    "actions": [
+      "选择行业→更新说明",
+      "切换公司名/刷新候选名→不影响经营RNG",
+      "输入自定义名称→即时校验",
+      "下一步→UI-03"
+    ],
+    "states": [
+      "默认未选择/已选/非法名称/输入法弹出/保存中"
+    ],
+    "rule": "仅有贸易、软件、企业服务三行业；不得从概念图导入医药、制造或零售行业作为可玩开局行业。",
+    "assets": [
+      "ILL-S02",
+      "ICO-I01",
+      "ICO-I02",
+      "ICO-I03",
+      "DEC-02"
+    ]
+  },
+  {
+    "id": "UI-03",
+    "name": "CEO角色创建",
+    "group": "B01 创建及引导",
+    "route": "S02 /onboarding/ceo",
+    "kind": "场景",
+    "priority": "P0",
+    "scene": "CEO人物半身立绘与办公室背景；不要求3D或人物捏脸。",
+    "structure": [
+      "顶部：步骤2/3",
+      "中上：CEO头像/形象预览与姓名随机/输入",
+      "中部：进取、稳健、亲和三种性格选择卡",
+      "中下：商业/管理/财务三能力数值与成长方向简示",
+      "底部：上一步、确认创建"
+    ],
+    "data": [
+      "ceoName；trait(BOLD/STEADY/PEOPLE)；initialStats；nameValidation"
+    ],
+    "actions": [
+      "随机/输入CEO名",
+      "切性格→即时更新能力预览",
+      "返回保留公司草稿",
+      "确认→创建新run与一次性注资→UI-04"
+    ],
+    "states": [
+      "草稿/输入无效/已选性格/创建中/创建重复请求"
+    ],
+    "rule": "初始能力各50，总150；成长方向来自领域规则；不增加天赋树、职业外观系统。",
+    "assets": [
+      "CHR-CEO01",
+      "ILL-S03",
+      "DEC-03",
+      "ICO-K01"
+    ]
+  },
+  {
+    "id": "UI-04",
+    "name": "首次招聘（2人）",
+    "group": "B01 创建及引导",
+    "route": "S03 /onboarding/hire",
+    "kind": "场景",
+    "priority": "P0",
+    "scene": "现代面试等候区与HR小立绘；候选人使用统一头像系统。",
+    "structure": [
+      "顶部：步骤3/3与已录用0/2或1/2",
+      "中部：3名候选人纵向可滚对比，头像、能力/潜力/协作、性格、月薪与招聘费",
+      "底部：当前现金、录用费用预览与选择操作",
+      "完成2人显示进入公司"
+    ],
+    "data": [
+      "offers[3]；selectedCandidate；hiredCount；fee；monthlySalary；cashAfter"
+    ],
+    "actions": [
+      "查看候选详情",
+      "确认录用→交易幂等",
+      "补足2人后进入公司→UI-05",
+      "中断后返回首聘进度"
+    ],
+    "states": [
+      "0/2；1/2；2/2；现金不足；候选失效；保存失败"
+    ],
+    "rule": "首聘逐人选且免费跳过教程不等于免招聘；首聘满2人才启动经营时钟；现金初始300000元。",
+    "assets": [
+      "ILL-S04",
+      "CHR-HR01",
+      "AVT-POOL",
+      "ICO-K02"
+    ]
+  },
+  {
+    "id": "UI-05",
+    "name": "公司经营首页",
+    "group": "B02 核心经营",
+    "route": "T01 /tab/company",
+    "kind": "主Tab",
+    "priority": "P0",
+    "scene": "企业办公场景横幅：创业初期小型办公室；后期可按资产级别更换场景，不改变规则。",
+    "structure": [
+      "顶部安全区：公司名（可省略）、CEO、年份月份、设置/帮助入口",
+      "主视觉区：办公插画约170–220高，可折叠到90–120高",
+      "经营卡：现金为首要数值；本年营收与当前年度预计利润成对",
+      "时间行：年份进度+暂停/1×/2×/5×",
+      "诊断卡：一条最关键的瓶颈/建议+立即管理入口",
+      "业务卡：主营部产能/订单需求、扩产、策略",
+      "固定四Tab：公司/部门/人才/排行"
+    ],
+    "data": [
+      "companyName；ceoStats；year/month；cash；revenueYTD；forecastProfit；capacity；demand；clockSpeed；cashRisk；diagnosis"
+    ],
+    "actions": [
+      "开始/暂停/变速",
+      "开经营策略UI-21",
+      "扩产UI-20",
+      "财务明细/年报UI-09",
+      "设置UI-12",
+      "问题卡→UI-15/EX-07"
+    ],
+    "states": [
+      "经营中；暂停；预计亏损；现金风险；教程；数据加载；空部门"
+    ],
+    "rule": "不使用概念图“每日收入/钻石/第6天/项目洽谈”作为当前核心业务字段；12个月=1年，营收/利润显示当前年口径。",
+    "assets": [
+      "ILL-S05",
+      "CHR-ASSIST01",
+      "DEC-04",
+      "ICO-K03",
+      "ICO-K04"
+    ]
+  },
+  {
+    "id": "UI-06",
+    "name": "部门总览",
+    "group": "B02 核心经营",
+    "route": "T02 /tab/departments",
+    "kind": "主Tab",
+    "priority": "P0",
+    "scene": "简洁办公组织墙背景，主营业务与支持部门分别用小场景标识。",
+    "structure": [
+      "页眉：公司经营状态与部门总数",
+      "置顶主营业务卡：人数、产能、需求缺口与扩产入口",
+      "支持部门卡：人资/采购/市场/客服/财务，未创建用灰态",
+      "卡片每行优先图标、人数和净贡献；详情/建部使用整卡入口",
+      "底部四Tab"
+    ],
+    "data": [
+      "mainBusinessDept；supportDepts；staffCount；capacity；demandGap；departmentNetContribution；autoMode"
+    ],
+    "actions": [
+      "点主营部→UI-11",
+      "创建部门→UI-19",
+      "已建部门→UI-11",
+      "员工配置→UI-22",
+      "扩产→UI-20"
+    ],
+    "states": [
+      "未建/已建但0员工/正常收益/负贡献/资金不足/已满部门"
+    ],
+    "rule": "部门只有主营部和5支持部门；0员工支持部门不得展示已产生效益；部门贡献不重复计入财务收入。",
+    "assets": [
+      "ILL-S06",
+      "ICO-D01",
+      "ICO-D02",
+      "ICO-D03",
+      "ICO-D04",
+      "ICO-D05",
+      "ICO-D06"
+    ]
+  },
+  {
+    "id": "UI-07",
+    "name": "人才总览",
+    "group": "B02 核心经营",
+    "route": "T03 /tab/staff",
+    "kind": "主Tab",
+    "priority": "P0",
+    "scene": "人才办公区横幅/小比例HR人物；主体重点突出员工头像与数据。",
+    "structure": [
+      "页眉：人才总数、本年预计薪资支出",
+      "筛选：全部/各部门，切换不重置列表",
+      "员工列表：头像、姓名、部门、能力/潜力摘要、月薪、任期（卡高自适应）",
+      "页内顶部招聘入口",
+      "底部四Tab"
+    ],
+    "data": [
+      "employeeList；staffCount；salaryCost；departmentFilter；sort"
+    ],
+    "actions": [
+      "部门过滤",
+      "整行员工卡→UI-10",
+      "招聘→UI-16",
+      "名单空时引导招聘",
+      "滚动维持位置"
+    ],
+    "states": [
+      "无员工/正常/长名单/离职中/候选加载失败"
+    ],
+    "rule": "员工真实字段来自领域状态；不虚构玩家可培训、任命、激励系统，相关概念图按钮仅作插画参考。",
+    "assets": [
+      "ILL-S07",
+      "CHR-HR01",
+      "AVT-POOL",
+      "ICO-K05"
+    ]
+  },
+  {
+    "id": "UI-08",
+    "name": "排行榜",
+    "group": "B02 核心经营",
+    "route": "T04 /tab/ranking",
+    "kind": "主Tab",
+    "priority": "P0",
+    "scene": "奖杯/商务荣誉墙小场景，横幅控制高度，主体留给清晰排行榜表格。",
+    "structure": [
+      "顶部：排行榜标题、当前数据来源标签",
+      "第一层：本地模拟/真实玩家切换（真实榜条件可用）",
+      "第二层：总资产/经营年限切换",
+      "我方摘要：当前名次、资产/年限、定位我方",
+      "列表整行可点：序号、公司/用户显示名、资产/年限、我方高亮",
+      "底部：规则/同步状态、四Tab"
+    ],
+    "data": [
+      "rankSource；rankMetric；companyRank；botRanks；playerRank；assets；completedYears；syncTimestamp"
+    ],
+    "actions": [
+      "切数据来源→按权限与网络显示",
+      "切资产/年限→重排并定位",
+      "点行→轻详情",
+      "规则→UI-24",
+      "打开平台真实榜→EX-01"
+    ],
+    "states": [
+      "本地榜/真榜启用/真榜未启用/断网缓存/无我方/同步中/数据为空"
+    ],
+    "rule": "当前本地指标只有总资产和经营年限；不加入利润榜/品牌榜/成长榜，也不许诺排名奖励。§29要求按钮不与首行重叠、整行点击。",
+    "assets": [
+      "ILL-S08",
+      "CHR-ASSIST01",
+      "ICO-K06",
+      "RANK-01",
+      "RANK-02",
+      "RANK-03"
+    ]
+  },
+  {
+    "id": "UI-09",
+    "name": "年度经营报告",
+    "group": "B04 财务与风险",
+    "route": "D01 /detail/annual-report",
+    "kind": "二级页",
+    "priority": "P0",
+    "scene": "财务报表主题，封面小插画为经营办公账本；主体使用原生表格。",
+    "structure": [
+      "固定标题：第N年财务报告",
+      "年份导航：较早年度/较新年度，左右独立",
+      "滚动正文：营业收入、直接成本、其他运营费、售后费、固定费、工资、招聘、裁员、设部、事件、折旧、净利润",
+      "独立财务守恒区域：期初/期末现金、业务资产、总资产",
+      "结束区：经营事件、业务建议；底部关闭"
+    ],
+    "data": [
+      "reportYear；annualRevenue；allCostBreakdowns；netProfit；openingCash；closingCash；businessAssets；events；isFinal"
+    ],
+    "actions": [
+      "上下年切换不叠文字",
+      "科目解释→UI-23",
+      "关闭返回原页面",
+      "首年引导→UI-33"
+    ],
+    "states": [
+      "无年报/进行中预估/已审定/巨额数字/长科目名/滚动到末行"
+    ],
+    "rule": "利润/现金/资产的定义不得混淆；费用用负号+语义；固定头尾避免遮挡列表；§29左右年份控制分开。",
+    "assets": [
+      "ILL-S09",
+      "ICO-K07",
+      "CHART-01",
+      "DEC-05"
+    ]
+  },
+  {
+    "id": "UI-10",
+    "name": "员工详情",
+    "group": "B03 人才与部门",
+    "route": "D02 /detail/employee",
+    "kind": "二级页",
+    "priority": "P0",
+    "scene": "员工人物半身卡片+个人办公桌小背景。",
+    "structure": [
+      "顶部：头像姓名/部门岗位/任职年限",
+      "能力区：能力、潜力、协作、性格偏好及成长提示（简条形）",
+      "薪资区：月薪、预计年度影响、雇佣时间",
+      "操作区：查看调岗（若现有命令支持）、裁员预览（危险弱化）"
+    ],
+    "data": [
+      "employee；attributes；traits；department；salary；tenure；growthForecast"
+    ],
+    "actions": [
+      "查看所属部门→UI-11",
+      "调岗（复用现有TransferService）→UI-22相关操作",
+      "裁员→UI-18",
+      "关闭"
+    ],
+    "states": [
+      "正常/待生效/已离职/命令处理中/任期长/薪资大额"
+    ],
+    "rule": "不得新增培训经验树；员工详情不自动修改能力或薪资；裁员金额只读预览后显式确认。",
+    "assets": [
+      "ILL-S10",
+      "AVT-POOL",
+      "ICO-K08",
+      "DEC-06"
+    ]
+  },
+  {
+    "id": "UI-11",
+    "name": "部门详情",
+    "group": "B03 人才与部门",
+    "route": "D03 /detail/department",
+    "kind": "二级页",
+    "priority": "P0",
+    "scene": "部门实景横幅：主营、客服、人资等各一张共享缩略场景。",
+    "structure": [
+      "顶部：部门名称、状态、人数",
+      "经营指标：本年支出、业务收益/节省、净贡献（不同科目要标注）",
+      "人员区：当前人数、AUTO/MANUAL及目标人数",
+      "列表区：本部门人员头像",
+      "操作区：招聘、调整人数、扩产（只限主营）"
+    ],
+    "data": [
+      "department；staffCount；annualCosts；annualBenefit；netContribution；staffMode；targetCount"
+    ],
+    "actions": [
+      "改模式/人数→UI-22",
+      "招聘→UI-16",
+      "主营扩产→UI-20",
+      "返回部门总览"
+    ],
+    "states": [
+      "尚未创建/0员工/负贡献/产能不足/已锁定/资金紧张"
+    ],
+    "rule": "成本中心不展示虚构销售收入；对应节省或需求增量口径要解释；不支持重复建同一部门。",
+    "assets": [
+      "ILL-D01",
+      "ICO-D01",
+      "ICO-D02",
+      "ICO-D03",
+      "ICO-D04",
+      "ICO-D05",
+      "ICO-D06"
+    ]
+  },
+  {
+    "id": "UI-12",
+    "name": "设置",
+    "group": "B05 设置与存档",
+    "route": "D04 /detail/settings",
+    "kind": "二级页",
+    "priority": "P0",
+    "scene": "办公桌极简背景；设置以干净的列表为主，几乎不占用大图。",
+    "structure": [
+      "账号/设备状态摘要",
+      "音频：全部音乐与音效总开关、音乐分项、音效分项",
+      "引导：重新查看",
+      "存档：本地存档与进度备份/云管理",
+      "平台：隐私协议、授权状态、版本",
+      "危险区：关闭公司"
+    ],
+    "data": [
+      "masterAudio；musicEnabled；soundEnabled；tutorialStatus；cloudStatus；loginStatus；version"
+    ],
+    "actions": [
+      "切音频开关立即本地持久化",
+      "重播教程",
+      "备份管理→EX-02",
+      "关闭公司→UI-13",
+      "隐私详情/返回"
+    ],
+    "states": [
+      "声音开/关/总开关关/无云能力/需要登录/保存中/失败"
+    ],
+    "rule": "总开关关闭时所有BGM/结果短乐/SFX静音并跨重启保存；分项设置逻辑不得互相冲突；不增第五主Tab。",
+    "assets": [
+      "ILL-S11",
+      "ICO-K09",
+      "STA-02",
+      "DEC-07"
+    ]
+  },
+  {
+    "id": "UI-13",
+    "name": "关闭公司确认",
+    "group": "B05 设置与存档",
+    "route": "D05 /dialog/close-company",
+    "kind": "危险确认",
+    "priority": "P0",
+    "scene": "轻量插画：熄灯的公司招牌，不用血腥/失败惩罚场景。",
+    "structure": [
+      "标题：关闭当前公司？",
+      "红色警示卡列出将清除的本局内容",
+      "明确不清除平台身份与依法保留信息",
+      "底部取消优先，危险确认独立",
+      "必要时输入公司名/第二次确认"
+    ],
+    "data": [
+      "companyName；resetScope；runId；confirmationToken；cloudPending"
+    ],
+    "actions": [
+      "取消无副作用",
+      "第二次确认→ResetService原子重置→UI-02",
+      "失败保留当前公司并提示"
+    ],
+    "states": [
+      "首次确认/二次确认/保存失败/旧云状态待同步/执行成功"
+    ],
+    "rule": "重置经营、员工、部门、现金、年限、排名和教程；新runId；不能只清空界面。",
+    "assets": [
+      "ILL-S12",
+      "STA-03",
+      "DEC-08"
+    ]
+  },
+  {
+    "id": "UI-14",
+    "name": "离线回归报告",
+    "group": "B04 财务与风险",
+    "route": "D06 /modal/offline-report",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "日升或办公楼晨光小插画；汇总卡清晰优先。",
+    "structure": [
+      "标题：欢迎回来",
+      "离线累计时长/等效经营年月（注明上限）",
+      "指标：营收变化、利润变化、现金变化",
+      "事件列表：发生/未发生",
+      "底部知道了，继续经营"
+    ],
+    "data": [
+      "offlineElapsed；calculatedMonths；revenueDelta；profitDelta；cashDelta；events；limitReason"
+    ],
+    "actions": [
+      "确认并关闭",
+      "查看更多年报（如已有）",
+      "异常结算→UI-27"
+    ],
+    "states": [
+      "有收益/亏损/暂停不结算/超出离线上限/0有效月份/失败待恢复"
+    ],
+    "rule": "离线按现有8小时折算1年、最多3年等规则；纯汇总，不提供“领取离线收益”重复结算按钮。",
+    "assets": [
+      "ILL-S13",
+      "ICO-K10",
+      "CHART-02"
+    ]
+  },
+  {
+    "id": "UI-15",
+    "name": "资金危机与经营困难",
+    "group": "B04 财务与风险",
+    "route": "D07 /detail/distress",
+    "kind": "二级页",
+    "priority": "P0",
+    "scene": "雨天办公室或空荡会议室轻情绪插画，不能暗示已破产。",
+    "structure": [
+      "标题：经营资金提醒",
+      "目前现金/刚性支出/资金缺口",
+      "风险原因文字",
+      "建议操作：控制支出、查看员工或部门",
+      "一次性经营援助入口（仅可用时）"
+    ],
+    "data": [
+      "cashShortfall；dueCost；riskReason；rescueAvailable；rescueUsed；cash"
+    ],
+    "actions": [
+      "查看员工→UI-07",
+      "查看部门→UI-06",
+      "经营援助→UI-26",
+      "返回经营"
+    ],
+    "states": [
+      "轻微警告/资金危险/可救助/救助已用/无费用到期"
+    ],
+    "rule": "亏损不是立即破产；现金下限0，救助不可重复；没有贷款/借款页面。",
+    "assets": [
+      "ILL-S14",
+      "STA-04",
+      "DEC-09"
+    ]
+  },
+  {
+    "id": "UI-16",
+    "name": "日常招聘中心",
+    "group": "B03 人才与部门",
+    "route": "A16 /modal/recruitment",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "HR办公区小横幅+HR立绘；候选人卡是主体。",
+    "structure": [
+      "顶部：招聘中心与部门筛选",
+      "本次招聘信息：现金/招聘预算/候选刷新",
+      "三候选对比：头像、能力、成长潜力、团队协作、性格、月薪、一次招聘费、综合倾向",
+      "按钮：查看/选择→确认，广告招聘券入口按条件展示"
+    ],
+    "data": [
+      "department；offers[3]；salary；fee；cash；couponBalance；adAvailability；expires"
+    ],
+    "actions": [
+      "筛选部门/刷新候选（规则校验）",
+      "点候选进入UI-17",
+      "看视频领券→EX-06",
+      "取消返回人才页"
+    ],
+    "states": [
+      "无候选/三人可选/过期/券可用/视频不可用/现金不足/请求中"
+    ],
+    "rule": "保留每次3候选对比；不照搬概念图的5人列表+匹配度百分数，除非代码已存在对应算法；广告券只免一次招聘费。",
+    "assets": [
+      "ILL-S15",
+      "CHR-HR01",
+      "AVT-POOL",
+      "ICO-K11",
+      "AD-01"
+    ]
+  },
+  {
+    "id": "UI-17",
+    "name": "招聘费用确认",
+    "group": "B03 人才与部门",
+    "route": "A17 /dialog/hiring-confirm",
+    "kind": "确认弹窗",
+    "priority": "P0",
+    "scene": "候选头像与递交Offer小插图，背景半透明。",
+    "structure": [
+      "标题：确认录用？",
+      "候选摘要与入职部门",
+      "支付：招聘费（若券免则¥0）/月薪/预计生效月",
+      "本次现金变动和操作后余额",
+      "底部取消、确认录用"
+    ],
+    "data": [
+      "candidate；department；recruitmentFee；couponUsed；salary；effectiveMonth；cashAfter"
+    ],
+    "actions": [
+      "取消",
+      "确认→Facade招聘事务+存档",
+      "成功→回列表显示新员工"
+    ],
+    "states": [
+      "正常/券免招聘费/余额不足/同命令重复/候选过期/存档失败"
+    ],
+    "rule": "录用次月生效；广告券不免后续工资；commandId幂等，不能先扣券后员工创建失败。",
+    "assets": [
+      "AVT-POOL",
+      "AD-02",
+      "DEC-10"
+    ]
+  },
+  {
+    "id": "UI-18",
+    "name": "裁员赔偿确认",
+    "group": "B03 人才与部门",
+    "route": "A18 /dialog/layoff-confirm",
+    "kind": "危险确认",
+    "priority": "P0",
+    "scene": "交接文件夹小图/员工头像，红色危机意象仅用在按钮和提示。",
+    "structure": [
+      "标题：确定裁员？",
+      "员工姓名与部门",
+      "赔偿月数、赔偿金额、次月可减少薪资",
+      "当前现金与预计余额",
+      "取消优先，红色确认裁员"
+    ],
+    "data": [
+      "employee；tenure；severanceMonths；severanceAmount；cashAfter；salarySavings"
+    ],
+    "actions": [
+      "取消",
+      "确认裁员→LayoffService+存档",
+      "保存失败不离开弹层"
+    ],
+    "states": [
+      "正常/现金不足/重复确认/员工不在岗/交易失败"
+    ],
+    "rule": "系统绝不自动裁员；裁员需要真实费用展示及二次确认；时点与工资归属取领域规则。",
+    "assets": [
+      "AVT-POOL",
+      "DEC-11",
+      "STA-05"
+    ]
+  },
+  {
+    "id": "UI-19",
+    "name": "新建部门确认",
+    "group": "B03 人才与部门",
+    "route": "A19 /dialog/create-department",
+    "kind": "确认弹窗",
+    "priority": "P0",
+    "scene": "部门门牌小插画。",
+    "structure": [
+      "标题：开设支持部门",
+      "待创建部门图标+效果描述",
+      "一次性创建费与余额",
+      "提示0员工无效益",
+      "底部取消与支付创建"
+    ],
+    "data": [
+      "departmentType；setupFee；cashAfter；noStaffNoBenefit"
+    ],
+    "actions": [
+      "取消",
+      "确认建部→DepartmentService+存档",
+      "成功→UI-11/部门列表"
+    ],
+    "states": [
+      "未建/已建/现金不足/提交中/保存失败"
+    ],
+    "rule": "只允许五种支持部门各创建一次；创建费按领域配置，不把图示金额硬编码为规则。",
+    "assets": [
+      "ILL-D01",
+      "ICO-D02",
+      "ICO-D03",
+      "ICO-D04",
+      "ICO-D05",
+      "ICO-D06"
+    ]
+  },
+  {
+    "id": "UI-20",
+    "name": "主营业务扩产",
+    "group": "B03 人才与部门",
+    "route": "A20 /modal/business-expansion",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "现行业工位或订单增长小幅插画。",
+    "structure": [
+      "顶部：扩大主营规模",
+      "当前需求/产能/瓶颈",
+      "可选投资额（遵守领域合法阶梯）",
+      "投资后现金/业务资产/预计产能增加",
+      "确认/取消"
+    ],
+    "data": [
+      "investmentAmount；capacityDelta；demandGap；cashAfter；assetIncrease；reserveLimit"
+    ],
+    "actions": [
+      "选择投资金额",
+      "展示只读结果预估",
+      "确认→InvestmentService",
+      "关闭"
+    ],
+    "states": [
+      "需求不足/现金不足/合法投资/危险现金线/保存失败"
+    ],
+    "rule": "投资为资本支出，不直接计入当期成本；不新增跨行业、第二项目线或商谈合约系统。",
+    "assets": [
+      "ILL-S16",
+      "ICO-K12",
+      "CHART-03"
+    ]
+  },
+  {
+    "id": "UI-21",
+    "name": "经营策略",
+    "group": "B03 人才与部门",
+    "route": "A21 /modal/business-strategy",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "三张直观策略插画贴纸：稳健/扩张/利润优先。",
+    "structure": [
+      "标题：经营方针",
+      "三种方案单选",
+      "每张显示风险/现金安全线/招聘倾向的简短说明",
+      "当前策略与预计影响",
+      "确认应用/取消"
+    ],
+    "data": [
+      "selectedPolicy；policyEffects；currentPolicy；cashSafetyReserve"
+    ],
+    "actions": [
+      "选择稳健/扩张/利润优先",
+      "确认→业务命令更新策略",
+      "取消恢复原值"
+    ],
+    "states": [
+      "已选/不可更改时段/保存中/未变化"
+    ],
+    "rule": "方案仅改变允许的经营参数，不添加新策略系统；自动招聘仍遵守锁定与预算。",
+    "assets": [
+      "STR-01",
+      "STR-02",
+      "STR-03",
+      "DEC-12"
+    ]
+  },
+  {
+    "id": "UI-22",
+    "name": "部门员工配置",
+    "group": "B03 人才与部门",
+    "route": "A22 /modal/staff-allocation",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "组织结构线框+头像小贴纸；数值优先。",
+    "structure": [
+      "顶部：部门名称及人数",
+      "模式切换：AUTO自动/MANUAL手动锁定",
+      "人数目标控件及当前人数/差额",
+      "说明：自动经营遵守规则，不强制裁员",
+      "底部保存/取消"
+    ],
+    "data": [
+      "department；mode；currentCount；targetCount；salaryEstimate"
+    ],
+    "actions": [
+      "切换AUTO/MANUAL",
+      "调整目标人数",
+      "保存→人员配置命令",
+      "取消"
+    ],
+    "states": [
+      "自动/手动锁定/目标大于预算/保存失败"
+    ],
+    "rule": "人员目标变化本身不自动裁员；自动不能修改手动锁定的目标人数；若现命令不支持调岗按钮则不显示。",
+    "assets": [
+      "ICO-K13",
+      "AVT-POOL",
+      "DEC-13"
+    ]
+  },
+  {
+    "id": "UI-23",
+    "name": "财务口径帮助",
+    "group": "B04 财务与风险",
+    "route": "A23 /help/finance",
+    "kind": "帮助弹层",
+    "priority": "P0",
+    "scene": "金币/账本极简图标，不绘大场景。",
+    "structure": [
+      "术语列表：营业收入、净利润、现金、总资产",
+      "每条用一行公式与常见误区",
+      "页脚知道了"
+    ],
+    "data": [
+      "definitionRevenue；definitionProfit；definitionCash；definitionAssets"
+    ],
+    "actions": [
+      "展开/收起术语",
+      "关闭",
+      "返回原数字入口"
+    ],
+    "states": [
+      "默认/文本过长/小屏滚动"
+    ],
+    "rule": "MVP全部收现，未做应收账款、贷款、税务和股票市值；禁止插入概念财务页的回款列表作为真实数据。",
+    "assets": [
+      "ICO-K14",
+      "DEC-14"
+    ]
+  },
+  {
+    "id": "UI-24",
+    "name": "排行榜规则说明",
+    "group": "B04 财务与风险",
+    "route": "A24 /help/ranking",
+    "kind": "帮助弹层",
+    "priority": "P0",
+    "scene": "奖牌图标和浅色小表格。",
+    "structure": [
+      "本地模拟榜与真实TapTap榜区别",
+      "总资产/经营年限口径",
+      "真榜异步同步、账号授权、隐私提示",
+      "关闭公司对本局名次的影响",
+      "底部我知道了"
+    ],
+    "data": [
+      "rankSource；metricDefinitions；syncStatus；privacyConsent"
+    ],
+    "actions": [
+      "切换规则标签",
+      "跳到平台说明",
+      "关闭"
+    ],
+    "states": [
+      "模拟榜/真实榜开通/真实榜关闭/无网"
+    ],
+    "rule": "无真实榜排名奖励承诺；真榜不展示虚构机器人；关闭公司异步0分更新不保证立即消失。",
+    "assets": [
+      "RANK-01",
+      "RANK-02",
+      "DEC-15"
+    ]
+  },
+  {
+    "id": "UI-25",
+    "name": "连续盈利里程碑",
+    "group": "B04 财务与风险",
+    "route": "A25 /modal/profit-goal",
+    "kind": "成就弹层",
+    "priority": "P0",
+    "scene": "金色奖章+办公楼点亮气氛插画。",
+    "structure": [
+      "顶部：恭喜连续3个完整年度盈利",
+      "数据：盈利年度与关键成绩",
+      "一条鼓励继续经营的说明",
+      "继续经营主按钮"
+    ],
+    "data": [
+      "positiveYearStreak；achievement；yearReached"
+    ],
+    "actions": [
+      "确认→返回经营",
+      "可从年报再看里程碑（如已有）"
+    ],
+    "states": [
+      "首次达成/已经达成/重新开局"
+    ],
+    "rule": "连续3个年度净利润>0，不是游戏通关终止，不能强制关公司。",
+    "assets": [
+      "ILL-S17",
+      "BAD-01",
+      "DEC-16"
+    ]
+  },
+  {
+    "id": "UI-26",
+    "name": "经营援助确认",
+    "group": "B04 财务与风险",
+    "route": "A26 /dialog/rescue-confirm",
+    "kind": "确认弹窗",
+    "priority": "P0",
+    "scene": "援助资金小箱子与安全盾图案；弱化“福利领取”煽动。",
+    "structure": [
+      "标题：确认经营援助",
+      "援助金额、使用次数、援助后现金",
+      "仅一次说明",
+      "取消/确认"
+    ],
+    "data": [
+      "capitalGranted；used；cashAfter；eligible"
+    ],
+    "actions": [
+      "取消",
+      "确认→RiskService+持久化",
+      "返回经营"
+    ],
+    "states": [
+      "可用/已用/危机状态不符/保存失败"
+    ],
+    "rule": "援助按项目规定的一次性资本注入处理，不允许广告换救助/无限重试；不虚构贷款。",
+    "assets": [
+      "ILL-S18",
+      "STA-06",
+      "DEC-17"
+    ]
+  },
+  {
+    "id": "UI-27",
+    "name": "存档异常恢复",
+    "group": "B05 设置与存档",
+    "route": "A27 /dialog/save-error",
+    "kind": "异常弹层",
+    "priority": "P0",
+    "scene": "破损文件夹与恢复盾简洁插画。",
+    "structure": [
+      "标题：进度保存异常",
+      "原因（可以理解的人话）",
+      "可采取的重试/本地继续/返回标题安全路径",
+      "底部按钮按实际能力可用"
+    ],
+    "data": [
+      "errorCode；retryAvailable；safeState；platformStatus"
+    ],
+    "actions": [
+      "重试写入",
+      "返回标题（不删档）",
+      "查看帮助"
+    ],
+    "states": [
+      "暂时失败/空间不足/双槽损坏/平台不可用/恢复完成"
+    ],
+    "rule": "禁止静默开新游戏；未真实持久化之前不显示“保存成功”，危险操作需被阻断。",
+    "assets": [
+      "ILL-S19",
+      "STA-07",
+      "DEC-18"
+    ]
+  },
+  {
+    "id": "UI-28",
+    "name": "教程：创建公司",
+    "group": "B01 创建及引导",
+    "route": "TUT-01 /tutorial/company",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "不使用整张引导截图，复用导师小头像及程序化遮罩。",
+    "structure": [
+      "焦点遮罩绑定真实公司名/行业卡",
+      "气泡“先选行业，再给公司取名”",
+      "下一步/跳过说明"
+    ],
+    "data": [
+      "targetAnchor；tutorialStep；copy"
+    ],
+    "actions": [
+      "指向真实控件",
+      "完成选择进入下一段",
+      "跳过只关闭气泡"
+    ],
+    "states": [
+      "正常/锚点缺失/键盘弹起/横向适配"
+    ],
+    "rule": "跳过引导不跳过有效公司名称和行业选择。",
+    "assets": [
+      "CHR-GUIDE01",
+      "TUT-01",
+      "DEC-19"
+    ]
+  },
+  {
+    "id": "UI-29",
+    "name": "教程：CEO设定",
+    "group": "B01 创建及引导",
+    "route": "TUT-02 /tutorial/ceo",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "导师头像+CEO设置卡高亮。",
+    "structure": [
+      "高亮姓名与性格",
+      "一条成长说明",
+      "下一步/跳过"
+    ],
+    "data": [
+      "targetAnchor；step；traitSelected"
+    ],
+    "actions": [
+      "查看性格说明",
+      "下一个教程步骤"
+    ],
+    "states": [
+      "已完成/未完成/跳过"
+    ],
+    "rule": "跳过说明也必须完成姓名/性格设定；不添加角色天赋树。",
+    "assets": [
+      "CHR-GUIDE01",
+      "TUT-02"
+    ]
+  },
+  {
+    "id": "UI-30",
+    "name": "教程：首聘",
+    "group": "B01 创建及引导",
+    "route": "TUT-03 /tutorial/hire",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "HR导师头像+候选对比卡高亮。",
+    "structure": [
+      "高亮能力/潜力/工资",
+      "引导实际录用2人",
+      "进度2/2后结束新手创建"
+    ],
+    "data": [
+      "hiredCount；targetAnchor"
+    ],
+    "actions": [
+      "查看对比",
+      "确认录用",
+      "跳过说明"
+    ],
+    "states": [
+      "0/2/1/2/2/2"
+    ],
+    "rule": "跳过后仍需录用满2人；教程不能偷偷代用户录用。",
+    "assets": [
+      "CHR-HR01",
+      "TUT-03"
+    ]
+  },
+  {
+    "id": "UI-31",
+    "name": "教程：认识财务指标",
+    "group": "B02 核心经营",
+    "route": "TUT-04 /tutorial/metrics",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "经营导师半身头像与三个指标的聚光遮罩。",
+    "structure": [
+      "依次高亮现金、收入、预计利润",
+      "简短口径提示",
+      "确认/跳过"
+    ],
+    "data": [
+      "targetAnchor；explanationSeen"
+    ],
+    "actions": [
+      "点击指标帮助",
+      "下一步/跳过"
+    ],
+    "states": [
+      "初次/中断恢复/重播"
+    ],
+    "rule": "现金不是利润，经营中的利润明确“预计”。",
+    "assets": [
+      "CHR-GUIDE01",
+      "TUT-04",
+      "ICO-K03"
+    ]
+  },
+  {
+    "id": "UI-32",
+    "name": "教程：经营时间控制",
+    "group": "B02 核心经营",
+    "route": "TUT-05 /tutorial/time",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "小闹钟贴纸与时间速率控件高亮。",
+    "structure": [
+      "高亮暂停/1×/2×/5×",
+      "提示可挂机与离线限制",
+      "下一步"
+    ],
+    "data": [
+      "speed；paused；tutorialStatus"
+    ],
+    "actions": [
+      "切换速度",
+      "开始经营",
+      "跳过说明"
+    ],
+    "states": [
+      "暂停/运行/后台恢复"
+    ],
+    "rule": "UI交互不修改领域月结节奏；不把现实日计数放在主时钟位置。",
+    "assets": [
+      "ICO-K15",
+      "TUT-05"
+    ]
+  },
+  {
+    "id": "UI-33",
+    "name": "教程：年度报告",
+    "group": "B04 财务与风险",
+    "route": "TUT-06 /tutorial/report",
+    "kind": "叠层",
+    "priority": "P0",
+    "scene": "奖状小贴纸+年报利润/现金变化区域高亮。",
+    "structure": [
+      "高亮净利润与现金变化",
+      "说明下一年策略决策",
+      "知道了/跳过"
+    ],
+    "data": [
+      "reportYear；profit；cashDelta；targetAnchor"
+    ],
+    "actions": [
+      "点击知道了",
+      "跳过说明",
+      "回顾报告"
+    ],
+    "states": [
+      "首年年结/以后重播/无报告"
+    ],
+    "rule": "必须按首个已结算年度触发，不因失败页面自动关闭年报。",
+    "assets": [
+      "CHR-GUIDE01",
+      "TUT-06",
+      "BAD-02"
+    ]
+  },
+  {
+    "id": "EX-01",
+    "name": "TapTap真实玩家榜说明与入口",
+    "group": "B07 联网和运营交互",
+    "route": "T04 subview /rank/online",
+    "kind": "子视图",
+    "priority": "P0",
+    "scene": "使用官方榜单原生UI优先；自绘页面只需要简洁说明。",
+    "structure": [
+      "平台真实榜可用性",
+      "选择总资产/已完成经营年限",
+      "权限、公开内容及最后同步时间",
+      "打开榜单/刷新/关闭",
+      "失联时保留本地模拟榜入口"
+    ],
+    "data": [
+      "realRankEnabled；privacyOptIn；lastSyncAt；accountReady；scoreAssets；scoreYears"
+    ],
+    "actions": [
+      "选择同意参与/打开Tap原生榜",
+      "刷新同期分数",
+      "回本地榜"
+    ],
+    "states": [
+      "未开通/未登录/未同意/同步中/断网/成功/部分失败"
+    ],
+    "rule": "不把机器人伪装真实用户；不上传公司自定义名称及员工；真实榜无额外排名奖励。",
+    "assets": [
+      "RANK-04",
+      "STA-08"
+    ]
+  },
+  {
+    "id": "EX-02",
+    "name": "进度云备份管理",
+    "group": "B07 联网和运营交互",
+    "route": "D04 subview /cloud/manage",
+    "kind": "二级弹层",
+    "priority": "P0",
+    "scene": "云朵+保险柜小插画。",
+    "structure": [
+      "当前本机已保存状态",
+      "云端账号和最近备份时间",
+      "自动备份总开关",
+      "立即备份/从云恢复/云端备份管理",
+      "删除云备份弱危险入口"
+    ],
+    "data": [
+      "cloudState；localSaveAt；cloudConfirmedAt；autoBackup；bindingState；pendingCount"
+    ],
+    "actions": [
+      "开启/关闭自动备份",
+      "立即上传",
+      "恢复→EX-03",
+      "删除→EX-04"
+    ],
+    "states": [
+      "未开通/待授权/待网络/上传中/待核对/成功/冲突/失败"
+    ],
+    "rule": "关闭自动备份并不等于删除旧云档；上传成功须回读验证才标确认；云端来源不是经营同步多人状态。",
+    "assets": [
+      "ILL-S20",
+      "STA-09",
+      "STA-10"
+    ]
+  },
+  {
+    "id": "EX-03",
+    "name": "云存档恢复及冲突选择",
+    "group": "B07 联网和运营交互",
+    "route": "D04 subview /cloud/restore",
+    "kind": "安全弹层",
+    "priority": "P0",
+    "scene": "两份账本/设备对照图。",
+    "structure": [
+      "并列或上下两卡：本机经营进度/云端进度（年月、资产、更新时间）",
+      "冲突与覆盖说明",
+      "下载预览、取消、确认以哪份继续",
+      "必要时告知旧设备待同步风险"
+    ],
+    "data": [
+      "localPreview；cloudPreview；accountBinding；revision；conflictReason"
+    ],
+    "actions": [
+      "选择当前继续/从云端恢复",
+      "冲突确认",
+      "取消回本机"
+    ],
+    "states": [
+      "无云档/云档较新/本地较新/双端冲突/版本不兼容/下载失败"
+    ],
+    "rule": "禁止直接合并两份公司账本或叠加资产；选择期间暂停经营并验证run/revision。",
+    "assets": [
+      "ILL-S21",
+      "STA-11"
+    ]
+  },
+  {
+    "id": "EX-04",
+    "name": "删除云端备份确认",
+    "group": "B07 联网和运营交互",
+    "route": "D04 subview /cloud/delete",
+    "kind": "危险确认",
+    "priority": "P0",
+    "scene": "云端保险柜解锁小图。",
+    "structure": [
+      "标题：删除云端备份？",
+      "清楚说明本机当前存档是否保留",
+      "二次确认",
+      "服务端结果/未知结果提示"
+    ],
+    "data": [
+      "cloudArchiveCount；localExists；deletionCapability；operationState"
+    ],
+    "actions": [
+      "取消",
+      "删除云档",
+      "未确认结果→查询状态/重试"
+    ],
+    "states": [
+      "可删除/不支持/处理中/结果未知/失败/成功"
+    ],
+    "rule": "不得把“关闭云备份开关”宣传成彻底删除；不伪造平台不支持的删除能力。",
+    "assets": [
+      "ILL-S22",
+      "STA-12"
+    ]
+  },
+  {
+    "id": "EX-05",
+    "name": "每日招聘券自愿提示",
+    "group": "B07 联网和运营交互",
+    "route": "overlay /ad/daily-offer",
+    "kind": "弹层",
+    "priority": "P0",
+    "scene": "一张招聘券+播放图标的小插画，不能出现现金礼包或钻石大奖。",
+    "structure": [
+      "标题：今日招聘福利",
+      "文案：完整观看视频可领一张免招聘费券；后续工资照常支付",
+      "看视频领取/跳过",
+      "资格与当日额度状态"
+    ],
+    "data": [
+      "adEligible；dailyShown；couponBalance；consent；runAge；platformSupported"
+    ],
+    "actions": [
+      "点击视频→EX-06",
+      "跳过回经营，不阻断玩法"
+    ],
+    "states": [
+      "资格不足/可观看/视频不可用/当日已领取/已跳过"
+    ],
+    "rule": "首聘时不弹；进入经营且前台60秒后满足资格才可提示；每日和招聘入口共享一次成功发券额度。",
+    "assets": [
+      "AD-01",
+      "AD-02",
+      "CHR-HR01"
+    ]
+  },
+  {
+    "id": "EX-06",
+    "name": "观看广告及招聘券状态",
+    "group": "B07 联网和运营交互",
+    "route": "overlay /ad/coupon-status",
+    "kind": "状态弹层",
+    "priority": "P0",
+    "scene": "金币斜杠+招聘券小章，避免整屏遮盖原生广告。",
+    "structure": [
+      "观看前：自愿按钮与规则",
+      "播放时：交给原生广告",
+      "返回后：领取成功/未看完/核对中/失败可重试",
+      "券到账：显示招聘费¥0且工资保留"
+    ],
+    "data": [
+      "adSession；playbackState；couponId；couponExpiry；grantState"
+    ],
+    "actions": [
+      "看视频→原生广告",
+      "结果待核→核对奖励",
+      "返回招聘→UI-16",
+      "正常付费招聘"
+    ],
+    "states": [
+      "可播放/加载中/原生播放/未完整观看/待核/已发券/失败"
+    ],
+    "rule": "只有原生完整观看回执后才能发券；不可凭UI或Fake发券；播放期间防止旧run回调改动新档。",
+    "assets": [
+      "AD-01",
+      "AD-02",
+      "STA-13"
+    ]
+  },
+  {
+    "id": "EX-07",
+    "name": "经营瓶颈诊断详情",
+    "group": "B07 联网和运营交互",
+    "route": "T01 subview /company/diagnosis",
+    "kind": "辅助弹层",
+    "priority": "P1",
+    "scene": "经营顾问半身小立绘+单张对比小图。",
+    "structure": [
+      "当前主要瓶颈（最多一条）",
+      "原因数据：需求与产能、现金安全线或部门负贡献",
+      "建议：前往部门/人才/策略",
+      "无需AI对话框"
+    ],
+    "data": [
+      "diagnosisType；derivedNumbers；recommendedAction"
+    ],
+    "actions": [
+      "进入对应管理页",
+      "关闭"
+    ],
+    "states": [
+      "无异常/产能不足/人员闲置/现金紧张/部门负贡献/阶段目标完成"
+    ],
+    "rule": "建议必须与引擎数据一致，不写“预计提升20%”等无法推导的效果。",
+    "assets": [
+      "CHR-ADVISOR01",
+      "CHART-03",
+      "DEC-20"
+    ]
+  },
+  {
+    "id": "EX-08",
+    "name": "轻度随机经营事件",
+    "group": "B07 联网和运营交互",
+    "route": "T01 overlay /event",
+    "kind": "事件弹层",
+    "priority": "P1",
+    "scene": "商务事件场景插画：客户来访、设备维护、团队表彰等，用统一模板。",
+    "structure": [
+      "事件图片+人物对话泡泡（可无角色）",
+      "事件名称、原因和影响结果",
+      "如领域规则提供选择才出现选项；默认只读结果/知道了",
+      "影响收入/成本/士气等必须由领域返回"
+    ],
+    "data": [
+      "eventType；description；eventImpact；year；choiceOptions(if any)"
+    ],
+    "actions": [
+      "知道了",
+      "查看具体年报",
+      "仅已存在决策命令时展示选项"
+    ],
+    "states": [
+      "有事件/无事件/已看/年度结算同期"
+    ],
+    "rule": "MVP每年最多1件、5类轻度事件；“合作项目洽谈签约120万”只作为对话构图参考，不能变成投资项目玩法。",
+    "assets": [
+      "EVT-01",
+      "EVT-02",
+      "EVT-03",
+      "EVT-04",
+      "EVT-05",
+      "CHR-CLIENT01"
+    ]
+  },
+  {
+    "id": "EX-09",
+    "name": "市场景气说明（只读卡）",
+    "group": "B07 联网和运营交互",
+    "route": "T01 component /market-info",
+    "kind": "组件展开态",
+    "priority": "P1",
+    "scene": "一张商业趋势小画面；不提供股票交易或跨行业投资。",
+    "structure": [
+      "行业：当前所属三选一",
+      "市场景气指示（来自模拟因子）",
+      "一条对主营业务影响的说明",
+      "折线/箭头只在有历史数据时显示"
+    ],
+    "data": [
+      "industry；marketFactor；demandTrend；optionalHistory"
+    ],
+    "actions": [
+      "展开/收起",
+      "返回公司经营",
+      "跳转策略入口（若已存在）"
+    ],
+    "states": [
+      "有数据/无历史/数值波动/领域未提供数据时隐藏"
+    ],
+    "rule": "概念稿中的“科技+4.8%、医药、制造”等行业分布、竞争者动态不作为MVP真实字段；市场卡仅解释现有模拟市场因子。",
+    "assets": [
+      "ILL-S23",
+      "CHART-04",
+      "ICO-I01",
+      "ICO-I02",
+      "ICO-I03"
+    ]
+  }
+]

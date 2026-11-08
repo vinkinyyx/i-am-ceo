@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="k10clock" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FBFDFF"/><stop offset="1" stop-color="#E4EEFB"/></linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="118" cy="112" r="46" fill="url(#k10clock)" stroke="#3668B2" stroke-width="7"/>
+    <g stroke="#9DB6D8" stroke-width="6">
+      <path d="M118 74v8"/>
+      <path d="M118 142v8"/>
+      <path d="M80 112h8"/>
+      <path d="M148 112h8"/>
+    </g>
+    <path d="M118 112V88" stroke="#C99232" stroke-width="8"/>
+    <path d="M118 112l20 12" stroke="#3668B2" stroke-width="7"/>
+    <circle cx="118" cy="112" r="6" fill="#3668B2"/>
+    <path d="M70 24a38 38 0 1 0 0 76 30 30 0 0 1 0-76z" fill="#F2C56A" stroke="#C99232" stroke-width="6"/>
+    <path d="M38 128l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#E3B25C"/>
+    <path d="M66 152l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#E3B25C"/>
+  </g>
+</svg>

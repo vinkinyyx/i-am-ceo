@@ -1,0 +1,14 @@
+{
+  "dir:ui": "5384e4f4-bee7-46d5-aaeb-8b7462eff54c",
+  "dir:ui/avatars": "43a81c6a-29a5-4c73-8741-c0321a1891d7",
+  "dir:ui/navigation": "96966356-b5d5-483e-ab5f-0228622d46d7",
+  "dir:ui_v2": "9fef447d-303a-42e4-a28f-e14538ef03da",
+  "dir:ui_v2/scenes": "682dc812-d1e4-41ea-9046-d90e2f08059a",
+  "dir:ui_v2/characters": "7efbfac7-3a8d-4060-ae64-b34abc7c780a",
+  "img:ui_v2/scenes/ill_s05.png": "8834315d-5c08-48d9-b8d4-5b1cadc4edb6",
+  "img:ui_v2/characters/chr_assist01.png": "485b18c3-657e-458e-bb63-421d03d5d434",
+  "img:ui_v2/characters/chr_hr01.png": "7f670c31-7703-43d4-88c8-8fb2a5b90f78",
+  "img:ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color1.png": "91be5cfc-9935-410e-b6e1-2d7cc48a0066",
+  "img:ui/navigation/Nav_Company.png": "672c366d-37f3-442c-99f7-5e69c8166033",
+  "img:ui/navigation/Nav_Company_Inactive.png": "296199ee-09fd-4e0a-a77c-239c7320c639"
+}

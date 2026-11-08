@@ -1,0 +1,40 @@
+PATCH_OK
+{
+  "releaseId": "r38-ui-v2-20261108",
+  "gameVersion": "0.1.0",
+  "copied": [
+    "logo.png",
+    "slogan.png",
+    "splash-art.png",
+    "first-screen.js"
+  ],
+  "patches": [
+    {
+      "label": "fetch-guard",
+      "matches": 1
+    },
+    {
+      "label": "init-once",
+      "matches": 1
+    },
+    {
+      "label": "boot-diag",
+      "matches": 1
+    },
+    {
+      "label": "account-guard",
+      "matches": 1
+    },
+    {
+      "label": "isdevelop",
+      "matches": 1
+    }
+  ],
+  "warnings": [],
+  "removedDuplicateLogos": [
+    "logo.89978.png"
+  ],
+  "removed": [
+    "splash.d49ca.jpg"
+  ]
+}

@@ -11,7 +11,7 @@ import { createInitialState } from '../domain/gameStateFactory';
 import type { AnnualReport, CandidateOffer, Employee, GameSpeed, GameState, IndustryId, MonthlyLedger } from '../domain/types';
 import { NameGenerator } from '../domain/NameGenerator';
 import { Rng, deriveSeed } from '../simulation/rng';
-import { GameClock, type ClockTickResult } from '../simulation/GameClock';
+import { GameClock, msPerMonth, type ClockTickResult } from '../simulation/GameClock';
 import { investInBusiness, previewInvest, type InvestPreview } from './InvestmentService';
 import { buildCompanyOverview, type CompanyOverview } from './CompanyOverviewService';
 import { buildDepartmentOverview, type DepartmentOverview } from './DepartmentOverviewService';
@@ -445,6 +445,11 @@ export class GameFacade {
     } catch (err) {
       return toFailure(err);
     }
+  }
+
+  /** §29.13：当前倍速下一个游戏月对应的真实毫秒；UI 时钟按此判断是否临近月结，避免每秒落盘。 */
+  monthDurationMs(speed?: GameSpeed): number {
+    return msPerMonth(this.cfg, speed ?? this.store.current.speed);
   }
 
   /** 扩产预览（只读，不改状态）。 */

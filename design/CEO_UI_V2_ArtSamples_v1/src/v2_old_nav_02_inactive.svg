@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <!-- OLD-NAV-02 公司（未选中态）192x192 透明；按 20–24px 展示尺寸定稿。
+       几何与 OLD-NAV-01 完全一致：屋顶 24,16,144,26 r9；主体 40,38,112,136 r6；
+       窗 28x24 @(62,60)/(102,60) r4；门 83,136,26,38。
+       主体/屋顶用 14px 灰蓝描边并内缩 7px，使外沿与选中态填充外沿重合；窗与门同尺寸灰蓝填充。 -->
+  <g>
+    <rect x="47" y="45" width="98" height="122" rx="4" fill="none" stroke="#7C8BA1" stroke-width="14"/>
+    <rect x="31" y="23" width="130" height="12" rx="6" fill="none" stroke="#7C8BA1" stroke-width="14"/>
+    <g fill="#7C8BA1">
+      <rect x="62" y="60" width="28" height="24" rx="4"/>
+      <rect x="102" y="60" width="28" height="24" rx="4"/>
+    </g>
+    <path d="M83 174v-32a6 6 0 0 1 6-6h14a6 6 0 0 1 6 6v32Z" fill="#7C8BA1"/>
+  </g>
+</svg>

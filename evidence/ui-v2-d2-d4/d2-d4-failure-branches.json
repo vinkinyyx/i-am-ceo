@@ -1,0 +1,75 @@
+{
+  "url": "http://127.0.0.1:8153/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "D3-dept-create-insufficient",
+      "status": "PASS",
+      "detail": 5
+    },
+    {
+      "id": "D3-money-hire-insufficient",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "id": "D3-money-hire-blocked",
+      "status": "PASS",
+      "detail": {
+        "cashBeforeHire": 3000,
+        "cashAfterHire": 3000,
+        "stillOpen": 1
+      }
+    },
+    {
+      "id": "D3-invest-insufficient",
+      "status": "PASS",
+      "detail": {
+        "investGate": {
+          "found": true,
+          "interactable": true
+        },
+        "rows": 1
+      }
+    },
+    {
+      "id": "D3-save-gate-shown",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "D3-save-gate-sta07",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D3-save-gate-ill-s19",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D3-save-gate-retry-stays",
+      "status": "PASS",
+      "detail": null
+    }
+  ],
+  "checkCounts": {
+    "PASS": 8,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

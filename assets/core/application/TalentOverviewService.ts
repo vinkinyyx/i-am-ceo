@@ -18,6 +18,8 @@ import { monthIndexOf } from './monthEntry';
 export interface TalentRowVM {
   employeeId: string;
   name: string;
+  /** §30.4 头像身份：沿用 Candidate/Employee 的 avatarId，UI 只做键映射 */
+  avatarId: string;
   deptId: string;
   deptType: DeptType;
   skill: number;
@@ -72,6 +74,7 @@ export function buildTalentOverview(state: GameState, filterKey = 'ALL'): Talent
     return {
       employeeId: e.employeeId,
       name: e.name,
+      avatarId: e.avatarId,
       deptId: e.departmentId,
       deptType: dept?.type ?? 'BUSINESS',
       skill: e.skill,

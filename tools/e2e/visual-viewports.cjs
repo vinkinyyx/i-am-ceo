@@ -9,6 +9,7 @@ const VIEWPORTS = [
   { name: '360x640', width: 360, height: 640 },
   { name: '390x844', width: 390, height: 844 },
   { name: '375x834', width: 375, height: 834 },
+  { name: '414x896', width: 414, height: 896 },
 ];
 function usage() {
   return 'Usage: node tools/e2e/visual-viewports.cjs --url <URL> --out <new-directory> [--seed <json>]';
@@ -149,7 +150,7 @@ async function main() {
       await driver.screenshot(`${viewport.name}-talent`);
 
       await clickBottomTab(driver, '排行');
-      await waitForText(driver, '本地模拟排行');
+      await waitForText(driver, '本地模拟');
       driver.check(`${viewport.name}-leaderboard-tab`, true);
       await driver.screenshot(`${viewport.name}-leaderboard`);
 

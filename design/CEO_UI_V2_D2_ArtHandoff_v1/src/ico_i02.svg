@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="i02win" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#F8FBFF"/><stop offset="1" stop-color="#E3ECFA"/></linearGradient>
+  </defs>
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <rect x="24" y="40" width="126" height="94" rx="12" fill="url(#i02win)" stroke="#3668B2" stroke-width="7"/>
+    <path d="M24 64h126" stroke="#3668B2" stroke-width="7"/>
+    <circle cx="44" cy="52" r="5" fill="#E3B25C"/>
+    <circle cx="60" cy="52" r="5" fill="#5D9F8C"/>
+    <circle cx="76" cy="52" r="5" fill="#9DB6D8"/>
+    <path d="M64 82l-14 13 14 13M100 82l14 13-14 13M88 78l-8 36" fill="none" stroke="#3668B2" stroke-width="7"/>
+    <g transform="translate(150 141)" fill="#5D9F8C">
+      <rect x="-5" y="-32" width="10" height="14" rx="3"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(45)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(90)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(135)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(180)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(225)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(270)"/>
+      <rect x="-5" y="-32" width="10" height="14" rx="3" transform="rotate(315)"/>
+    </g>
+    <circle cx="150" cy="141" r="24" fill="#E9F5F0" stroke="#5D9F8C" stroke-width="7"/>
+    <circle cx="150" cy="141" r="9" fill="#FFFFFF" stroke="#5D9F8C" stroke-width="5"/>
+  </g>
+</svg>

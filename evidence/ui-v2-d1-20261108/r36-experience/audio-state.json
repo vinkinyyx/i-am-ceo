@@ -1,0 +1,41 @@
+{
+  "audioFiles": [
+    "build\\web-mobile\\assets\\resources\\native\\00\\00d9bd02-ccc1-4420-b29e-2bcbd97f0e6a.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\0f\\0fcb9616-fae0-4a78-91a5-b419e3f7d7a9.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\1c\\1ceab98d-04c2-4099-a794-5123a1d696cf.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\20\\208af423-b909-4d18-94ad-d232e658663f.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\4c\\4c6f731d-d0af-4504-b593-f3e7a6d6eefc.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\5b\\5b09275e-05d3-4243-9b99-a7b267fb2b43.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\69\\69c77acf-3c28-452d-a746-2df2813c038c.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\72\\725172cd-0d22-48ab-9225-30b6c5279143.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\77\\77087e91-dea3-426d-9f22-0dd1f38244d2.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\a7\\a78e7177-aa82-476f-a041-0caa98e23f31.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\c7\\c7930016-a800-4639-9e88-cc9909474d3b.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\e1\\e13d0402-6b6e-4de7-aa16-b82aebf92a67.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\e2\\e2432044-89f7-4519-8c75-e62848004c58.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\e7\\e7f782ff-500b-4bba-8a70-c643a9154a68.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\f2\\f2478ff3-8c0f-469d-bf6c-e8f941929b25.mp3",
+    "build\\web-mobile\\assets\\resources\\native\\fd\\fd052b86-9e21-41e4-9eca-6b5c201fb15c.mp3"
+  ],
+  "audioState": {
+    "audioSourceExport": true,
+    "audioNodes": [
+      {
+        "node": "AudioManager",
+        "components": [
+          "AudioSource"
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "node": "AudioManager",
+        "clip": "BGM_02_OfficeLoop",
+        "playing": true,
+        "loop": true,
+        "volume": 0.6
+      }
+    ]
+  },
+  "console": []
+}

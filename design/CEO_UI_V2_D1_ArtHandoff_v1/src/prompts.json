@@ -1,0 +1,50 @@
+{
+  "style_reference": "../CEO_UI_V2_ArtSamples_v1/src/prompts.json",
+  "palette": "#3668B2 #315FA4 #243247 #F4F6FA #FFE3B4 #C79A6B #E5B85D",
+  "lighting": "warm daylight from left, cool blue-grey shadows",
+  "scene_assets": {
+    "ILL-S06": {
+      "generated_source": "raw/ill_s06_generated.png",
+      "output": "png/ill_s06.png",
+      "editable_source": "raw image master plus this prompt metadata",
+      "prompt": "Empty modern business interior, no people, text, UI or logo; Japanese light semi-realistic 2D commercial illustration, soft cel shading, left warm daylight, cool blue-grey shadows, restrained blue-white-cream palette; compose for 343x160 and 343x96 mobile crops."
+    },
+    "ILL-S07": {
+      "generated_source": "raw/ill_s07_generated.png",
+      "output": "png/ill_s07.png",
+      "editable_source": "raw image master plus this prompt metadata",
+      "prompt": "Empty modern business interior, no people, text, UI or logo; Japanese light semi-realistic 2D commercial illustration, soft cel shading, left warm daylight, cool blue-grey shadows, restrained blue-white-cream palette; compose for 343x160 and 343x96 mobile crops."
+    },
+    "ILL-S08": {
+      "generated_source": "raw/ill_s08_generated.png",
+      "output": "png/ill_s08.png",
+      "editable_source": "raw image master plus this prompt metadata",
+      "prompt": "Empty modern business interior, no people, text, UI or logo; Japanese light semi-realistic 2D commercial illustration, soft cel shading, left warm daylight, cool blue-grey shadows, restrained blue-white-cream palette; compose for 343x160 and 343x96 mobile crops."
+    },
+    "ILL-S09": {
+      "generated_source": "raw/ill_s09_generated.png",
+      "output": "png/ill_s09.png",
+      "editable_source": "raw image master plus this prompt metadata",
+      "prompt": "Empty modern business interior, no people, text, UI or logo; Japanese light semi-realistic 2D commercial illustration, soft cel shading, left warm daylight, cool blue-grey shadows, restrained blue-white-cream palette; compose for 343x160 and 343x96 mobile crops."
+    },
+    "ILL-S15": {
+      "generated_source": "raw/ill_s15_generated.png",
+      "output": "png/ill_s15.png",
+      "editable_source": "raw image master plus this prompt metadata",
+      "prompt": "Empty modern business interior, no people, text, UI or logo; Japanese light semi-realistic 2D commercial illustration, soft cel shading, left warm daylight, cool blue-grey shadows, restrained blue-white-cream palette; compose for 343x160 and 343x96 mobile crops."
+    }
+  },
+  "avatar_groups": [
+    "男短发",
+    "女齐肩发",
+    "男卷发",
+    "女短发",
+    "男眼镜",
+    "女马尾",
+    "男背头",
+    "女长发"
+  ],
+  "avatar_variants": "同一组固定SVG几何轮廓，配色1/2/3仅调整西装蓝系深浅；透明底256×256。",
+  "icons": "独立可编辑SVG；透明PNG由render.cjs超采样输出。",
+  "prohibited": "所有动态文字、金额、图表、按钮均交由Cocos绘制。"
+}

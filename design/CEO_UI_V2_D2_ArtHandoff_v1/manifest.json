@@ -1,0 +1,1315 @@
+{
+  "package": "CEO UI V2 D2 美术交接 v1",
+  "generated_for": "Cocos Creator 3.8.8; developer agent import",
+  "style_reference": "../../assets/UI/CEO_UI_Redesign_V2/03_Asset_Registry_V2.json",
+  "count": 46,
+  "assets": [
+    {
+      "asset_id": "ICO-I01",
+      "name": "电商贸易",
+      "file": "png/ico_i01.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6719,
+      "source": "src/ico_i01.svg",
+      "master": "src/ico_i01.svg",
+      "runtime_path": "ui_v2/industries/ico_i01.png",
+      "runtime_key": "ui_v2/industries/ico_i01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "购物袋+纸箱；蓝主体、金色点缀；无文字。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_i01_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-I02",
+      "name": "软件科技",
+      "file": "png/ico_i02.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 8118,
+      "source": "src/ico_i02.svg",
+      "master": "src/ico_i02.svg",
+      "runtime_path": "ui_v2/industries/ico_i02.png",
+      "runtime_key": "ui_v2/industries/ico_i02",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "代码窗口+齿轮；窗口内用箭头/斜杠符号，不含可读文字。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_i02_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-I03",
+      "name": "企业服务",
+      "file": "png/ico_i03.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 2940,
+      "source": "src/ico_i03.svg",
+      "master": "src/ico_i03.svg",
+      "runtime_path": "ui_v2/industries/ico_i03.png",
+      "runtime_key": "ui_v2/industries/ico_i03",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "公文包+楼宇；蓝白主体、金色锁扣。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_i03_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K09",
+      "name": "设置/音频",
+      "file": "png/ico_k09.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 4506,
+      "source": "src/ico_k09.svg",
+      "master": "src/ico_k09.svg",
+      "runtime_path": "ui_v2/business/ico_k09.png",
+      "runtime_key": "ui_v2/business/ico_k09",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "滑杆+音符；三档滑杆，金色音符。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k09_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K10",
+      "name": "离线提示",
+      "file": "png/ico_k10.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 8549,
+      "source": "src/ico_k10.svg",
+      "master": "src/ico_k10.svg",
+      "runtime_path": "ui_v2/business/ico_k10.png",
+      "runtime_key": "ui_v2/business/ico_k10",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "月牙+时钟；夜间离线语义，金色月牙。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k10_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K12",
+      "name": "投资产能",
+      "file": "png/ico_k12.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 5655,
+      "source": "src/ico_k12.svg",
+      "master": "src/ico_k12.svg",
+      "runtime_path": "ui_v2/business/ico_k12.png",
+      "runtime_key": "ui_v2/business/ico_k12",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "上升柱+箭头；末柱金色强调。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k12_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K13",
+      "name": "组织锁定",
+      "file": "png/ico_k13.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 4641,
+      "source": "src/ico_k13.svg",
+      "master": "src/ico_k13.svg",
+      "runtime_path": "ui_v2/business/ico_k13.png",
+      "runtime_key": "ui_v2/business/ico_k13",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "组织节点+锁；锁为金色，节点为蓝色。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k13_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K14",
+      "name": "财务帮助",
+      "file": "png/ico_k14.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 10001,
+      "source": "src/ico_k14.svg",
+      "master": "src/ico_k14.svg",
+      "runtime_path": "ui_v2/business/ico_k14.png",
+      "runtime_key": "ui_v2/business/ico_k14",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "账本+问号；问号为图形路径，不含文字。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k14_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ICO-K15",
+      "name": "经营倍速",
+      "file": "png/ico_k15.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6801,
+      "source": "src/ico_k15.svg",
+      "master": "src/ico_k15.svg",
+      "runtime_path": "ui_v2/business/ico_k15.png",
+      "runtime_key": "ui_v2/business/ico_k15",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "快进双箭头+表盘；橙金指针。",
+      "category": "icon",
+      "preview": [
+        "preview/ico_k15_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "CHR-CEO01",
+      "name": "CEO 半身立绘",
+      "file": "png/chr_ceo01.png",
+      "width": 720,
+      "height": 960,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 115144,
+      "source": "src/chr_ceo01.svg",
+      "master": "src/chr_ceo01.svg",
+      "runtime_path": "ui_v2/characters/chr_ceo01.png",
+      "runtime_key": "ui_v2/characters/chr_ceo01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 180px height light preview",
+      "notes": "深蓝西装、白衬衫、短发，正面略侧；透明背景，前景占画面≥80%。",
+      "category": "character",
+      "preview": [
+        "preview/chr_ceo01_180.png"
+      ]
+    },
+    {
+      "asset_id": "CHR-GUIDE01",
+      "name": "新手导师半身",
+      "file": "png/chr_guide01.png",
+      "width": 720,
+      "height": 960,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 161875,
+      "source": "src/chr_guide01.svg",
+      "master": "src/chr_guide01.svg",
+      "runtime_path": "ui_v2/characters/chr_guide01.png",
+      "runtime_key": "ui_v2/characters/chr_guide01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 180px height light preview",
+      "notes": "青绿色针织衫、温和微笑、手持小册；小册无文字。",
+      "category": "character",
+      "preview": [
+        "preview/chr_guide01_180.png"
+      ]
+    },
+    {
+      "asset_id": "CHR-ADVISOR01",
+      "name": "经营顾问半身",
+      "file": "png/chr_advisor01.png",
+      "width": 720,
+      "height": 960,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 121766,
+      "source": "src/chr_advisor01.svg",
+      "master": "src/chr_advisor01.svg",
+      "runtime_path": "ui_v2/characters/chr_advisor01.png",
+      "runtime_key": "ui_v2/characters/chr_advisor01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 180px height light preview",
+      "notes": "灰蓝马甲、金色细框眼镜、图表夹；图表仅柱线，无文字。",
+      "category": "character",
+      "preview": [
+        "preview/chr_advisor01_180.png"
+      ]
+    },
+    {
+      "asset_id": "BRD-01",
+      "name": "品牌图形",
+      "file": "png/brd_01.png",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 89538,
+      "source": "src/brd_01.svg",
+      "master": "src/brd_01.svg",
+      "runtime_path": "ui_v2/brand/brd_01.png",
+      "runtime_key": "ui_v2/brand/brd_01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "蓝金圆环内 C/E/O 抽象徽记；字母为几何路径，不含长文字。",
+      "category": "brand",
+      "preview": [
+        "preview/brd_01_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S01",
+      "name": "启动主视觉·城市创业",
+      "file": "png/ill_s01.png",
+      "width": 1080,
+      "height": 2400,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 256979,
+      "source": "src/ill_s01.svg",
+      "master": "src/ill_s01.svg",
+      "runtime_path": "ui_v2/scenes/ill_s01.png",
+      "runtime_key": "ui_v2/scenes/ill_s01",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=1098 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "竖向城市天际线+晨光；中下留干净渐变区给 Logo；空镜无人物/按钮。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s01_360x160.png",
+        "preview/ill_s01_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S02",
+      "name": "创建公司·创业办公桌",
+      "file": "png/ill_s02.png",
+      "width": 1080,
+      "height": 720,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 60546,
+      "source": "src/ill_s02.svg",
+      "master": "src/ill_s02.svg",
+      "runtime_path": "ui_v2/scenes/ill_s02.png",
+      "runtime_key": "ui_v2/scenes/ill_s02",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=225 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "办公桌、笔记本、咖啡、窗光；空镜无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s02_360x160.png",
+        "preview/ill_s02_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S03",
+      "name": "CEO 创建·老板办公室",
+      "file": "png/ill_s03.png",
+      "width": 1080,
+      "height": 720,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 45242,
+      "source": "src/ill_s03.svg",
+      "master": "src/ill_s03.svg",
+      "runtime_path": "ui_v2/scenes/ill_s03.png",
+      "runtime_key": "ui_v2/scenes/ill_s03",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=225 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "书架、落地窗、老板桌；空镜无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s03_360x160.png",
+        "preview/ill_s03_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S04",
+      "name": "首次招聘·等候室",
+      "file": "png/ill_s04.png",
+      "width": 1080,
+      "height": 720,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 41775,
+      "source": "src/ill_s04.svg",
+      "master": "src/ill_s04.svg",
+      "runtime_path": "ui_v2/scenes/ill_s04.png",
+      "runtime_key": "ui_v2/scenes/ill_s04",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=225 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "明亮等候室、两把椅子、前台；空镜无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s04_360x160.png",
+        "preview/ill_s04_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S10",
+      "name": "员工详情·办公桌近景",
+      "file": "png/ill_s10.png",
+      "width": 1080,
+      "height": 560,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 59684,
+      "source": "src/ill_s10.svg",
+      "master": "src/ill_s10.svg",
+      "runtime_path": "ui_v2/scenes/ill_s10.png",
+      "runtime_key": "ui_v2/scenes/ill_s10",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=141 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "个人办公桌近景；空镜无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s10_360x160.png",
+        "preview/ill_s10_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S12",
+      "name": "关闭公司·夜办公楼层",
+      "file": "png/ill_s12.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 21506,
+      "source": "src/ill_s12.svg",
+      "master": "src/ill_s12.svg",
+      "runtime_path": "ui_v2/scenes/ill_s12.png",
+      "runtime_key": "ui_v2/scenes/ill_s12",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "熄灯的夜办公楼层；深蓝低照度，无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s12_360x160.png",
+        "preview/ill_s12_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S13",
+      "name": "离线回归·日出办公楼",
+      "file": "png/ill_s13.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 32529,
+      "source": "src/ill_s13.svg",
+      "master": "src/ill_s13.svg",
+      "runtime_path": "ui_v2/scenes/ill_s13.png",
+      "runtime_key": "ui_v2/scenes/ill_s13",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "日出时的办公楼外景；暖色天际，无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s13_360x160.png",
+        "preview/ill_s13_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S14",
+      "name": "资金危机·雨天窗景",
+      "file": "png/ill_s14.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 41482,
+      "source": "src/ill_s14.svg",
+      "master": "src/ill_s14.svg",
+      "runtime_path": "ui_v2/scenes/ill_s14.png",
+      "runtime_key": "ui_v2/scenes/ill_s14",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "雨天窗景办公室；冷蓝低饱和，无人物。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s14_360x160.png",
+        "preview/ill_s14_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S18",
+      "name": "经营援助·资金到账",
+      "file": "png/ill_s18.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 49883,
+      "source": "src/ill_s18.svg",
+      "master": "src/ill_s18.svg",
+      "runtime_path": "ui_v2/scenes/ill_s18.png",
+      "runtime_key": "ui_v2/scenes/ill_s18",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "纸钞/盾牌/到账上升箭头；概念插图，无文字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s18_360x160.png",
+        "preview/ill_s18_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S19",
+      "name": "异常恢复·文件夹+盾牌",
+      "file": "png/ill_s19.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 54135,
+      "source": "src/ill_s19.svg",
+      "master": "src/ill_s19.svg",
+      "runtime_path": "ui_v2/scenes/ill_s19.png",
+      "runtime_key": "ui_v2/scenes/ill_s19",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "文件夹+盾牌+对勾；概念插图，无文字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s19_360x160.png",
+        "preview/ill_s19_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S20",
+      "name": "云备份·云端保险柜",
+      "file": "png/ill_s20.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 52248,
+      "source": "src/ill_s20.svg",
+      "master": "src/ill_s20.svg",
+      "runtime_path": "ui_v2/scenes/ill_s20.png",
+      "runtime_key": "ui_v2/scenes/ill_s20",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "云端保险柜；数据点汇入云，无文字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s20_360x160.png",
+        "preview/ill_s20_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S21",
+      "name": "云冲突·两份进度账本",
+      "file": "png/ill_s21.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 63090,
+      "source": "src/ill_s21.svg",
+      "master": "src/ill_s21.svg",
+      "runtime_path": "ui_v2/scenes/ill_s21.png",
+      "runtime_key": "ui_v2/scenes/ill_s21",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "两份进度账本对比，中间警示菱形；无文字/数字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s21_360x160.png",
+        "preview/ill_s21_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S22",
+      "name": "云删除·打开的保险柜",
+      "file": "png/ill_s22.png",
+      "width": 720,
+      "height": 480,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 47678,
+      "source": "src/ill_s22.svg",
+      "master": "src/ill_s22.svg",
+      "runtime_path": "ui_v2/scenes/ill_s22.png",
+      "runtime_key": "ui_v2/scenes/ill_s22",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=150 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "打开的保险柜+确认对勾；无文字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s22_360x160.png",
+        "preview/ill_s22_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S23",
+      "name": "主营市场趋势·城市天际线",
+      "file": "png/ill_s23.png",
+      "width": 720,
+      "height": 400,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 26466,
+      "source": "src/ill_s23.svg",
+      "master": "src/ill_s23.svg",
+      "runtime_path": "ui_v2/scenes/ill_s23.png",
+      "runtime_key": "ui_v2/scenes/ill_s23",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=108 w=720 h=192; preview 360x160 & 360x96",
+      "notes": "城市商务天际线+趋势线；无文字。",
+      "category": "scene",
+      "preview": [
+        "preview/ill_s23_360x160.png",
+        "preview/ill_s23_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "STA-03",
+      "name": "重置警告",
+      "file": "png/sta_03.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 7203,
+      "source": "src/sta_03.svg",
+      "master": "src/sta_03.svg",
+      "runtime_path": "ui_v2/status/sta_03.png",
+      "runtime_key": "ui_v2/status/sta_03",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "循环箭头+感叹号；警示橙 #D9922E。",
+      "category": "status",
+      "preview": [
+        "preview/sta_03_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-04",
+      "name": "现金风险",
+      "file": "png/sta_04.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6143,
+      "source": "src/sta_04.svg",
+      "master": "src/sta_04.svg",
+      "runtime_path": "ui_v2/status/sta_04.png",
+      "runtime_key": "ui_v2/status/sta_04",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "钱袋+下箭头；危险红 #C75353。",
+      "category": "status",
+      "preview": [
+        "preview/sta_04_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-05",
+      "name": "裁员风险",
+      "file": "png/sta_05.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6590,
+      "source": "src/sta_05.svg",
+      "master": "src/sta_05.svg",
+      "runtime_path": "ui_v2/status/sta_05.png",
+      "runtime_key": "ui_v2/status/sta_05",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "人物剪影+减号；警示橙。",
+      "category": "status",
+      "preview": [
+        "preview/sta_05_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-06",
+      "name": "援助成功",
+      "file": "png/sta_06.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 7167,
+      "source": "src/sta_06.svg",
+      "master": "src/sta_06.svg",
+      "runtime_path": "ui_v2/status/sta_06.png",
+      "runtime_key": "ui_v2/status/sta_06",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "手+盾+对勾；盈利绿 #2E9E6B。",
+      "category": "status",
+      "preview": [
+        "preview/sta_06_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-07",
+      "name": "存档错误",
+      "file": "png/sta_07.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6013,
+      "source": "src/sta_07.svg",
+      "master": "src/sta_07.svg",
+      "runtime_path": "ui_v2/status/sta_07.png",
+      "runtime_key": "ui_v2/status/sta_07",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "软盘+叉；危险红。",
+      "category": "status",
+      "preview": [
+        "preview/sta_07_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-09",
+      "name": "云待上传",
+      "file": "png/sta_09.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 7885,
+      "source": "src/sta_09.svg",
+      "master": "src/sta_09.svg",
+      "runtime_path": "ui_v2/status/sta_09.png",
+      "runtime_key": "ui_v2/status/sta_09",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "云+上箭头；主蓝 #3668B2。",
+      "category": "status",
+      "preview": [
+        "preview/sta_09_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-10",
+      "name": "云已确认",
+      "file": "png/sta_10.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 8192,
+      "source": "src/sta_10.svg",
+      "master": "src/sta_10.svg",
+      "runtime_path": "ui_v2/status/sta_10.png",
+      "runtime_key": "ui_v2/status/sta_10",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "云+对勾；盈利绿。",
+      "category": "status",
+      "preview": [
+        "preview/sta_10_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-11",
+      "name": "存档冲突",
+      "file": "png/sta_11.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 9586,
+      "source": "src/sta_11.svg",
+      "master": "src/sta_11.svg",
+      "runtime_path": "ui_v2/status/sta_11.png",
+      "runtime_key": "ui_v2/status/sta_11",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "两份文档+警示三角；警示橙。",
+      "category": "status",
+      "preview": [
+        "preview/sta_11_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-12",
+      "name": "删除待确认",
+      "file": "png/sta_12.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 7564,
+      "source": "src/sta_12.svg",
+      "master": "src/sta_12.svg",
+      "runtime_path": "ui_v2/status/sta_12.png",
+      "runtime_key": "ui_v2/status/sta_12",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "垃圾桶+问号；中性蓝灰。",
+      "category": "status",
+      "preview": [
+        "preview/sta_12_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "STA-13",
+      "name": "广告奖励待核",
+      "file": "png/sta_13.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 9360,
+      "source": "src/sta_13.svg",
+      "master": "src/sta_13.svg",
+      "runtime_path": "ui_v2/status/sta_13.png",
+      "runtime_key": "ui_v2/status/sta_13",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "播放键+沙漏；金色等待。",
+      "category": "status",
+      "preview": [
+        "preview/sta_13_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "AD-01",
+      "name": "自愿观看视频角标",
+      "file": "png/ad_01.png",
+      "width": 360,
+      "height": 280,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15621,
+      "source": "src/ad_01.svg",
+      "master": "src/ad_01.svg",
+      "runtime_path": "ui_v2/ads/ad_01.png",
+      "runtime_key": "ui_v2/ads/ad_01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "播放圆钮+胶卷；不烘焙文字。",
+      "category": "ad",
+      "preview": [
+        "preview/ad_01_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "AD-02",
+      "name": "免一次招聘费券",
+      "file": "png/ad_02.png",
+      "width": 360,
+      "height": 280,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 25657,
+      "source": "src/ad_02.svg",
+      "master": "src/ad_02.svg",
+      "runtime_path": "ui_v2/ads/ad_02.png",
+      "runtime_key": "ui_v2/ads/ad_02",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "票券+剪刀虚线；不做成已获得状态（无对勾/盖章）。",
+      "category": "ad",
+      "preview": [
+        "preview/ad_02_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "BAD-01",
+      "name": "三年连续盈利奖章",
+      "file": "png/bad_01.png",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 35628,
+      "source": "src/bad_01.svg",
+      "master": "src/bad_01.svg",
+      "runtime_path": "ui_v2/badges/bad_01.png",
+      "runtime_key": "ui_v2/badges/bad_01",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "金色奖章+抽象数字 3（路径绘制）；无其他文字。",
+      "category": "badge",
+      "preview": [
+        "preview/bad_01_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "RANK-04",
+      "name": "真实榜入口插图",
+      "file": "png/rank_04.png",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 25591,
+      "source": "src/rank_04.svg",
+      "master": "src/rank_04.svg",
+      "runtime_path": "ui_v2/rank/rank_04.png",
+      "runtime_key": "ui_v2/rank/rank_04",
+      "fit": "contain",
+      "crop_focus": {
+        "anchor": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain; 128px light/dark alpha review",
+      "notes": "榜单板+柱状条；不画名次数字。",
+      "category": "rank",
+      "preview": [
+        "preview/rank_04_alpha_review.png"
+      ]
+    },
+    {
+      "asset_id": "EVT-01",
+      "name": "客户需求变化",
+      "file": "png/evt_01.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 40252,
+      "source": "src/evt_01.svg",
+      "master": "src/evt_01.svg",
+      "runtime_path": "ui_v2/events/evt_01.png",
+      "runtime_key": "ui_v2/events/evt_01",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=162 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "商店+上升曲线；事件插图，无人物/文字。",
+      "category": "event",
+      "preview": [
+        "preview/evt_01_360x160.png",
+        "preview/evt_01_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "EVT-02",
+      "name": "设备维护",
+      "file": "png/evt_02.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 62961,
+      "source": "src/evt_02.svg",
+      "master": "src/evt_02.svg",
+      "runtime_path": "ui_v2/events/evt_02.png",
+      "runtime_key": "ui_v2/events/evt_02",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=162 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "机器+扳手；无文字。",
+      "category": "event",
+      "preview": [
+        "preview/evt_02_360x160.png",
+        "preview/evt_02_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "EVT-03",
+      "name": "市场景气波动",
+      "file": "png/evt_03.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 67793,
+      "source": "src/evt_03.svg",
+      "master": "src/evt_03.svg",
+      "runtime_path": "ui_v2/events/evt_03.png",
+      "runtime_key": "ui_v2/events/evt_03",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=162 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "波浪曲线+城市剪影；无文字。",
+      "category": "event",
+      "preview": [
+        "preview/evt_03_360x160.png",
+        "preview/evt_03_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "EVT-04",
+      "name": "人才相关事件",
+      "file": "png/evt_04.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 57294,
+      "source": "src/evt_04.svg",
+      "master": "src/evt_04.svg",
+      "runtime_path": "ui_v2/events/evt_04.png",
+      "runtime_key": "ui_v2/events/evt_04",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=162 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "两个人头像剪影+对话气泡；无文字。",
+      "category": "event",
+      "preview": [
+        "preview/evt_04_360x160.png",
+        "preview/evt_04_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "EVT-05",
+      "name": "运营成本变化",
+      "file": "png/evt_05.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 64219,
+      "source": "src/evt_05.svg",
+      "master": "src/evt_05.svg",
+      "runtime_path": "ui_v2/events/evt_05.png",
+      "runtime_key": "ui_v2/events/evt_05",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52) -> src x=0 y=162 w=1080 h=288; preview 360x160 & 360x96",
+      "notes": "账单+硬币堆；无金额/文字。",
+      "category": "event",
+      "preview": [
+        "preview/evt_05_360x160.png",
+        "preview/evt_05_360x96.png"
+      ]
+    }
+  ]
+}

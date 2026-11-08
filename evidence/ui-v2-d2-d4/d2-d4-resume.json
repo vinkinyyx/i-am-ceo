@@ -1,0 +1,40 @@
+{
+  "url": "http://127.0.0.1:8153/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "D3-resume-progress-1of2",
+      "status": "PASS",
+      "detail": {
+        "headMid": 1,
+        "resumed": 1
+      }
+    },
+    {
+      "id": "D3-resume-no-double-charge",
+      "status": "PASS",
+      "detail": {
+        "cashMid": 293582,
+        "cashAfterReload": 293582
+      }
+    },
+    {
+      "id": "D3-resume-complete-2of2",
+      "status": "PASS",
+      "detail": null
+    }
+  ],
+  "checkCounts": {
+    "PASS": 3,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

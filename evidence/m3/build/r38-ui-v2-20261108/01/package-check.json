@@ -1,0 +1,65 @@
+{
+  "releaseId": "r38-ui-v2-20261108",
+  "gameVersion": "0.1.0",
+  "purpose": "diagnostic",
+  "verifiedAt": "2026-11-08T16:44:04.055Z",
+  "projectSizeBudgetBytes": 20971520,
+  "zipPath": "build\\release\\r38-ui-v2-20261108\\01\\game.zip",
+  "sizeBytes": 11544165,
+  "sizeMib": 11.009,
+  "sha256": "614133fdbcf9bcb99e7e6e726a04775fe3012729354bac855dc1b6254ebf07df",
+  "entryCount": 598,
+  "gameJson": {
+    "deviceOrientation": "portrait",
+    "networkTimeout": {
+      "request": 5000,
+      "connectSocket": 5000,
+      "uploadFile": 5000,
+      "downloadFile": 500000
+    },
+    "productVersion": "0.1.0",
+    "convertScriptVersion": "2.0.4-ts"
+  },
+  "applicationEntry": "application.90501.js",
+  "gameJsRelativeReferences": [
+    "./application.90501.js",
+    "./engine-adapter.e45dd.js",
+    "./first-screen",
+    "./web-adapter.898ec.js"
+  ],
+  "productionProfile": {
+    "kind": "taptap",
+    "releaseId": "r38-ui-v2-20261108",
+    "gameVersion": "0.1.0"
+  },
+  "findings": {
+    "backslashEntries": [],
+    "absoluteOrTraversal": [],
+    "duplicateNames": {},
+    "missing": [],
+    "forbidden": [],
+    "secrets": [],
+    "versionMismatch": null,
+    "profileMismatch": null,
+    "missingResourceReferences": [],
+    "releaseConfigErrors": [],
+    "adsEnvironment": "disabled",
+    "policyVersion": 3,
+    "configMode": {
+      "purpose": "diagnostic",
+      "cloud": {
+        "enabled": false,
+        "environment": "disabled"
+      },
+      "leaderboards": {
+        "enabled": false,
+        "environment": "disabled"
+      },
+      "ads": {
+        "enabled": false,
+        "environment": "disabled"
+      },
+      "authEndpointSet": false
+    }
+  }
+}

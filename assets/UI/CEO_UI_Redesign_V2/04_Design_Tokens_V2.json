@@ -1,0 +1,73 @@
+{
+  "project": "我是CEO",
+  "version": "2.0",
+  "date": "2026-11-08",
+  "runtime": {
+    "engine": "Cocos Creator 3.8.8",
+    "logic_width": 375,
+    "logic_height": 812,
+    "fit": "FIXED_WIDTH + SafeArea",
+    "concept_export": "1080×2400 PNG, 9:20; not runtime clickable UI",
+    "orientation": "portrait",
+    "test_viewports": [
+      "360×640",
+      "375×812",
+      "390×844",
+      "428×926",
+      "1080×2400"
+    ]
+  },
+  "geometry": {
+    "page_padding": 16,
+    "card_padding": 12,
+    "card_gap": 12,
+    "section_gap": 16,
+    "card_radius": 12,
+    "button_radius": 8,
+    "button_visual_primary_height": 42,
+    "button_visual_secondary_height": 34,
+    "button_hit_min": 44,
+    "tap_gap_min": 8,
+    "bottom_nav_visual_height": 58,
+    "topbar_visual_height": 52,
+    "hero_regular_height_range": [
+      140,
+      200
+    ],
+    "hero_modal_height_range": [
+      80,
+      140
+    ],
+    "list_row_min_height": 52
+  },
+  "color": {
+    "primary": "#3668B2",
+    "primary_strong": "#315FA4",
+    "primary_soft": "#E4EDFB",
+    "canvas": "#F4F6FA",
+    "surface": "#FFFFFF",
+    "text": "#243247",
+    "text_secondary": "#53647A",
+    "divider": "#E3E8F0",
+    "profit": "#237652",
+    "loss": "#AB3D45",
+    "gold": "#E5B85D",
+    "warning": "#D9922E",
+    "disabled": "#B7BFCB"
+  },
+  "font": {
+    "title": 21,
+    "section": 16,
+    "body": 15,
+    "label": 13,
+    "caption": 12,
+    "metric": 26,
+    "button": 16
+  },
+  "navigation": [
+    "公司",
+    "部门",
+    "人才",
+    "排行"
+  ]
+}

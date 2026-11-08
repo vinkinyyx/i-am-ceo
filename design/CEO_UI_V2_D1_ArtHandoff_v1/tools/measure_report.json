@@ -1,0 +1,427 @@
+[
+  {
+    "asset_id": "ILL-S06",
+    "width": 1080,
+    "height": 560,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 725619
+  },
+  {
+    "asset_id": "ILL-S07",
+    "width": 1080,
+    "height": 560,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 799425
+  },
+  {
+    "asset_id": "ILL-S08",
+    "width": 1080,
+    "height": 560,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 678577
+  },
+  {
+    "asset_id": "ILL-S09",
+    "width": 1080,
+    "height": 560,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 764965
+  },
+  {
+    "asset_id": "ILL-S15",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 808705
+  },
+  {
+    "asset_id": "OLD-NAV-03",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 2755
+  },
+  {
+    "asset_id": "OLD-NAV-04",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 2568
+  },
+  {
+    "asset_id": "OLD-NAV-05",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6166
+  },
+  {
+    "asset_id": "OLD-NAV-06",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 8297
+  },
+  {
+    "asset_id": "OLD-NAV-07",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 2043
+  },
+  {
+    "asset_id": "OLD-NAV-08",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 1756
+  },
+  {
+    "asset_id": "OLD-NAV-09",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 14808
+  },
+  {
+    "asset_id": "ICO-D01",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 4116
+  },
+  {
+    "asset_id": "ICO-D02",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 10972
+  },
+  {
+    "asset_id": "ICO-D03",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6371
+  },
+  {
+    "asset_id": "ICO-D04",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 8218
+  },
+  {
+    "asset_id": "ICO-D05",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 4976
+  },
+  {
+    "asset_id": "ICO-D06",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 11140
+  },
+  {
+    "asset_id": "ICO-K03",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6590
+  },
+  {
+    "asset_id": "ICO-K04",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 2379
+  },
+  {
+    "asset_id": "ICO-K07",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 4647
+  },
+  {
+    "asset_id": "OLD-AV-02",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 55188,
+    "note": "同一身份配色变体：源自 OLD-AV-01，仅衣装 HSV 调色"
+  },
+  {
+    "asset_id": "OLD-AV-03",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 53515,
+    "note": "同一身份配色变体：源自 OLD-AV-01，仅衣装 HSV 调色"
+  },
+  {
+    "asset_id": "OLD-AV-04",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 13321
+  },
+  {
+    "asset_id": "OLD-AV-05",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 13771
+  },
+  {
+    "asset_id": "OLD-AV-06",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 13873
+  },
+  {
+    "asset_id": "OLD-AV-07",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 16893
+  },
+  {
+    "asset_id": "OLD-AV-08",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 17332
+  },
+  {
+    "asset_id": "OLD-AV-09",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 17439
+  },
+  {
+    "asset_id": "OLD-AV-10",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15110
+  },
+  {
+    "asset_id": "OLD-AV-11",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15560
+  },
+  {
+    "asset_id": "OLD-AV-12",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15661
+  },
+  {
+    "asset_id": "OLD-AV-13",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 17352
+  },
+  {
+    "asset_id": "OLD-AV-14",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 17796
+  },
+  {
+    "asset_id": "OLD-AV-15",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 17905
+  },
+  {
+    "asset_id": "OLD-AV-16",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15449
+  },
+  {
+    "asset_id": "OLD-AV-17",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15893
+  },
+  {
+    "asset_id": "OLD-AV-18",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15996
+  },
+  {
+    "asset_id": "OLD-AV-19",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 14739
+  },
+  {
+    "asset_id": "OLD-AV-20",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15186
+  },
+  {
+    "asset_id": "OLD-AV-21",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15286
+  },
+  {
+    "asset_id": "OLD-AV-22",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 12391
+  },
+  {
+    "asset_id": "OLD-AV-23",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 12844
+  },
+  {
+    "asset_id": "OLD-AV-24",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 12954
+  },
+  {
+    "asset_id": "RANK-01",
+    "width": 384,
+    "height": 384,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 58788
+  },
+  {
+    "asset_id": "RANK-02",
+    "width": 384,
+    "height": 384,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 26950
+  },
+  {
+    "asset_id": "RANK-03",
+    "width": 384,
+    "height": 384,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 19176
+  }
+]

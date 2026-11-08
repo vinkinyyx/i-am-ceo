@@ -1,0 +1,104 @@
+[
+  {
+    "asset_id": "ILL-S05",
+    "file": "png/v2_ill_s05_office_scene.png",
+    "width": 1080,
+    "height": 660,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "opaque_ratio": 1.0,
+    "bbox": [
+      0,
+      0,
+      1080,
+      660
+    ],
+    "bytes": 471614
+  },
+  {
+    "asset_id": "CHR-ASSIST01",
+    "file": "png/v2_chr_assist01.png",
+    "width": 720,
+    "height": 960,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_ratio": 0.4799,
+    "bbox": [
+      37,
+      30,
+      682,
+      960
+    ],
+    "bytes": 451804
+  },
+  {
+    "asset_id": "CHR-HR01",
+    "file": "png/v2_chr_hr01.png",
+    "width": 720,
+    "height": 960,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_ratio": 0.5094,
+    "bbox": [
+      33,
+      30,
+      686,
+      960
+    ],
+    "bytes": 389384
+  },
+  {
+    "asset_id": "OLD-AV-01",
+    "file": "png/v2_old_av_01.png",
+    "width": 256,
+    "height": 256,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_ratio": 0.4618,
+    "bbox": [
+      0,
+      13,
+      256,
+      255
+    ],
+    "bytes": 51785
+  },
+  {
+    "asset_id": "OLD-NAV-01",
+    "file": "png/v2_old_nav_01_selected.png",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_ratio": 0.5152,
+    "bbox": [
+      21,
+      13,
+      171,
+      177
+    ],
+    "bytes": 11165
+  },
+  {
+    "asset_id": "OLD-NAV-02",
+    "file": "png/v2_old_nav_02_inactive.png",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "opaque_ratio": 0.3332,
+    "bbox": [
+      21,
+      13,
+      171,
+      177
+    ],
+    "bytes": 3637
+  }
+]

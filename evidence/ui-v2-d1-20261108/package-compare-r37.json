@@ -1,0 +1,20 @@
+{
+  "checkedAt": "2026-11-08T14:55:02.382Z",
+  "r37Baseline": {
+    "file": "build/release/r37-20261107/02/game.zip",
+    "bytes": 3807146,
+    "zipEntries": 144,
+    "pngEntries": 6,
+    "v2ArtEntries": 0
+  },
+  "currentBuild": {
+    "dir": "build/web-mobile",
+    "files": 239,
+    "bytes": 17328171,
+    "pngs": 57,
+    "resourceIndexEntries": 190,
+    "uiV2SpriteKeys": 159
+  },
+  "assetsUILeakInBuild": 0,
+  "notes": "R37 为旧基线（无 V2 美术）；当前构建含 53 个 V2 SpriteFrame 键（见 resource-keys-check.json），assets/UI 设计区参考图 0 泄漏。"
+}

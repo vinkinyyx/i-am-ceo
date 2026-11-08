@@ -1,0 +1,34 @@
+{
+  "url": "http://127.0.0.1:8176/",
+  "viewport": {
+    "width": 1080,
+    "height": 2400
+  },
+  "checks": [],
+  "checkCounts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [
+    {
+      "kind": "requestfailed",
+      "url": "http://127.0.0.1:8176/assets/resources/import/6c/6c74a159-fcac-4e0f-86a1-cebdac847599@f9941.json",
+      "message": "net::ERR_FAILED"
+    },
+    {
+      "kind": "requestfailed",
+      "url": "http://127.0.0.1:8176/assets/resources/import/91/91be5cfc-9935-410e-b6e1-2d7cc48a0066@f9941.json",
+      "message": "net::ERR_FAILED"
+    },
+    {
+      "kind": "requestfailed",
+      "url": "http://127.0.0.1:8176/assets/resources/import/6c/6c74a159-fcac-4e0f-86a1-cebdac847599@f9941.json",
+      "message": "net::ERR_FAILED"
+    }
+  ],
+  "status": "FAIL",
+  "exitCode": 1
+}

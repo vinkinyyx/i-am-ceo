@@ -1,0 +1,462 @@
+[
+  {
+    "asset_id": "ICO-I01",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6719,
+    "runtime_path": "ui_v2/industries/ico_i01.png"
+  },
+  {
+    "asset_id": "ICO-I02",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 8118,
+    "runtime_path": "ui_v2/industries/ico_i02.png"
+  },
+  {
+    "asset_id": "ICO-I03",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 2940,
+    "runtime_path": "ui_v2/industries/ico_i03.png"
+  },
+  {
+    "asset_id": "ICO-K09",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 4506,
+    "runtime_path": "ui_v2/business/ico_k09.png"
+  },
+  {
+    "asset_id": "ICO-K10",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 8549,
+    "runtime_path": "ui_v2/business/ico_k10.png"
+  },
+  {
+    "asset_id": "ICO-K12",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 5655,
+    "runtime_path": "ui_v2/business/ico_k12.png"
+  },
+  {
+    "asset_id": "ICO-K13",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 4641,
+    "runtime_path": "ui_v2/business/ico_k13.png"
+  },
+  {
+    "asset_id": "ICO-K14",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 10001,
+    "runtime_path": "ui_v2/business/ico_k14.png"
+  },
+  {
+    "asset_id": "ICO-K15",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6801,
+    "runtime_path": "ui_v2/business/ico_k15.png"
+  },
+  {
+    "asset_id": "CHR-CEO01",
+    "width": 720,
+    "height": 960,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 115144,
+    "runtime_path": "ui_v2/characters/chr_ceo01.png"
+  },
+  {
+    "asset_id": "CHR-GUIDE01",
+    "width": 720,
+    "height": 960,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 161875,
+    "runtime_path": "ui_v2/characters/chr_guide01.png"
+  },
+  {
+    "asset_id": "CHR-ADVISOR01",
+    "width": 720,
+    "height": 960,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 121766,
+    "runtime_path": "ui_v2/characters/chr_advisor01.png"
+  },
+  {
+    "asset_id": "BRD-01",
+    "width": 512,
+    "height": 512,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 89538,
+    "runtime_path": "ui_v2/brand/brd_01.png"
+  },
+  {
+    "asset_id": "ILL-S01",
+    "width": 1080,
+    "height": 2400,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 256979,
+    "runtime_path": "ui_v2/scenes/ill_s01.png"
+  },
+  {
+    "asset_id": "ILL-S02",
+    "width": 1080,
+    "height": 720,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 60546,
+    "runtime_path": "ui_v2/scenes/ill_s02.png"
+  },
+  {
+    "asset_id": "ILL-S03",
+    "width": 1080,
+    "height": 720,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 45242,
+    "runtime_path": "ui_v2/scenes/ill_s03.png"
+  },
+  {
+    "asset_id": "ILL-S04",
+    "width": 1080,
+    "height": 720,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 41775,
+    "runtime_path": "ui_v2/scenes/ill_s04.png"
+  },
+  {
+    "asset_id": "ILL-S10",
+    "width": 1080,
+    "height": 560,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 59684,
+    "runtime_path": "ui_v2/scenes/ill_s10.png"
+  },
+  {
+    "asset_id": "ILL-S12",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 21506,
+    "runtime_path": "ui_v2/scenes/ill_s12.png"
+  },
+  {
+    "asset_id": "ILL-S13",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 32529,
+    "runtime_path": "ui_v2/scenes/ill_s13.png"
+  },
+  {
+    "asset_id": "ILL-S14",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 41482,
+    "runtime_path": "ui_v2/scenes/ill_s14.png"
+  },
+  {
+    "asset_id": "ILL-S18",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 49883,
+    "runtime_path": "ui_v2/scenes/ill_s18.png"
+  },
+  {
+    "asset_id": "ILL-S19",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 54135,
+    "runtime_path": "ui_v2/scenes/ill_s19.png"
+  },
+  {
+    "asset_id": "ILL-S20",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 52248,
+    "runtime_path": "ui_v2/scenes/ill_s20.png"
+  },
+  {
+    "asset_id": "ILL-S21",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 63090,
+    "runtime_path": "ui_v2/scenes/ill_s21.png"
+  },
+  {
+    "asset_id": "ILL-S22",
+    "width": 720,
+    "height": 480,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 47678,
+    "runtime_path": "ui_v2/scenes/ill_s22.png"
+  },
+  {
+    "asset_id": "ILL-S23",
+    "width": 720,
+    "height": 400,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 26466,
+    "runtime_path": "ui_v2/scenes/ill_s23.png"
+  },
+  {
+    "asset_id": "STA-03",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 7203,
+    "runtime_path": "ui_v2/status/sta_03.png"
+  },
+  {
+    "asset_id": "STA-04",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6143,
+    "runtime_path": "ui_v2/status/sta_04.png"
+  },
+  {
+    "asset_id": "STA-05",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6590,
+    "runtime_path": "ui_v2/status/sta_05.png"
+  },
+  {
+    "asset_id": "STA-06",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 7167,
+    "runtime_path": "ui_v2/status/sta_06.png"
+  },
+  {
+    "asset_id": "STA-07",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 6013,
+    "runtime_path": "ui_v2/status/sta_07.png"
+  },
+  {
+    "asset_id": "STA-09",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 7885,
+    "runtime_path": "ui_v2/status/sta_09.png"
+  },
+  {
+    "asset_id": "STA-10",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 8192,
+    "runtime_path": "ui_v2/status/sta_10.png"
+  },
+  {
+    "asset_id": "STA-11",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 9586,
+    "runtime_path": "ui_v2/status/sta_11.png"
+  },
+  {
+    "asset_id": "STA-12",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 7564,
+    "runtime_path": "ui_v2/status/sta_12.png"
+  },
+  {
+    "asset_id": "STA-13",
+    "width": 192,
+    "height": 192,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 9360,
+    "runtime_path": "ui_v2/status/sta_13.png"
+  },
+  {
+    "asset_id": "AD-01",
+    "width": 360,
+    "height": 280,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 15621,
+    "runtime_path": "ui_v2/ads/ad_01.png"
+  },
+  {
+    "asset_id": "AD-02",
+    "width": 360,
+    "height": 280,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 25657,
+    "runtime_path": "ui_v2/ads/ad_02.png"
+  },
+  {
+    "asset_id": "BAD-01",
+    "width": 384,
+    "height": 384,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 35628,
+    "runtime_path": "ui_v2/badges/bad_01.png"
+  },
+  {
+    "asset_id": "RANK-04",
+    "width": 384,
+    "height": 384,
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "bytes": 25591,
+    "runtime_path": "ui_v2/rank/rank_04.png"
+  },
+  {
+    "asset_id": "EVT-01",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 40252,
+    "runtime_path": "ui_v2/events/evt_01.png"
+  },
+  {
+    "asset_id": "EVT-02",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 62961,
+    "runtime_path": "ui_v2/events/evt_02.png"
+  },
+  {
+    "asset_id": "EVT-03",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 67793,
+    "runtime_path": "ui_v2/events/evt_03.png"
+  },
+  {
+    "asset_id": "EVT-04",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 57294,
+    "runtime_path": "ui_v2/events/evt_04.png"
+  },
+  {
+    "asset_id": "EVT-05",
+    "width": 1080,
+    "height": 600,
+    "mode": "RGB",
+    "alpha_min": 255,
+    "alpha_max": 255,
+    "bytes": 64219,
+    "runtime_path": "ui_v2/events/evt_05.png"
+  }
+]

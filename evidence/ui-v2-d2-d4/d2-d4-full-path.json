@@ -1,0 +1,266 @@
+{
+  "url": "http://127.0.0.1:8153/",
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "checks": [
+    {
+      "id": "D2-create-brand",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D2-create-guide",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D2-create-industry-icons",
+      "status": "PASS",
+      "detail": {
+        "count": 3,
+        "frames": 3
+      }
+    },
+    {
+      "id": "D2-create-scene-ill-s02",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D2-create-industry-uuid",
+      "status": "PASS",
+      "detail": [
+        "uuid:2eb9c099-8d41-4647-a125-6450e79d79a8@f9941",
+        "uuid:205fd6d0-09f9-4be4-b27d-697b18935e40@f9941",
+        "uuid:2f343768-6a33-465a-9604-3af98e4313f0@f9941"
+      ]
+    },
+    {
+      "id": "D2-ceo-scene-ill-s03",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 2
+      }
+    },
+    {
+      "id": "D2-ceo-figure-chr-ceo01",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D2-hire-scene-ill-s04",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 2
+      }
+    },
+    {
+      "id": "D2-hire-figure-chr-hr01",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D3-hire-confirm-avatar",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D3-first-hire-2-headcount",
+      "status": "PASS",
+      "detail": {
+        "headcount": 2
+      }
+    },
+    {
+      "id": "D3-first-hire-cash-decreases",
+      "status": "PASS",
+      "detail": {
+        "cashBefore": 300000,
+        "cashAfter": 287145
+      }
+    },
+    {
+      "id": "D2-company-banner",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 2
+      }
+    },
+    {
+      "id": "D2-time-icon-ico-k15",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-diagnosis-row",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-diagnosis-advisor",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-market-ill-s23",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-market-industry-icon",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-help-ico-k14",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-settings-ico-k09",
+      "status": "PASS",
+      "detail": {
+        "count": 2,
+        "frames": 2
+      }
+    },
+    {
+      "id": "D4-cloud-ill-s20",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-cloud-status-sta09-10",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-cloud-delete-unavailable",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 1
+      }
+    },
+    {
+      "id": "D4-cloud-delete-explained",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "id": "D4-rank-real-entry-gated",
+      "status": "PASS",
+      "detail": {
+        "count": 0,
+        "frames": 0
+      }
+    },
+    {
+      "id": "D4-rank-local-rows",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "id": "D3-year-end-settled",
+      "status": "PASS",
+      "detail": {
+        "reports": 1,
+        "waitedMs": 56381
+      }
+    },
+    {
+      "id": "D2-annual-deco-ill-s09",
+      "status": "PASS",
+      "detail": {
+        "count": 1,
+        "frames": 2
+      }
+    },
+    {
+      "id": "D3-annual-cash-bridge",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "id": "D4-annual-events",
+      "status": "SKIP",
+      "detail": "本年无随机事件（真实数据为空，不虚构）"
+    },
+    {
+      "id": "D3-close-reopen-new-run",
+      "status": "PASS",
+      "detail": {
+        "runBefore": "run_r356xl000000",
+        "runAfter": {
+          "runId": "run_m17iz3000002",
+          "employees": 0
+        }
+      }
+    },
+    {
+      "id": "D3-close-reopen-empty-headcount",
+      "status": "PASS",
+      "detail": {
+        "runId": "run_m17iz3000002",
+        "employees": 0
+      }
+    }
+  ],
+  "checkCounts": {
+    "PASS": 31,
+    "FAIL": 0,
+    "SKIP": 1,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "FAIL",
+  "exitCode": 1
+}

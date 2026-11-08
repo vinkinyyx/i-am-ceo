@@ -1,0 +1,16 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\verify-package.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO\\build\\release\\r38-ui-v2-20261108\\02\\game.zip",
+    "r38-ui-v2-20261108",
+    "0.1.0",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02",
+    "diagnostic"
+  ],
+  "startedAt": "2026-11-08T16:49:39.278Z",
+  "finishedAt": "2026-11-08T16:49:39.524Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02\\verify-package.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02\\verify-package.err.log"
+}

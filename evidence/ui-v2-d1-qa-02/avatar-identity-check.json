@@ -1,0 +1,71 @@
+{
+  "checkedAt": "2026-11-08T23:29:27",
+  "checks": [
+    {
+      "id": "av-same-spec-256-rgba",
+      "status": "PASS",
+      "detail": {
+        "OLD-AV-01": [
+          256,
+          256
+        ],
+        "OLD-AV-02": [
+          256,
+          256
+        ],
+        "OLD-AV-03": [
+          256,
+          256
+        ]
+      }
+    },
+    {
+      "id": "av-identical-alpha-boundary",
+      "status": "PASS",
+      "detail": null
+    },
+    {
+      "id": "OLD-AV-02-diff-only-in-clothing",
+      "status": "PASS",
+      "detail": {
+        "diffInsideClothing": 12441,
+        "diffOutsideClothing": 0,
+        "changingPixels": 12441
+      }
+    },
+    {
+      "id": "OLD-AV-03-diff-only-in-clothing",
+      "status": "PASS",
+      "detail": {
+        "diffInsideClothing": 12441,
+        "diffOutsideClothing": 0,
+        "changingPixels": 12441
+      }
+    },
+    {
+      "id": "av-thumb-44px-distinct",
+      "status": "PASS",
+      "detail": {
+        "meanRgb": {
+          "OLD-AV-01": [
+            69.6,
+            71.4,
+            82.7
+          ],
+          "OLD-AV-02": [
+            79.4,
+            78.9,
+            89.4
+          ],
+          "OLD-AV-03": [
+            62.7,
+            65.2,
+            73.5
+          ]
+        },
+        "sheet": "evidence\\ui-v2-d1-qa-02\\avatar-thumbs-44px.png"
+      }
+    }
+  ],
+  "status": "PASS"
+}

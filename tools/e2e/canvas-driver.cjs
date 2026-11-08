@@ -33,6 +33,24 @@ class CanvasDriver {
 
   async waitForCanvas(timeoutMs = 20_000) {
     await this.page.waitForFunction(() => typeof cc !== 'undefined' && !!cc.director?.getScene(), null, { timeout: timeoutMs });
+    await this.waitForInputReady();
+  }
+
+  /**
+   * Tap 转换流水线的 DOM 启动图（#tap-splash）覆盖在 canvas 上且 pointer-events: auto，
+   * 场景已渲染但启动图未撤下前的点击会被 DOM 层吞掉。真实玩家同样要等启动图消失后才能操作，
+   * 因此这里以「中心点命中的是 canvas 且启动图已移除」作为输入就绪门，而不是固定 sleep。
+   */
+  async waitForInputReady(timeoutMs = 20_000) {
+    await this.page.waitForFunction(() => {
+      if (document.getElementById('tap-splash')) return false;
+      const canvas = cc.game?.canvas;
+      if (!canvas) return false;
+      const rect = canvas.getBoundingClientRect();
+      if (!(rect.width > 0) || !(rect.height > 0)) return false;
+      const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2);
+      return hit === canvas;
+    }, null, { timeout: timeoutMs });
   }
 
   async geometry() {
@@ -43,8 +61,8 @@ class CanvasDriver {
     });
   }
 
-  async findLabels(text, { exact = true, parentContains, nth = 0 } = {}) {
-    return this.page.evaluate(({ text, exact, parentContains }) => {
+  async findLabels(text, { exact = true, parentContains, nth = 0, buttonOnly = false } = {}) {
+    return this.page.evaluate(({ text, exact, parentContains, buttonOnly }) => {
       // Creator release builds may expose the class as UITransformComponent and
       // minify constructor.name. Geometry must fail closed when no real transform exists.
       const UITransformType = cc.UITransform || cc.UITransformComponent;
@@ -64,6 +82,8 @@ class CanvasDriver {
               if (ancestor.getComponent(cc.Button)) { targetNode = ancestor; break; }
               ancestor = ancestor.parent;
             }
+            // 只接受真实挂在 Button 上的文案：纯提示 Label 即使包含同样文字也不是可点目标。
+            if (buttonOnly && targetNode === node && !node.getComponent(cc.Button)) return;
             const transform = targetNode.getComponent(UITransformType);
             if (!transform) throw new Error(`ui-transform-component-missing:${label.string}`);
             const box = transform?.getBoundingBoxToWorld();

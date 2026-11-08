@@ -1,0 +1,18 @@
+{
+  "url": "http://127.0.0.1:8176/",
+  "viewport": {
+    "width": 428,
+    "height": 926
+  },
+  "checks": [],
+  "checkCounts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "PASS",
+  "exitCode": 0
+}

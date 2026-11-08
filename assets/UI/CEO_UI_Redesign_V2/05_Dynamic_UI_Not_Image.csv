@@ -1,0 +1,16 @@
+﻿ui_id,名称,涉及页面,建议实现,不得生图原因/注意
+CHART-01,年报费用/利润表,UI-09,Cocos Label + Layout/ScrollView,右对齐完整金额，费用负号；不使用图像图表
+CHART-02,离线收益比较,UI-14,Cocos Label + 2横条（可选）,已结算数据，不额外计算收益
+CHART-03,需求/产能双条比较,"UI-20,EX-07",两条原生矩形进度条,同刻度，显示真实数值与差值
+CHART-04,行业景气轻趋势,EX-09,线段+点/仅箭头,只在状态中有历史数据时绘；否则不出现假曲线
+AVT-POOL,可复用员工头像组,"UI-04,UI-07,UI-10,UI-16",从B06 24张按角色种子选取,不是另一个素材文件
+TUT-01,公司创建高亮遮罩,UI-28,Mask/Graphics + 气泡组件,锚定真实控件，屏幕变动重定位
+TUT-02,CEO设定高亮遮罩,UI-29,Mask/Graphics + 气泡组件,与TUT-01共用Prefab
+TUT-03,首次招聘高亮遮罩,UI-30,Mask/Graphics + 气泡组件,与TUT-01共用Prefab
+TUT-04,经营指标高亮遮罩,UI-31,Mask/Graphics + 气泡组件,与TUT-01共用Prefab
+TUT-05,时间控制高亮遮罩,UI-32,Mask/Graphics + 气泡组件,与TUT-01共用Prefab
+TUT-06,年报高亮遮罩,UI-33,Mask/Graphics + 气泡组件,与TUT-01共用Prefab
+UI-STATE,所有数值/文字/用户输入,所有页面,Cocos Label/EditBox,严禁写入整屏PNG
+CTA-BTN,交互按钮及热区,所有页面,Cocos Button + 9-slice/Graphics,图面与触控区域分离，至少44×44
+CORE-NAV,四主Tab容器,UI-05~08,四等宽Cocos Tab组件,不新增第5 Tab
+DATA-PROGRESS,月进度/员工成长/排名趋势指示,多个页面,Cocos原生进度条/文字箭头,不从截图切取像素图

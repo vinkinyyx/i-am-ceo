@@ -1,0 +1,51 @@
+{
+  "url": "http://127.0.0.1:8176/",
+  "viewport": {
+    "width": 360,
+    "height": 640
+  },
+  "checks": [
+    {
+      "id": "hire-confirmed-with-single-fee-and-next-month",
+      "status": "PASS",
+      "detail": {
+        "fee": 5734,
+        "cash": [
+          1000000,
+          994266
+        ],
+        "staff": [
+          6,
+          7
+        ],
+        "feeEntries": 1,
+        "expected": 1,
+        "actual": 1,
+        "avatarId": "avatar_06"
+      }
+    },
+    {
+      "id": "reopen-preserves-hire-and-avatar",
+      "status": "PASS",
+      "detail": {
+        "avatarId": "avatar_06",
+        "cash": 994266
+      }
+    },
+    {
+      "id": "flow-exception",
+      "status": "FAIL",
+      "detail": "page.evaluate: TypeError: Cannot read properties of null (reading 'getBoundingBoxToWorld')\n    at visit (eval at evaluate (:370:30), <anonymous>:3:231)\n    at Array.forEach (<anonymous>)\n    at visit (eval at evaluate (:370:30), <anonymous>:3:330)\n    at Array.forEach (<anonymous>)\n    at visit (eval at evaluate (:370:30), <anonymous>:3:330)\n    at Array.forEach (<anonymous>)\n    at visit (eval at evaluate (:370:30), <anonymous>:3:330)\n    at Array.forEach (<anonymous>)\n    at visit (eval at evaluate (:370:30), <anonymous>:3:330)\n    at Array.forEach (<anonymous>)"
+    }
+  ],
+  "checkCounts": {
+    "PASS": 2,
+    "FAIL": 1,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "TIMEOUT": 0
+  },
+  "browserErrors": [],
+  "status": "FAIL",
+  "exitCode": 1
+}

@@ -1,0 +1,1412 @@
+{
+  "package": "CEO UI V2 D1 美术交接 v1",
+  "generated_for": "Cocos Creator 3.8.8; developer agent import",
+  "style_reference": "../CEO_UI_V2_ArtSamples_v1",
+  "assets": [
+    {
+      "asset_id": "ILL-S06",
+      "file": "png/ill_s06.png",
+      "width": 1080,
+      "height": 560,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 725619,
+      "source": "raw/ill_s06_generated.png",
+      "master": "master/ill_s06_master_1536.png",
+      "runtime_path": "ui_v2/scenes/ill_s06.png",
+      "runtime_key": "ui_v2/scenes/ill_s06",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52); preview containers 343×160 and 343×96",
+      "notes": "空镜，无烘焙文字；HR保留独立立绘合成。",
+      "preview": [
+        "preview/ill_s06_160.png",
+        "preview/ill_s06_96.png",
+        "preview/ill_s06_360x160.png",
+        "preview/ill_s06_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S07",
+      "file": "png/ill_s07.png",
+      "width": 1080,
+      "height": 560,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 799425,
+      "source": "raw/ill_s07_generated.png",
+      "master": "master/ill_s07_master_1536.png",
+      "runtime_path": "ui_v2/scenes/ill_s07.png",
+      "runtime_key": "ui_v2/scenes/ill_s07",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52); preview containers 343×160 and 343×96",
+      "notes": "空镜，无烘焙文字；HR保留独立立绘合成。",
+      "preview": [
+        "preview/ill_s07_160.png",
+        "preview/ill_s07_96.png",
+        "preview/ill_s07_360x160.png",
+        "preview/ill_s07_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S08",
+      "file": "png/ill_s08.png",
+      "width": 1080,
+      "height": 560,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 678577,
+      "source": "raw/ill_s08_generated.png",
+      "master": "master/ill_s08_master_1536.png",
+      "runtime_path": "ui_v2/scenes/ill_s08.png",
+      "runtime_key": "ui_v2/scenes/ill_s08",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52); preview containers 343×160 and 343×96",
+      "notes": "空镜，无烘焙文字；HR保留独立立绘合成。",
+      "preview": [
+        "preview/ill_s08_160.png",
+        "preview/ill_s08_96.png",
+        "preview/ill_s08_360x160.png",
+        "preview/ill_s08_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S09",
+      "file": "png/ill_s09.png",
+      "width": 1080,
+      "height": 560,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 764965,
+      "source": "raw/ill_s09_generated.png",
+      "master": "master/ill_s09_master_1536.png",
+      "runtime_path": "ui_v2/scenes/ill_s09.png",
+      "runtime_key": "ui_v2/scenes/ill_s09",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52); preview containers 343×160 and 343×96",
+      "notes": "空镜，无烘焙文字；HR保留独立立绘合成。",
+      "preview": [
+        "preview/ill_s09_160.png",
+        "preview/ill_s09_96.png",
+        "preview/ill_s09_360x160.png",
+        "preview/ill_s09_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "ILL-S15",
+      "file": "png/ill_s15.png",
+      "width": 1080,
+      "height": 600,
+      "mode": "RGB",
+      "alpha_min": 255,
+      "alpha_max": 255,
+      "bytes": 808705,
+      "source": "raw/ill_s15_generated.png",
+      "master": "master/ill_s15_master_1536.png",
+      "runtime_path": "ui_v2/scenes/ill_s15.png",
+      "runtime_key": "ui_v2/scenes/ill_s15",
+      "fit": "cover center",
+      "crop_focus": {
+        "scene": [
+          0.5,
+          0.52
+        ]
+      },
+      "crop_rect": "cover center=(0.50,0.52); preview containers 343×160 and 343×96",
+      "notes": "空镜，无烘焙文字；HR保留独立立绘合成。",
+      "preview": [
+        "preview/ill_s15_160.png",
+        "preview/ill_s15_96.png",
+        "preview/ill_s15_360x160.png",
+        "preview/ill_s15_360x96.png"
+      ]
+    },
+    {
+      "asset_id": "OLD-NAV-03",
+      "file": "png/old_nav_03.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 2755,
+      "source": "src/old_nav_03.svg",
+      "master": "src/old_nav_03.svg",
+      "runtime_path": "ui/navigation/Nav_Department.png",
+      "runtime_key": "ui/navigation/Nav_Department",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Department.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_03_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Department",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-04",
+      "file": "png/old_nav_04.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 2568,
+      "source": "src/old_nav_04.svg",
+      "master": "src/old_nav_04.svg",
+      "runtime_path": "ui/navigation/Nav_Department_Inactive.png",
+      "runtime_key": "ui/navigation/Nav_Department_Inactive",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Department_Inactive.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_04_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Department_Inactive",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-05",
+      "file": "png/old_nav_05.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6166,
+      "source": "src/old_nav_05.svg",
+      "master": "src/old_nav_05.svg",
+      "runtime_path": "ui/navigation/Nav_Talent.png",
+      "runtime_key": "ui/navigation/Nav_Talent",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Talent.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_05_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Talent",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-06",
+      "file": "png/old_nav_06.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 8297,
+      "source": "src/old_nav_06.svg",
+      "master": "src/old_nav_06.svg",
+      "runtime_path": "ui/navigation/Nav_Talent_Inactive.png",
+      "runtime_key": "ui/navigation/Nav_Talent_Inactive",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Talent_Inactive.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_06_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Talent_Inactive",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-07",
+      "file": "png/old_nav_07.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 2043,
+      "source": "src/old_nav_07.svg",
+      "master": "src/old_nav_07.svg",
+      "runtime_path": "ui/navigation/Nav_Leaderboard.png",
+      "runtime_key": "ui/navigation/Nav_Leaderboard",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Leaderboard.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_07_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Leaderboard",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-08",
+      "file": "png/old_nav_08.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 1756,
+      "source": "src/old_nav_08.svg",
+      "master": "src/old_nav_08.svg",
+      "runtime_path": "ui/navigation/Nav_Leaderboard_Inactive.png",
+      "runtime_key": "ui/navigation/Nav_Leaderboard_Inactive",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "按样板导航状态色；轮廓配对。B06源核验：Nav_Leaderboard_Inactive.svg 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_08_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Leaderboard_Inactive",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-NAV-09",
+      "file": "png/old_nav_09.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 14808,
+      "source": "src/old_nav_09.svg",
+      "master": "src/old_nav_09.svg",
+      "runtime_path": "ui/navigation/Nav_Settings.png",
+      "runtime_key": "ui/navigation/Nav_Settings",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "设置入口图标，不属于底部 Tab。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_nav_09_alpha_review.png"
+      ],
+      "source_key": "ui/navigation/Nav_Settings",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D01",
+      "file": "png/ico_d01.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 4116,
+      "source": "src/ico_d01.svg",
+      "master": "src/ico_d01.svg",
+      "runtime_path": "ui/departments/Department_MainBusiness.png",
+      "runtime_key": "ui/departments/Department_MainBusiness",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 MainBusiness 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d01_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_MainBusiness",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D02",
+      "file": "png/ico_d02.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 10972,
+      "source": "src/ico_d02.svg",
+      "master": "src/ico_d02.svg",
+      "runtime_path": "ui/departments/Department_HumanResources.png",
+      "runtime_key": "ui/departments/Department_HumanResources",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 HumanResources 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d02_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_HumanResources",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D03",
+      "file": "png/ico_d03.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6371,
+      "source": "src/ico_d03.svg",
+      "master": "src/ico_d03.svg",
+      "runtime_path": "ui/departments/Department_Procurement.png",
+      "runtime_key": "ui/departments/Department_Procurement",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 Procurement 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d03_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_Procurement",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D04",
+      "file": "png/ico_d04.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 8218,
+      "source": "src/ico_d04.svg",
+      "master": "src/ico_d04.svg",
+      "runtime_path": "ui/departments/Department_Marketing.png",
+      "runtime_key": "ui/departments/Department_Marketing",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 Marketing 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d04_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_Marketing",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D05",
+      "file": "png/ico_d05.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 4976,
+      "source": "src/ico_d05.svg",
+      "master": "src/ico_d05.svg",
+      "runtime_path": "ui/departments/Department_CustomerService.png",
+      "runtime_key": "ui/departments/Department_CustomerService",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 CustomerService 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d05_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_CustomerService",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-D06",
+      "file": "png/ico_d06.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 11140,
+      "source": "src/ico_d06.svg",
+      "master": "src/ico_d06.svg",
+      "runtime_path": "ui/departments/Department_Finance.png",
+      "runtime_key": "ui/departments/Department_Finance",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "复用B06 Finance 轮廓；统一蓝白金与左上暖光。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/ico_d06_alpha_review.png"
+      ],
+      "source_key": "ui/departments/Department_Finance",
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-K03",
+      "file": "png/ico_k03.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 6590,
+      "source": "src/ico_k03.svg",
+      "master": "src/ico_k03.svg",
+      "runtime_path": "ui_v2/business/ico_k03.png",
+      "runtime_key": "ui_v2/business/ico_k03",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "资金指标：钱包轮廓，不含金额。",
+      "preview": [
+        "preview/ico_k03_alpha_review.png"
+      ],
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-K04",
+      "file": "png/ico_k04.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 2379,
+      "source": "src/ico_k04.svg",
+      "master": "src/ico_k04.svg",
+      "runtime_path": "ui_v2/business/ico_k04.png",
+      "runtime_key": "ui_v2/business/ico_k04",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "利润指标：递增柱形，不含数值；数值与图表由Cocos绘制。",
+      "preview": [
+        "preview/ico_k04_alpha_review.png"
+      ],
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "ICO-K07",
+      "file": "png/ico_k07.png",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 4647,
+      "source": "src/ico_k07.svg",
+      "master": "src/ico_k07.svg",
+      "runtime_path": "ui_v2/business/ico_k07.png",
+      "runtime_key": "ui_v2/business/ico_k07",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "报表说明：空白账本和勾记，不含文字或图表。",
+      "preview": [
+        "preview/ico_k07_alpha_review.png"
+      ],
+      "small_preview": "preview/04_icons_22px_pixel_review.png"
+    },
+    {
+      "asset_id": "OLD-AV-02",
+      "file": "png/old_av_02.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 55188,
+      "source": "../CEO_UI_V2_ArtSamples_v1/png/v2_old_av_01.png",
+      "master": "../CEO_UI_V2_ArtSamples_v1/png/v2_old_av_01.png",
+      "runtime_path": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "与 OLD-AV-01 同一身份：复用其母版，仅对蓝色衣装像素做 HSV 调色，皮肤/头发/五官/轮廓不变。保留 Asset Registry 原 source_key 与运行 .meta UUID。",
+      "preview": [
+        "preview/old_av_02_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color2",
+      "derived_from": "OLD-AV-01",
+      "derivation": "tools/recolor_avatar_variants.py"
+    },
+    {
+      "asset_id": "OLD-AV-03",
+      "file": "png/old_av_03.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 53515,
+      "source": "../CEO_UI_V2_ArtSamples_v1/png/v2_old_av_01.png",
+      "master": "../CEO_UI_V2_ArtSamples_v1/png/v2_old_av_01.png",
+      "runtime_path": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "与 OLD-AV-01 同一身份：复用其母版，仅对蓝色衣装像素做 HSV 调色，皮肤/头发/五官/轮廓不变。保留 Asset Registry 原 source_key 与运行 .meta UUID。",
+      "preview": [
+        "preview/old_av_03_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color3",
+      "derived_from": "OLD-AV-01",
+      "derivation": "tools/recolor_avatar_variants.py"
+    },
+    {
+      "asset_id": "OLD-AV-04",
+      "file": "png/old_av_04.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 13321,
+      "source": "src/old_av_04.svg",
+      "master": "src/old_av_04.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_04_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-05",
+      "file": "png/old_av_05.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 13771,
+      "source": "src/old_av_05.svg",
+      "master": "src/old_av_05.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_05_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-06",
+      "file": "png/old_av_06.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 13873,
+      "source": "src/old_av_06.svg",
+      "master": "src/old_av_06.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_06_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_02_Female_ShoulderHair_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-07",
+      "file": "png/old_av_07.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 16893,
+      "source": "src/old_av_07.svg",
+      "master": "src/old_av_07.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_07_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-08",
+      "file": "png/old_av_08.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 17332,
+      "source": "src/old_av_08.svg",
+      "master": "src/old_av_08.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_08_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-09",
+      "file": "png/old_av_09.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 17439,
+      "source": "src/old_av_09.svg",
+      "master": "src/old_av_09.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_09_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_03_Male_CurlyHair_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-10",
+      "file": "png/old_av_10.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15110,
+      "source": "src/old_av_10.svg",
+      "master": "src/old_av_10.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_10_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-11",
+      "file": "png/old_av_11.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15560,
+      "source": "src/old_av_11.svg",
+      "master": "src/old_av_11.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_11_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-12",
+      "file": "png/old_av_12.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15661,
+      "source": "src/old_av_12.svg",
+      "master": "src/old_av_12.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_12_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_04_Female_ShortHair_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-13",
+      "file": "png/old_av_13.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 17352,
+      "source": "src/old_av_13.svg",
+      "master": "src/old_av_13.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_13_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-14",
+      "file": "png/old_av_14.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 17796,
+      "source": "src/old_av_14.svg",
+      "master": "src/old_av_14.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_14_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-15",
+      "file": "png/old_av_15.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 17905,
+      "source": "src/old_av_15.svg",
+      "master": "src/old_av_15.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_15_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_05_Male_Glasses_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-16",
+      "file": "png/old_av_16.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15449,
+      "source": "src/old_av_16.svg",
+      "master": "src/old_av_16.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_16_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-17",
+      "file": "png/old_av_17.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15893,
+      "source": "src/old_av_17.svg",
+      "master": "src/old_av_17.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_17_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-18",
+      "file": "png/old_av_18.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15996,
+      "source": "src/old_av_18.svg",
+      "master": "src/old_av_18.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_18_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_06_Female_Ponytail_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-19",
+      "file": "png/old_av_19.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 14739,
+      "source": "src/old_av_19.svg",
+      "master": "src/old_av_19.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_19_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-20",
+      "file": "png/old_av_20.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15186,
+      "source": "src/old_av_20.svg",
+      "master": "src/old_av_20.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_20_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-21",
+      "file": "png/old_av_21.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 15286,
+      "source": "src/old_av_21.svg",
+      "master": "src/old_av_21.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_21_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_07_Male_SlickedHair_Color3"
+    },
+    {
+      "asset_id": "OLD-AV-22",
+      "file": "png/old_av_22.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 12391,
+      "source": "src/old_av_22.svg",
+      "master": "src/old_av_22.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color1.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color1",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_22_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color1"
+    },
+    {
+      "asset_id": "OLD-AV-23",
+      "file": "png/old_av_23.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 12844,
+      "source": "src/old_av_23.svg",
+      "master": "src/old_av_23.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color2.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color2",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_23_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color2"
+    },
+    {
+      "asset_id": "OLD-AV-24",
+      "file": "png/old_av_24.png",
+      "width": 256,
+      "height": 256,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 12954,
+      "source": "src/old_av_24.svg",
+      "master": "src/old_av_24.svg",
+      "runtime_path": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color3.png",
+      "runtime_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color3",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "角色组轮廓固定；颜色变体只改衣装蓝系。 保留Asset Registry原source_key。",
+      "preview": [
+        "preview/old_av_24_alpha_review.png"
+      ],
+      "source_key": "ui/avatars/EmployeeAvatar_08_Female_LongHair_Color3"
+    },
+    {
+      "asset_id": "RANK-01",
+      "file": "png/rank_01.png",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 58788,
+      "source": "src/rank_01.svg",
+      "master": "src/rank_01.svg",
+      "runtime_path": "ui_v2/rank/rank_01.png",
+      "runtime_key": "ui_v2/rank/rank_01",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "金银铜三枚徽章均在384×384透明图中独立可切，子图矩形记录于child_frames_px；名次由原生Label渲染。",
+      "preview": [
+        "preview/rank_01_alpha_review.png"
+      ],
+      "child_frames_px": {
+        "gold": {
+          "x": 124,
+          "y": 41,
+          "w": 136,
+          "h": 159,
+          "pixels": 17342
+        },
+        "silver": {
+          "x": 36,
+          "y": 198,
+          "w": 128,
+          "h": 127,
+          "pixels": 11864
+        },
+        "bronze": {
+          "x": 220,
+          "y": 198,
+          "w": 128,
+          "h": 127,
+          "pixels": 11864
+        }
+      },
+      "small_preview": "preview/rank_01_40px.png"
+    },
+    {
+      "asset_id": "RANK-02",
+      "file": "png/rank_02.png",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 26950,
+      "source": "src/rank_02.svg",
+      "master": "src/rank_02.svg",
+      "runtime_path": "ui_v2/rank/rank_02.png",
+      "runtime_key": "ui_v2/rank/rank_02",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "本人排名标记：蓝白罗盘徽章，无名次和文字。",
+      "preview": [
+        "preview/rank_02_alpha_review.png"
+      ],
+      "small_preview": "preview/rank_02_40px.png"
+    },
+    {
+      "asset_id": "RANK-03",
+      "file": "png/rank_03.png",
+      "width": 384,
+      "height": 384,
+      "mode": "RGBA",
+      "alpha_min": 0,
+      "alpha_max": 255,
+      "bytes": 19176,
+      "source": "src/rank_03.svg",
+      "master": "src/rank_03.svg",
+      "runtime_path": "ui_v2/rank/rank_03.png",
+      "runtime_key": "ui_v2/rank/rank_03",
+      "fit": "contain center",
+      "crop_focus": {
+        "icon": [
+          0.5,
+          0.5
+        ]
+      },
+      "crop_rect": "contain center",
+      "notes": "小型奖杯徽章；缩小后高对比轮廓。",
+      "preview": [
+        "preview/rank_03_alpha_review.png"
+      ],
+      "small_preview": "preview/rank_03_40px.png"
+    }
+  ],
+  "reuse_decisions": [
+    {
+      "asset_id": "OLD-NAV-03",
+      "source_key": "ui/navigation/Nav_Department",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Department.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-04",
+      "source_key": "ui/navigation/Nav_Department_Inactive",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Department_Inactive.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-05",
+      "source_key": "ui/navigation/Nav_Talent",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Talent.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-06",
+      "source_key": "ui/navigation/Nav_Talent_Inactive",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Talent_Inactive.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-07",
+      "source_key": "ui/navigation/Nav_Leaderboard",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Leaderboard.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-08",
+      "source_key": "ui/navigation/Nav_Leaderboard_Inactive",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Leaderboard_Inactive.svg",
+      "decision": "复用轮廓并重绘状态色"
+    },
+    {
+      "asset_id": "OLD-NAV-09",
+      "source_key": "ui/navigation/Nav_Settings",
+      "reusable_svg": "DesignSource/B06_SharedSVG/navigation/Nav_Settings.svg",
+      "decision": "复用轮廓；仅作原设置入口"
+    },
+    {
+      "asset_id": "ICO-D01",
+      "source_key": "ui/departments/Department_MainBusiness",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_MainBusiness.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    },
+    {
+      "asset_id": "ICO-D02",
+      "source_key": "ui/departments/Department_HumanResources",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_HumanResources.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    },
+    {
+      "asset_id": "ICO-D03",
+      "source_key": "ui/departments/Department_Procurement",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_Procurement.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    },
+    {
+      "asset_id": "ICO-D04",
+      "source_key": "ui/departments/Department_Marketing",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_Marketing.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    },
+    {
+      "asset_id": "ICO-D05",
+      "source_key": "ui/departments/Department_CustomerService",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_CustomerService.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    },
+    {
+      "asset_id": "ICO-D06",
+      "source_key": "ui/departments/Department_Finance",
+      "reusable_svg": "DesignSource/B06_SharedSVG/departments/Department_Finance.svg",
+      "decision": "可复用轮廓；本交付统一描边与配色"
+    }
+  ],
+  "small_size_previews": [
+    "preview/04_icons_22px_pixel_review.png",
+    "preview/04_icons_24px_pixel_review.png",
+    "preview/02_avatars_light_small.png",
+    "preview/02_avatars_dark_small.png"
+  ]
+}

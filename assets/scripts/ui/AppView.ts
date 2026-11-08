@@ -19,7 +19,7 @@ import {
   view,
 } from 'cc';
 import { GameFacade } from '../../core/application/GameFacade';
-import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport, SupportDeptType, Policy, Department, DeptType } from '../../core/domain/types';
+import type { CandidateOffer, GameState, GameSpeed, IndustryId, CeoTrait, AnnualReport, AnnualEvent, SupportDeptType, Policy, Department, DeptType } from '../../core/domain/types';
 import type { DepartmentVM, UncreatedDeptVM } from '../../core/application/DepartmentOverviewService';
 import type { TalentRowVM } from '../../core/application/TalentOverviewService';
 import { createPlatform } from '../platform/PlatformFactory';
@@ -70,6 +70,7 @@ import {
   stretchToParent,
 } from './UiFactory';
 import { BUTTON_BASELINE, fitTextWithEllipsis, layoutActionRow } from './uiMetrics';
+import { attachRankMedal, attachSceneBanner, attachUiSprite, createAvatarSlot, rankMedalFor, setAvatarImage, RANK_TROPHY_KEY, type AvatarSlot } from './spriteLoader';
 import { THEME, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
 import { TEXT_TOKENS } from './textTokens';
 import { audioManager } from '../audio/AudioManager';
@@ -91,10 +92,36 @@ import type { CloudArchiveRef, CloudCheckpointV1 } from '../../core/persistence/
 
 type TabId = 'COMPANY' | 'DEPARTMENT' | 'TALENT' | 'RANK';
 
+/** §30.5 UI-06：部门类型 → ICO-D01~06 运行键（B06 source_key） */
+const DEPT_ICON_KEYS: Record<DeptType, string> = {
+  BUSINESS: 'ui/departments/Department_MainBusiness',
+  HR: 'ui/departments/Department_HumanResources',
+  PROCUREMENT: 'ui/departments/Department_Procurement',
+  MARKETING: 'ui/departments/Department_Marketing',
+  CUSTOMER_SERVICE: 'ui/departments/Department_CustomerService',
+  FINANCE: 'ui/departments/Department_Finance',
+};
+
+/** D2/D4：年度事件 → 文案与 EVT-01~05 运行键（只展示真实已发生记录）。 */
+const ANNUAL_EVENT_META: Record<NonNullable<AnnualEvent['type']>, { label: string; iconKey: string }> = {
+  ORDER_SURGE: { label: '订单激增', iconKey: 'ui_v2/events/evt_01' },
+  ORDER_DROP: { label: '订单下滑', iconKey: 'ui_v2/events/evt_02' },
+  COST_RISE: { label: '成本上涨', iconKey: 'ui_v2/events/evt_03' },
+  EMPLOYEE_LEAVE: { label: '员工离职', iconKey: 'ui_v2/events/evt_04' },
+  ASSET_LOSS: { label: '资产损失', iconKey: 'ui_v2/events/evt_05' },
+};
+
 const INDUSTRY_LABELS: Record<IndustryId, string> = {
   TRADE: '电商贸易',
   SOFTWARE: '软件科技',
   SERVICE: '企业服务',
+};
+
+/** D2：行业 → ICO-I01~03 运行键（创建页与市场/诊断复用）。 */
+const INDUSTRY_ICON_KEYS: Record<IndustryId, string> = {
+  TRADE: 'ui_v2/industries/ico_i01',
+  SOFTWARE: 'ui_v2/industries/ico_i02',
+  SERVICE: 'ui_v2/industries/ico_i03',
 };
 
 const TRAIT_LABELS: Record<CeoTrait, { name: string; desc: string }> = {
@@ -157,6 +184,9 @@ const COMPANY_NAME_ERROR_TEXT: Record<
   TAG: '公司名不能包含网页标签',
   FORBIDDEN_WORD: '公司名包含不允许的词语，请换一个',
 };
+
+/** §29.13：在线时钟落盘合并窗口。低端机每秒 clone+序列化+双槽写入会造成周期性掉帧。 */
+const TICK_FLUSH_MS = 10_000;
 
 let commandSeq = 0;
 function nextCommandId(prefix: string): string {
@@ -270,7 +300,7 @@ export class AppView extends Component {
     rows: TalentRowVM[];
     listTop: number;
     step: number;
-    cards: Array<{ node: Node; name: Node; meta: Node; pay: Node; state: Node; index: number }>;
+    cards: Array<{ node: Node; name: Node; meta: Node; pay: Node; state: Node; avatar: AvatarSlot; index: number }>;
   } | null = null;
   /** R31：应用上下文代际（换 run/恢复云档/重开公司时递增，旧弹窗必须失效）。 */
   private contextEpoch = 0;
@@ -413,6 +443,8 @@ export class AppView extends Component {
     platform.onHide(() => {
       const now = Date.now();
       this.lastBackgroundMs = now;
+      // §29.13：合并落盘后进后台前顺手提交一次剩余进度；失败由回前台结算兜底。
+      void this.flushClockOnHide(now);
       this.fgClock.enterBackground(now);
       audioManager.onAppHide();
       this.adCoordinator?.cancelLoading();
@@ -441,7 +473,15 @@ export class AppView extends Component {
   private renderSaveGateError(code: string, stage: string, kind: 'unavailable' | 'corrupt'): void {
     try {
       const overlay = this.modalOverlay(true);
-      createRect({ width: 320, height: 320, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+      const gateCard = createRect({ width: 320, height: 320, color: Color.WHITE, radius: 12, parent: overlay });
+      gateCard.setPosition(0, 0);
+      // UI-27：存档闸门使用 ILL-S19 底图 + STA-07 状态贴纸（不改变重试/退出几何）
+      this.attachCardBackdrop(gateCard, 'ui_v2/scenes/ill_s19', 70);
+      const gateIcon = new Node('SaveGateIcon');
+      gateIcon.parent = gateCard;
+      gateIcon.addComponent(UITransform).setContentSize(new Size(28, 28));
+      gateIcon.setPosition(-132, 132);
+      attachUiSprite(gateIcon, 'ui_v2/status/sta_07');
       createLabel({ text: kind === 'corrupt' ? '本地存档异常' : '暂时读不到存档', fontSize: 20, bold: true, parent: overlay }).setPosition(0, 120);
       createLabel({
         text:
@@ -512,7 +552,15 @@ export class AppView extends Component {
   private renderBootError(code: string, stage: string): void {
     try {
       const overlay = this.modalOverlay(true);
-      createRect({ width: 320, height: 300, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+      const bootCard = createRect({ width: 320, height: 300, color: Color.WHITE, radius: 12, parent: overlay });
+      bootCard.setPosition(0, 0);
+      // UI-01：启动/继续态使用 ILL-S01 场景 + BRD-01 品牌标（无真实进度时不做假进度条）
+      this.attachCardBackdrop(bootCard, 'ui_v2/scenes/ill_s01', 70);
+      const bootBrand = new Node('BootBrand');
+      bootBrand.parent = bootCard;
+      bootBrand.addComponent(UITransform).setContentSize(new Size(36, 36));
+      bootBrand.setPosition(-130, 122);
+      attachUiSprite(bootBrand, 'ui_v2/brand/brd_01');
       createLabel({ text: '启动失败', fontSize: 20, bold: true, parent: overlay }).setPosition(0, 110);
       createLabel({
         text: `错误编号：${code}\n阶段：${stage}\n\n本地经营数据未被修改，可重试启动；\n多次失败请稍后再试。`,
@@ -757,6 +805,9 @@ export class AppView extends Component {
   private lastFrameMs = 0;
   private settlingForeground = false;
   private clockTickInFlight = false;
+  /** §29.13：尚未落盘的真实毫秒；随 run 切换清零，进后台时尽力提交一次。 */
+  private pendingTickMs = 0;
+  private pendingTickRunId: string | null = null;
   private pendingForegroundSettlement = false;
   private pendingOnlineTick: { elapsedMs: number; runId: string; atMs: number } | null = null;
   private adCoordinator: AdRewardCoordinator | null = null;
@@ -1220,6 +1271,8 @@ export class AppView extends Component {
     if (!facade) return false;
     const before = facade.getState();
     if (before.speed !== 0) {
+      // §29.13：先按旧倍速结算累计时间，再切暂停，避免 pending 区间被按新倍速折算。
+      await this.commitClockTick(Date.now());
       const r = await facade.setSpeed(0, { commandId: nextCommandId('speed'), expectedRunId: before.runId });
       if (!r.ok) { this.toast(r.displayMessage); return false; }
       this.cloudPausedForPreview = true;
@@ -1439,6 +1492,9 @@ export class AppView extends Component {
         owner: this.dialogOwner(),
       },
     });
+    // EX-03：云档列表使用 ILL-S21 场景 + STA-11 云端状态贴纸（只读装饰）
+    this.appendDialogScene(handle.body, 'ui_v2/scenes/ill_s21', 64, 286);
+    this.appendDialogIcon(handle.body, 'ui_v2/status/sta_11', 32);
     if (this.cloudArchives.length === 0) {
       createLabel({
         text: '当前账号下没有可用云档。可先在设置里“备份到云”。',
@@ -1722,6 +1778,8 @@ export class AppView extends Component {
         owner: this.dialogOwner(),
       },
     });
+    // EX-05/UI-17：激励视频弹窗使用 AD-01 场景 + AD-02 券图标（可跳过说明不变）
+    this.appendDialogScene(handle.body, 'ui_v2/ads/ad_01', 64, 260);
     createLabel({
       text: `${message}\n完整观看后发券；也可跳过继续经营。`,
       fontSize: 13,
@@ -1755,6 +1813,7 @@ export class AppView extends Component {
       parent: handle.footer,
       onClick: () => handle.close(),
     }).setPosition(skip.x, 0);
+    this.appendDialogIcon(handle.body, 'ui_v2/ads/ad_02', 36);
   }
 
   private async requestAdCoupon(): Promise<void> {
@@ -1813,6 +1872,9 @@ export class AppView extends Component {
       }
       // 只有结算提交成功后才消费该区间；paused/非经营态也由settleOffline更新水位。
       this.pendingForegroundSettlement = false;
+      // §29.13：离线结算已覆盖到 now，未落盘的前台进度不能再叠加。
+      this.pendingTickMs = 0;
+      this.pendingTickRunId = this.facade.getState().runId;
       if (this.adCoordinator?.hasPendingGrant()) {
         // 24.14.3.6：观看已完成但发券未决 → 回前台只补核对原奖励，不重看视频、不重复发券。
         // DEV-02：补发核对必须等当前代际身份确认结束；owner 未知时协调器保留 pending 后续再核。
@@ -1846,6 +1908,12 @@ export class AppView extends Component {
         owner: this.dialogOwner(),
       },
     });
+    // UI-14：离线回归专属场景 + ICO-K10 图标
+    this.appendDialogScene(handle.body, 'ui_v2/scenes/ill_s13', 64, 260);
+    const offlineIcon = new Node('OfflineIcon');
+    offlineIcon.parent = handle.body;
+    offlineIcon.addComponent(UITransform).setContentSize(new Size(26, 26));
+    attachUiSprite(offlineIcon, 'ui_v2/business/ico_k10');
     createLabel({
       text:
         `离线期间结算 ${p.monthsSettled} 个月` +
@@ -1895,46 +1963,79 @@ export class AppView extends Component {
     const now = Date.now();
     const dt = this.lastFrameMs > 0 && now > this.lastFrameMs ? now - this.lastFrameMs : 0;
     if (dt <= 0) return;
+    if (this.pendingTickRunId !== s.runId) {
+      this.pendingTickRunId = s.runId;
+      this.pendingTickMs = 0;
+    }
+    this.pendingTickMs += dt;
+    this.lastFrameMs = now;
+    // §29.13：把 1Hz 落盘合并到「临近月结」或 10 秒窗口。未月结的进度只留在内存，
+    // 跨月/切后台/回前台结算时一次提交；GameClock 仍按真实 elapsed 逐月补齐。
+    const remaining = Math.max(0, this.facade.monthDurationMs(s.speed) - (s.progressMsInMonth ?? 0));
+    if (this.pendingTickMs < TICK_FLUSH_MS && this.pendingTickMs < remaining) return;
+    void this.commitClockTick(now);
+  }
+
+  /** §29.13：一次性提交累计真实时间；失败时放回 pending，由下个 tick 合并重试。 */
+  private async commitClockTick(now: number): Promise<void> {
+    if (!this.facade || this.clockTickInFlight || this.pendingTickMs <= 0) return;
+    const elapsed = this.pendingTickMs;
+    const before = this.facade.getState();
+    const runId = before.runId;
+    this.pendingTickMs = 0;
     this.clockTickInFlight = true;
-    void this.facade
-      .advanceRealTime(dt, s.runId, now)
-      .then((r) => {
-        if (!r.ok) {
-          if (this.facade?.getPersistenceStatus() === 'ready') {
-            if (this.facade.getState().runId !== s.runId) this.lastFrameMs = now;
-            // Keep the elapsed interval pending after a known non-commit conflict.
-            return;
-          }
-          this.pendingOnlineTick = { elapsedMs: dt, runId: s.runId, atMs: now };
-          this.lastFrameMs = 0;
-          this.renderPersistenceRecovery();
+    try {
+      const r = await this.facade.advanceRealTime(elapsed, runId, now);
+      if (!r.ok) {
+        if (this.facade.getPersistenceStatus() === 'ready') {
+          if (this.facade.getState().runId === runId) this.pendingTickMs += elapsed;
           return;
         }
-        this.pendingOnlineTick = null;
-        this.lastFrameMs = now;
-        // 在线推进已消耗的真实时间同步到前后台水位，避免下次离线重复计入
-        this.fgClock.noteOnlineProgress(now);
-        if (r.payload.monthsAdvanced === 0 && r.payload.yearsClosed.length === 0) return;
-        // 年结短乐：按刚关闭年份的盈亏播放
-        for (const y of r.payload.yearsClosed) {
-          const rep = this.facade!.getAnnualReport(y);
-          if (rep) {
-            if (rep.profitYuan >= 0) void audioManager.yearProfit();
-            else void audioManager.yearLoss();
-          }
+        this.pendingOnlineTick = { elapsedMs: elapsed, runId, atMs: now };
+        this.lastFrameMs = 0;
+        this.renderPersistenceRecovery();
+        return;
+      }
+      this.pendingOnlineTick = null;
+      this.lastFrameMs = now;
+      // 在线推进已消耗的真实时间同步到前后台水位，避免下次离线重复计入
+      this.fgClock.noteOnlineProgress(now);
+      if (r.payload.monthsAdvanced === 0 && r.payload.yearsClosed.length === 0) return;
+      // 年结短乐：按刚关闭年份的盈亏播放
+      for (const y of r.payload.yearsClosed) {
+        const rep = this.facade.getAnnualReport(y);
+        if (rep) {
+          if (rep.profitYuan >= 0) void audioManager.yearProfit();
+          else void audioManager.yearLoss();
         }
-        const after = this.facade!.getState();
-        if (after.target3YearsAchieved && !s.target3YearsAchieved) void audioManager.threeYearGoal();
-        this.render();
-      })
-      .catch(() => {
-        if (this.facade?.getPersistenceStatus() !== 'ready') {
-          this.pendingOnlineTick = { elapsedMs: dt, runId: s.runId, atMs: now };
-          this.lastFrameMs = 0;
-          this.renderPersistenceRecovery();
-        }
-      })
-      .finally(() => { this.clockTickInFlight = false; });
+      }
+      const after = this.facade.getState();
+      if (after.target3YearsAchieved && !before.target3YearsAchieved) void audioManager.threeYearGoal();
+      this.render();
+    } catch {
+      if (this.facade?.getPersistenceStatus() !== 'ready') {
+        this.pendingOnlineTick = { elapsedMs: elapsed, runId, atMs: now };
+        this.lastFrameMs = 0;
+        this.renderPersistenceRecovery();
+      } else if (this.facade?.getState().runId === runId) {
+        this.pendingTickMs += elapsed;
+      }
+    } finally {
+      this.clockTickInFlight = false;
+    }
+  }
+
+  /** §29.13：进后台前尽力提交剩余进度；失败也无妨——回前台的 settleOffline 会按墙钟补齐。 */
+  private async flushClockOnHide(now: number): Promise<void> {
+    if (!this.facade || this.pendingTickMs <= 0) return;
+    const elapsed = this.pendingTickMs;
+    const runId = this.facade.getState().runId;
+    this.pendingTickMs = 0;
+    try {
+      await this.facade.advanceRealTime(elapsed, runId, now);
+    } catch {
+      /* 由回前台结算兜底，不在此处弹错误 */
+    }
   }
 
   private tickAdEligibility(): void {
@@ -2011,7 +2112,15 @@ export class AppView extends Component {
     if (!this.facade || this.persistenceRecoveryOverlay?.isValid) return;
     const overlay = this.modalOverlay();
     this.persistenceRecoveryOverlay = overlay;
-    createRect({ width: 318, height: 250, color: Color.WHITE, radius: 12, parent: overlay });
+    const recoveryCard = createRect({ width: 318, height: 250, color: Color.WHITE, radius: 12, parent: overlay });
+    recoveryCard.setPosition(0, 0);
+    // UI-27：落盘待核对态复用 ILL-S19 + STA-07（与存档闸门同一套状态语义）
+    this.attachCardBackdrop(recoveryCard, 'ui_v2/scenes/ill_s19', 70);
+    const recoveryIcon = new Node('RecoveryIcon');
+    recoveryIcon.parent = recoveryCard;
+    recoveryIcon.addComponent(UITransform).setContentSize(new Size(26, 26));
+    recoveryIcon.setPosition(-131, 101);
+    attachUiSprite(recoveryIcon, 'ui_v2/status/sta_07');
     createLabel({ text: '正在保护经营存档', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 88);
     createLabel({
       text: '上次操作的保存结果尚未确认。经营时间已暂停，请重试核对；核对前不会提交新操作。',
@@ -2151,6 +2260,50 @@ export class AppView extends Component {
     return { runId, accountEpoch: this.authEpoch, contextEpoch: this.contextEpoch, ...(entityId ? { entityId } : {}) };
   }
 
+  // ---------------------------------------------------------------- UI V2 D2–D4 装饰
+
+  /** 弹窗正文追加独立场景图（固定高度，随正文滚动，不拦截点击）。 */
+  private appendDialogScene(body: Node, sceneKey: string, height: number, width = 276, charKey?: string): void {
+    const node = new Node('DialogScene');
+    node.parent = body;
+    node.addComponent(UITransform).setContentSize(new Size(width, height));
+    attachSceneBanner(node, {
+      sceneKey,
+      ...(charKey ? { charKey } : {}),
+      focus: [0.5, 0.52],
+      radius: 6,
+    });
+  }
+
+  /** 弹窗正文追加独立状态贴纸（正方形，随正文滚动，不拦截点击）。 */
+  private appendDialogIcon(body: Node, key: string, size = 48): void {
+    const node = new Node('DialogIcon');
+    node.parent = body;
+    node.addComponent(UITransform).setContentSize(new Size(size, size));
+    attachUiSprite(node, key);
+  }
+
+  /** 卡片最底层贴场景图（位于卡片白底之上、正文之下，不改变既有几何）。 */
+  private attachCardBackdrop(card: Node, sceneKey: string, opacity = 90): void {
+    const tr = card.getComponent(UITransform);
+    const node = new Node('CardBackdrop');
+    node.parent = card;
+    node.setSiblingIndex(0);
+    node.addComponent(UITransform).setContentSize(new Size(tr?.width ?? 320, tr?.height ?? 240));
+    node.addComponent(UIOpacity).opacity = opacity;
+    attachSceneBanner(node, { sceneKey, focus: [0.5, 0.5], radius: 12 });
+  }
+
+  /** 页首品牌条：BRD-01 小标 + 主标题，替换原纯文字标题（占位高度不变）。 */
+  private createBrandTitle(parent: Node, y: number, text: string): void {
+    const logo = new Node('BrandLogo');
+    logo.parent = parent;
+    logo.addComponent(UITransform).setContentSize(new Size(30, 30));
+    logo.setPosition(-Math.min(150, Array.from(text).length * 12 + 24), y);
+    attachUiSprite(logo, 'ui_v2/brand/brd_01');
+    createLabel({ text, fontSize: 24, bold: true, color: THEME.primary, parent }).setPosition(0, y);
+  }
+
   /** TASK-M3-12-03：月结/年结/普通刷新——只清 PageLayer，保留 ModalLayer 与 ToastLayer。 */
   private clearPageContent(): void {
     this.pageLayer.destroyAllChildren();
@@ -2170,6 +2323,8 @@ export class AppView extends Component {
     this.toastLayer?.destroyAllChildren();
     this.toastNode = null;
     this.persistenceRecoveryOverlay = null;
+    this.pendingTickMs = 0;
+    this.pendingTickRunId = null;
     this.shell = null;
     this.createPane = null;
     this.createGuard = new CreateSubmitGuard();
@@ -2306,6 +2461,11 @@ export class AppView extends Component {
     handle.onClose(() => {
       if (this.state().phase === 'DISTRESS') this.distressAckKey = key;
     });
+    // UI-15/26：困难态用 ILL-S14 + STA-04；救助确认改用 ILL-S18 + STA-06
+    if (!handle.closed) {
+      this.appendDialogScene(handle.body, s.rescueCapitalUsed ? 'ui_v2/scenes/ill_s14' : 'ui_v2/scenes/ill_s18', 64, 264);
+      this.appendDialogIcon(handle.body, s.rescueCapitalUsed ? 'ui_v2/status/sta_04' : 'ui_v2/status/sta_06', 40);
+    }
   }
 
   // ---------------------------------------------------------------- R27 创建页通用壳
@@ -2463,6 +2623,8 @@ export class AppView extends Component {
       title: string;
       titleSize?: number;
       caption?: string;
+      /** D2：卡片左侧独立图标键（行业/部门/政策等）。 */
+      iconKey?: string;
       onTap: () => void;
     },
   ): Node {
@@ -2477,25 +2639,33 @@ export class AppView extends Component {
     card.setPosition(0, opts.y);
     card.addComponent(BlockInputEvents);
     card.on(Node.EventType.TOUCH_END, opts.onTap);
+    if (opts.iconKey) {
+      const icon = new Node('ChoiceIcon');
+      icon.parent = card;
+      icon.addComponent(UITransform).setContentSize(new Size(26, 26));
+      icon.setPosition(-width / 2 + 23, opts.caption ? 8 : 0);
+      attachUiSprite(icon, opts.iconKey);
+    }
+    const textShift = opts.iconKey ? 18 : 0;
     createLabel({
       text: opts.title,
       fontSize: opts.titleSize ?? 15,
       bold: opts.selected,
       color: opts.selected ? THEME.primary : THEME.text,
-      width: width - 24,
+      width: width - 24 - (opts.iconKey ? 36 : 0),
       align: 'left',
       parent: card,
-    }).setPosition(0, opts.caption ? 9 : 0);
+    }).setPosition(textShift, opts.caption ? 9 : 0);
     if (opts.caption) {
       createLabel({
         text: opts.caption,
         fontSize: 12,
         color: THEME.textWeak,
-        width: width - 24,
+        width: width - 24 - (opts.iconKey ? 36 : 0),
         lineHeight: 18,
         align: 'left',
         parent: card,
-      }).setPosition(0, -15);
+      }).setPosition(textShift, -15);
     }
     return card;
   }
@@ -2549,7 +2719,13 @@ export class AppView extends Component {
     const layout = this.shellLayout();
     const { content } = this.mountCreatePage(layout, { footerHeight: 72 });
 
-    createLabel({ text: '《我是CEO》', fontSize: 24, bold: true, color: THEME.primary, parent: content }).setPosition(0, 372);
+    this.createBrandTitle(content, 372, '《我是CEO》');
+    // TUT-01：公司步骤的引导角色（纯装饰，不遮挡标题与事件）
+    const guide = new Node('CreateGuide');
+    guide.parent = content;
+    guide.addComponent(UITransform).setContentSize(new Size(56, 56));
+    guide.setPosition(140, 368);
+    attachUiSprite(guide, 'ui_v2/characters/chr_guide01');
     createLabel({
       text: CREATE_COPY.stepCompany,
       fontSize: TEXT_TOKENS.caption.fontSize,
@@ -2575,6 +2751,7 @@ export class AppView extends Component {
         selected: this.selectedIndustry === id,
         title: INDUSTRY_LABELS[id],
         caption: INDUSTRY_PRESENTATION[id].blurb,
+        iconKey: INDUSTRY_ICON_KEYS[id],
         onTap: () => {
           this.selectedIndustry = id;
           this.rollNames();
@@ -2646,6 +2823,13 @@ export class AppView extends Component {
       onClick: () => this.openCustomNameDialog(),
     }).setPosition(83, actionY);
 
+    // ILL-S02：创建公司专属场景图（独立于排行榜与经营页，随正文滚动）
+    const companyScene = new Node('CreateCompanyScene');
+    companyScene.parent = content;
+    companyScene.addComponent(UITransform).setContentSize(new Size(343, 88));
+    companyScene.setPosition(0, actionY - 96);
+    attachSceneBanner(companyScene, { sceneKey: 'ui_v2/scenes/ill_s02', focus: [0.5, 0.55], radius: 8 });
+
     const chosenName = this.chosenCompanyName();
     this.addCreateFooterButton({
       text: '下一步：创建 CEO',
@@ -2698,7 +2882,7 @@ export class AppView extends Component {
       this.customCeoName = generateCeoName(this.state().runId, this.ceoNameNonce);
     }
 
-    createLabel({ text: '《我是CEO》', fontSize: 24, bold: true, color: THEME.primary, parent: content }).setPosition(0, 372);
+    this.createBrandTitle(content, 372, '《我是CEO》');
     createLabel({
       text: CREATE_COPY.stepCeo,
       fontSize: 12,
@@ -2832,6 +3016,20 @@ export class AppView extends Component {
       align: 'left',
       parent: content,
     }).setPosition(0, -244);
+
+    // ILL-S03 + CHR-CEO01：CEO 页专属场景与主角形象（独立图，随正文滚动）
+    const ceoScene = new Node('CreateCeoScene');
+    ceoScene.parent = content;
+    ceoScene.addComponent(UITransform).setContentSize(new Size(343, 104));
+    ceoScene.setPosition(0, -300);
+    attachSceneBanner(ceoScene, {
+      sceneKey: 'ui_v2/scenes/ill_s03',
+      charKey: 'ui_v2/characters/chr_ceo01',
+      focus: [0.5, 0.5],
+      charHeightRatio: 0.96,
+      charXRatio: 0.68,
+      radius: 8,
+    });
 
     this.addCreateFooterButton({
       text: '上一步',
@@ -3053,6 +3251,20 @@ export class AppView extends Component {
       }).setPosition(0, -50);
     });
 
+    // ILL-S04 + CHR-HR01：首聘专属场景与 HR 形象
+    const hireScene = new Node('InitialHireScene');
+    hireScene.parent = content;
+    hireScene.addComponent(UITransform).setContentSize(new Size(343, 96));
+    hireScene.setPosition(0, 326 - Math.max(1, available.length) * 170 - 30);
+    attachSceneBanner(hireScene, {
+      sceneKey: 'ui_v2/scenes/ill_s04',
+      charKey: 'ui_v2/characters/chr_hr01',
+      focus: [0.5, 0.5],
+      charHeightRatio: 0.96,
+      charXRatio: 0.72,
+      radius: 8,
+    });
+
     this.addCreateFooterButton({
       text: view.continueLabel,
       width: 327,
@@ -3094,7 +3306,7 @@ export class AppView extends Component {
     // 一次开框固定一个意图：commandId 与发起 runId 都在闭包里，重试复用同一个
     const commandId = nextCommandId('hire');
     const originRunId = this.state().runId;
-    openConfirmDialog({
+    const hireDialog = openConfirmDialog({
       overlay: this.modalOverlay(),
       viewportHeight: this.shellLayout().viewportHeight,
       title: '确认录用？',
@@ -3137,6 +3349,11 @@ export class AppView extends Component {
         if (!opts.initial && this.state().runId === originRunId) this.renderHireDialog(opts.offer, deptId);
       },
     });
+    // UI-17：确认窗使用候选人真实头像（AVT-POOL）；有券时叠加 AD-02 券说明图
+    const candidate = opts.offer.candidates.find((c) => c.candidateId === candidateId);
+    const confirmAvatar = createAvatarSlot(hireDialog.body, 56, 'HireConfirmAvatar');
+    setAvatarImage(confirmAvatar, candidate?.avatarId, p.candidateName);
+    if (opts.couponId) this.appendDialogIcon(hireDialog.body, 'ui_v2/ads/ad_02', 40);
   }
 
   private async startClock(): Promise<void> {
@@ -3305,7 +3522,7 @@ export class AppView extends Component {
       parent: parent,
       onClick: () => this.renderCompanyDetail(),
     }).setPosition(-38, 344);
-    createButton({
+    const settingsBtn = createButton({
       text: '设置',
       width: 56,
       height: 44,
@@ -3313,11 +3530,42 @@ export class AppView extends Component {
       color: new Color(255, 255, 255, 40),
       parent: parent,
       onClick: () => this.renderSettings(),
-    }).setPosition(145, 340);
+    });
+    settingsBtn.setPosition(145, 340);
+    // §30.5 UI-05：设置图标只接已有设置入口（按钮内左图右文，热区不变）
+    const settingsIcon = new Node('SettingsIcon');
+    settingsIcon.parent = settingsBtn;
+    settingsIcon.addComponent(UITransform).setContentSize(new Size(12, 12));
+    settingsIcon.setPosition(-17, 0);
+    attachUiSprite(settingsIcon, 'ui/navigation/Nav_Settings');
+    const settingsLabel = settingsBtn.getChildByName('ButtonLabel');
+    if (settingsLabel) settingsLabel.setPosition(6, 0);
+
+    // §30.3 UI-05：顶部栏下方插入两层横幅（场景 cover + 助理 contain，装饰不占触区）
+    const layout = this.shellLayout();
+    const bannerH = layout.viewportHeight < 720 ? 96 : 160;
+    const shift = bannerH + 12;
+    const banner = new Node('CompanyBanner');
+    banner.parent = parent;
+    banner.addComponent(UITransform).setContentSize(new Size(343, bannerH));
+    banner.setPosition(0, 300 - 6 - bannerH / 2);
+    attachSceneBanner(banner, {
+      sceneKey: 'ui_v2/scenes/ill_s05',
+      charKey: 'ui_v2/characters/chr_assist01',
+      focus: bannerH >= 120 ? [0.5, 0.48] : [0.5, 0.56],
+      charHeightRatio: 0.94,
+      charXRatio: 0.62,
+    });
 
     // R28：现金主指标；营收/利润为已结算累计附指标（口径写在标题里，不把预计当实际）
     const cashCard = createRect({ width: 343, height: 86, color: Color.WHITE, radius: 8, parent: parent });
-    cashCard.setPosition(0, 258);
+    cashCard.setPosition(0, 258 - shift);
+    // §30.5 UI-05：资金指标图标（ICO-K03 钱包，装饰不占触区）
+    const cashIcon = new Node('CashIcon');
+    cashIcon.parent = cashCard;
+    cashIcon.addComponent(UITransform).setContentSize(new Size(18, 18));
+    cashIcon.setPosition(-152, 26);
+    attachUiSprite(cashIcon, 'ui_v2/business/ico_k03');
     createLabel({ text: '当前可用现金', fontSize: 12, color: THEME.textWeak, parent: cashCard }).setPosition(0, 26);
     createLabel({
       text: moneyText(vm.cashYuan),
@@ -3341,7 +3589,15 @@ export class AppView extends Component {
     ];
     secondary.forEach(([title, value, color], i) => {
       const card = createRect({ width: 167, height: 62, color: Color.WHITE, radius: 8, parent: parent });
-      card.setPosition(i === 0 ? -87 : 87, 186);
+      card.setPosition(i === 0 ? -87 : 87, 186 - shift);
+      // §30.5 UI-05：利润指标图标（ICO-K04 递增柱形，只装饰利润卡，布局不动）
+      if (i === 1) {
+        const profitIcon = new Node('ProfitIcon');
+        profitIcon.parent = card;
+        profitIcon.addComponent(UITransform).setContentSize(new Size(14, 14));
+        profitIcon.setPosition(-72, 15);
+        attachUiSprite(profitIcon, 'ui_v2/business/ico_k04');
+      }
       createLabel({ text: title, fontSize: 11, color: THEME.textWeak, width: 155, parent: card }).setPosition(0, 15);
       createLabel({
         text: value < 0 ? `-${moneyText(Math.abs(value))}` : moneyText(value),
@@ -3354,11 +3610,11 @@ export class AppView extends Component {
     });
 
     // 时间控制单独成区：暂停/1×/2×/5× 就地更新，不重建整页
-    this.renderTimeControl(parent, 126);
+    this.renderTimeControl(parent, 126 - shift);
 
     // CEO 与团队
     const ceoCard = createRect({ width: 343, height: 56, color: Color.WHITE, radius: 8, parent: parent });
-    ceoCard.setPosition(0, 62);
+    ceoCard.setPosition(0, 62 - shift);
     createLabel({
       text: `${s.ceo?.name ?? ''}（${TRAIT_LABELS[s.ceo?.trait ?? 'STEADY'].name}）`,
       fontSize: 13,
@@ -3385,7 +3641,7 @@ export class AppView extends Component {
 
     // 业务资产 / 产能 / 需求 / 报告入口
     const actionCard = createRect({ width: 343, height: 124, color: Color.WHITE, radius: 8, parent: parent });
-    actionCard.setPosition(0, -22);
+    actionCard.setPosition(0, -22 - shift);
     createLabel({
       text: '业务资产与产能',
       fontSize: 13,
@@ -3443,7 +3699,15 @@ export class AppView extends Component {
 
     // 盈利目标与现金风险（口径来自领域 assessRisk）
     const goalCard = createRect({ width: 343, height: 76, color: Color.WHITE, radius: 8, parent: parent });
-    goalCard.setPosition(0, -126);
+    goalCard.setPosition(0, -126 - shift);
+    if (vm.target3YearsAchieved) {
+      // UI-25：真实达成后才挂 BAD-01 荣誉徽章（不改数值、不提前显示）
+      const badge = new Node('GoalBadge');
+      badge.parent = goalCard;
+      badge.addComponent(UITransform).setContentSize(new Size(24, 24));
+      badge.setPosition(-150, 18);
+      attachUiSprite(badge, 'ui_v2/badges/bad_01');
+    }
     createLabel({
       text: vm.target3YearsAchieved
         ? '已达成连续 3 年盈利目标，可继续自由经营'
@@ -3451,9 +3715,9 @@ export class AppView extends Component {
       fontSize: 13,
       bold: true,
       color: vm.target3YearsAchieved ? THEME.profit : THEME.text,
-      width: 320,
+      width: vm.target3YearsAchieved ? 290 : 320,
       parent: goalCard,
-    }).setPosition(0, 18);
+    }).setPosition(vm.target3YearsAchieved ? 10 : 0, 18);
     createLabel({
       text: vm.risk.level === 'WARNING'
         ? `现金预警：当前现金低于未来 6 个月刚性费用 ${moneyText(vm.risk.sixMonthNeed)}`
@@ -3483,7 +3747,7 @@ export class AppView extends Component {
           this.distressAckKey = null;
           this.ensureDistressNotice();
         },
-      }).setPosition(0, -190);
+      }).setPosition(0, -190 - shift);
     }
   }
 
@@ -3558,6 +3822,81 @@ export class AppView extends Component {
         parent: row,
       }).setPosition(71, 0);
     }
+    // EX-07：经营诊断（顾问形象 + 与公司页同刻度的需求/产能条，口径取领域值）
+    const diagRow = new Node('DiagnosisRow');
+    diagRow.parent = body;
+    diagRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 100));
+    const advisor = new Node('AdvisorFigure');
+    advisor.parent = diagRow;
+    advisor.addComponent(UITransform).setContentSize(new Size(56, 56));
+    advisor.setPosition(-innerWidth / 2 + 28, 16);
+    attachUiSprite(advisor, 'ui_v2/characters/chr_advisor01');
+    createLabel({
+      text: '经营诊断（只读）',
+      fontSize: 13,
+      bold: true,
+      width: innerWidth - 70,
+      align: 'left',
+      parent: diagRow,
+    }).setPosition(36, 36);
+    createLabel({
+      text: vm.idleRisk
+        ? '产能已高于当月需求：优先提升订单，继续扩产可能闲置'
+        : '当月需求可覆盖产能：扩产前仍建议核对现金安全线',
+      fontSize: 11,
+      color: vm.idleRisk ? THEME.danger : THEME.textWeak,
+      width: innerWidth - 70,
+      lineHeight: 16,
+      align: 'left',
+      parent: diagRow,
+    }).setPosition(36, 12);
+    const scaleMax = Math.max(vm.monthlyCapacityYuan, vm.monthlyPotentialOrderYuan, 1);
+    const barW = 110;
+    const bars: Array<[string, number, Color]> = [
+      ['产能', vm.monthlyCapacityYuan, THEME.primary],
+      ['需求', vm.monthlyPotentialOrderYuan, THEME.secondary],
+    ];
+    bars.forEach(([name, value, color], index) => {
+      const barY = -12 - index * 18;
+      createLabel({
+        text: name,
+        fontSize: 10,
+        color: THEME.textWeak,
+        width: 28,
+        align: 'left',
+        parent: diagRow,
+      }).setPosition(-innerWidth / 2 + 14, barY);
+      const track = new Node('BarTrack');
+      track.parent = diagRow;
+      track.addComponent(UITransform).setContentSize(new Size(barW, 8));
+      track.setPosition(-innerWidth / 2 + 32 + barW / 2, barY);
+      const tg = track.addComponent(Graphics);
+      tg.fillColor = THEME.divider;
+      tg.roundRect(-barW / 2, -4, barW, 8, 3);
+      tg.fill();
+      const fillNode = new Node('BarFill');
+      fillNode.parent = track;
+      fillNode.addComponent(UITransform).setContentSize(new Size(barW, 8));
+      const fg = fillNode.addComponent(Graphics);
+      fg.fillColor = color;
+      fg.roundRect(-barW / 2, -4, Math.max(2, Math.round((barW * value) / scaleMax)), 8, 3);
+      fg.fill();
+    });
+    // EX-09：市场只读（场景图 + 行业图标 + 潜在订单）
+    this.appendDialogScene(body, 'ui_v2/scenes/ill_s23', 72, innerWidth);
+    const marketIcon = new Node('MarketIndustryIcon');
+    marketIcon.parent = body;
+    marketIcon.addComponent(UITransform).setContentSize(new Size(28, 28));
+    attachUiSprite(marketIcon, INDUSTRY_ICON_KEYS[company.industry]);
+    createLabel({
+      text: `市场：${INDUSTRY_LABELS[company.industry]}｜当月潜在订单 ${moneyText(vm.monthlyPotentialOrderYuan)}｜当月产能 ${moneyText(vm.monthlyCapacityYuan)}`,
+      fontSize: 11,
+      color: THEME.textWeak,
+      width: innerWidth,
+      lineHeight: 18,
+      align: 'left',
+      parent: body,
+    });
     createLabel({
       text: '提示：顶部栏只显示单行公司名，完整名称以本页为准。',
       fontSize: 11,
@@ -3565,9 +3904,64 @@ export class AppView extends Component {
       width: innerWidth,
       parent: body,
     });
+    const detailFooter = layoutActionRow(240, 2, BUTTON_BASELINE.gap);
+    const helpItem = detailFooter[0]!;
+    const closeItem = detailFooter[1]!;
+    createButton({
+      text: '口径说明',
+      width: helpItem.width,
+      height: 46,
+      variant: 'secondary',
+      color: THEME.chip,
+      textColor: THEME.primary,
+      parent: handle.footer,
+      onClick: () => this.renderCompanyHelpDialog(),
+    }).setPosition(helpItem.x, 0);
     createButton({
       text: '关闭',
-      width: 240,
+      width: closeItem.width,
+      height: 46,
+      parent: handle.footer,
+      onClick: () => handle.close(),
+    }).setPosition(closeItem.x, 0);
+  }
+
+  /** UI-23：只读口径说明（ICO-K14），解释金额与排名的计算边界，不做建议承诺。 */
+  private renderCompanyHelpDialog(): void {
+    const handle = openScrollableDialog({
+      overlay: this.modalOverlay(),
+      viewportHeight: this.shellLayout().viewportHeight,
+      title: '口径说明',
+      width: 320,
+      desiredBodyHeight: 240,
+      session: { semanticKey: `company-help:${this.contextEpoch}`, kind: 'notice', owner: this.dialogOwner() },
+    });
+    const head = new Node('HelpHead');
+    head.parent = handle.body;
+    head.addComponent(UITransform).setContentSize(new Size(264, 44));
+    const icon = new Node('HelpIcon');
+    icon.parent = head;
+    icon.addComponent(UITransform).setContentSize(new Size(32, 32));
+    icon.setPosition(-116, 0);
+    attachUiSprite(icon, 'ui_v2/business/ico_k14');
+    createLabel({ text: '数据口径（只读）', fontSize: 14, bold: true, width: 220, align: 'left', parent: head }).setPosition(16, 0);
+    createLabel({
+      text:
+        '总资产 = 可用现金 + 未折旧业务资产；不含负债（MVP 无贷款）。\n' +
+        '利润 = 当年收入 − 直接成本 − 工资 − 部门与运营费用；不含资本注入。\n' +
+        '当月需求是潜在订单上限，实际收入取 min(订单, 产能)。\n' +
+        '经营年限以已完成年度结算为准，进行中的年度不计入。\n' +
+        '本地模拟榜不上传平台；真实榜仅在开启授权后提交总资产与完成年限。',
+      fontSize: 12,
+      color: THEME.text,
+      width: 264,
+      lineHeight: 20,
+      align: 'left',
+      parent: handle.body,
+    });
+    createButton({
+      text: '知道了',
+      width: 220,
       height: 46,
       parent: handle.footer,
       onClick: () => handle.close(),
@@ -3588,6 +3982,12 @@ export class AppView extends Component {
       0,
       112,
     );
+    // UI-31：气泡内时间控制图标（与公司页同一 ICO-K15）
+    const bubbleClock = new Node('BubbleClockIcon');
+    bubbleClock.parent = overlay;
+    bubbleClock.addComponent(UITransform).setContentSize(new Size(22, 22));
+    bubbleClock.setPosition(-122, 112);
+    attachUiSprite(bubbleClock, 'ui_v2/business/ico_k15');
     createLabel({
       text: '营收是卖出去多少；利润才是扣掉成本后赚的钱。\n\n公司会自动经营，你可以暂停或加速时间。',
       fontSize: 14,
@@ -3642,7 +4042,13 @@ export class AppView extends Component {
     const s = this.state();
     const wrap = createRect({ width: 343, height: 56, color: Color.WHITE, radius: 8, parent });
     wrap.setPosition(0, centerY);
-    createLabel({ text: '时间', fontSize: 12, color: THEME.textWeak, parent: wrap }).setPosition(-140, 0);
+    createLabel({ text: '时间', fontSize: 12, color: THEME.textWeak, parent: wrap }).setPosition(-136, 0);
+    // UI-31：时间控制独立图标 ICO-K15（装饰，不遮挡倍速按钮热区）
+    const clockIcon = new Node('TimeIcon');
+    clockIcon.parent = wrap;
+    clockIcon.addComponent(UITransform).setContentSize(new Size(18, 18));
+    clockIcon.setPosition(-162, 0);
+    attachUiSprite(clockIcon, 'ui_v2/business/ico_k15');
     const speeds: Array<[string, GameSpeed]> = [
       ['暂停', 0],
       ['1×', 1],
@@ -3675,6 +4081,8 @@ export class AppView extends Component {
       this.toast(this.speedLabel(speed));
       return;
     }
+    // §29.13：切换前先按旧倍速结算累计时间，避免 pending 区间被按新倍速折算。
+    await this.commitClockTick(Date.now());
     const r = await this.facade.setSpeed(speed, { commandId: nextCommandId('speed'), expectedRunId: s.runId });
     if (!r.ok) {
       this.toast(r.displayMessage);
@@ -3708,15 +4116,28 @@ export class AppView extends Component {
     if (!vm) return;
     createLabel({ text: '部门', fontSize: 22, bold: true, color: THEME.text, parent: parent }).setPosition(0, 344);
 
+    // §30.5 UI-06：标题下插入 ILL-S06 场景横幅（纯场景无人物，装饰不占触区）
+    const deptLayout = this.shellLayout();
+    const deptBannerH = deptLayout.viewportHeight < 720 ? 96 : 160;
+    const deptShift = deptBannerH + 12;
+    const deptBanner = new Node('DeptBanner');
+    deptBanner.parent = parent;
+    deptBanner.addComponent(UITransform).setContentSize(new Size(343, deptBannerH));
+    deptBanner.setPosition(0, 300 - 6 - deptBannerH / 2);
+    attachSceneBanner(deptBanner, {
+      sceneKey: 'ui_v2/scenes/ill_s06',
+      focus: [0.5, 0.52],
+    });
+
     // 经营方针：按钮与说明分组，说明在上、按钮在下
-    createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 282);
+    createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 282 - deptShift);
     createLabel({
       text: `自动经营方针：${POLICY_META[s.policy].name}（${POLICY_META[s.policy].desc}）`,
       fontSize: 12,
       color: THEME.textWeak,
       width: 320,
       parent: parent,
-    }).setPosition(0, 312);
+    }).setPosition(0, 312 - deptShift);
     (['GROWTH', 'STEADY', 'PROFIT'] as Policy[]).forEach((p, i) => {
       createButton({
         text: POLICY_META[p].name,
@@ -3728,11 +4149,11 @@ export class AppView extends Component {
         textColor: s.policy === p ? Color.WHITE : THEME.textWeak,
         parent: parent,
         onClick: () => void this.onSetPolicy(p),
-      }).setPosition(-100 + i * 100, 268);
+      }).setPosition(-100 + i * 100, 268 - deptShift);
     });
 
     // 自动预算入口：门槛/安全线/可支配余量（真实查询）
-    createRect({ width: 343, height: 64, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 196);
+    createRect({ width: 343, height: 64, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, 196 - deptShift);
     createLabel({
       text: `自动预算｜${POLICY_META[vm.autoBudget.policy].name}（ROI≥${(vm.autoBudget.roiThresholdBps / 10_000).toFixed(1)}）\n`
         + `保留 ${vm.autoBudget.cashReserveMonths} 个月刚性费用｜可支配 ${compactMoney(vm.autoBudget.spendableYuan)}`,
@@ -3741,7 +4162,7 @@ export class AppView extends Component {
       width: 210,
       lineHeight: 17,
       parent: parent,
-    }).setPosition(-60, 196);
+    }).setPosition(-60, 196 - deptShift);
     createButton({
       text: '预览',
       width: 76,
@@ -3749,7 +4170,7 @@ export class AppView extends Component {
       fontSize: 13,
       parent: parent,
       onClick: () => this.openAutoBudgetDialog(),
-    }).setPosition(125, 196);
+    }).setPosition(125, 196 - deptShift);
 
     // 归因说明：历史账本无逐部门归因，数字只代表当月估算
     createLabel({
@@ -3759,10 +4180,10 @@ export class AppView extends Component {
       width: 343,
       lineHeight: 17,
       parent: parent,
-    }).setPosition(0, 150);
+    }).setPosition(0, 150 - deptShift);
 
     // 已建部门卡片（主营 + 支持部门）
-    let y = 40;
+    let y = 40 - deptShift;
     const ordered = [
       ...vm.departments.filter((d) => d.type === 'BUSINESS'),
       ...vm.departments.filter((d) => d.type !== 'BUSINESS'),
@@ -3790,15 +4211,27 @@ export class AppView extends Component {
       : `估算${VALUE_KIND_TEXT[deptVm.valueKind]} ${compactMoney(deptVm.estimatedMonthlyValueYuan)}`;
 
     createRect({ width: 343, height: 156, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
-    createLabel({ text: name, fontSize: 15, bold: true, width: 214, align: 'left', parent: parent }).setPosition(-54, y + 54);
+    // §30.5 UI-06：部门类型图标（ICO-D01~06，装饰不占触区；名称右移留位）
+    const deptIcon = new Node('DeptIcon');
+    deptIcon.parent = parent;
+    deptIcon.addComponent(UITransform).setContentSize(new Size(22, 22));
+    deptIcon.setPosition(-156, y + 54);
+    attachUiSprite(deptIcon, DEPT_ICON_KEYS[deptVm.type]);
+    createLabel({ text: name, fontSize: 15, bold: true, width: 200, align: 'left', parent: parent }).setPosition(-40, y + 54);
+    // UI-22：编制模式图标 ICO-K13（AUTO/LOCKED 同一图标，状态仍由右侧文字表达）
+    const staffingIcon = new Node('StaffingIcon');
+    staffingIcon.parent = parent;
+    staffingIcon.addComponent(UITransform).setContentSize(new Size(18, 18));
+    staffingIcon.setPosition(86, y + 54);
+    attachUiSprite(staffingIcon, 'ui_v2/business/ico_k13');
     createLabel({
       text: deptVm.staffingMode === 'AUTO' ? '自动编制' : '手动锁定',
       fontSize: 12,
       color: deptVm.staffingMode === 'AUTO' ? THEME.secondary : THEME.textWeak,
-      width: 74,
+      width: 66,
       align: 'right',
       parent: parent,
-    }).setPosition(124, y + 54);
+    }).setPosition(128, y + 54);
     createLabel({
       text: `在岗 ${deptVm.headcount} 人｜月薪合计 ${compactMoney(deptVm.monthlyPayrollYuan)}`,
       fontSize: 12,
@@ -3868,7 +4301,13 @@ export class AppView extends Component {
   private renderUncreatedDept(parent: Node, u: UncreatedDeptVM, y: number): void {
     const meta = SUPPORT_DEPT_META[u.type];
     createRect({ width: 343, height: 92, color: Color.WHITE, radius: 8, parent: parent }).setPosition(0, y);
-    createLabel({ text: meta.name, fontSize: 14, bold: true, width: 200, align: 'left', parent: parent }).setPosition(-60, y + 28);
+    // §30.5 UI-06：创建入口同样标部门类型图标
+    const newDeptIcon = new Node('DeptIcon');
+    newDeptIcon.parent = parent;
+    newDeptIcon.addComponent(UITransform).setContentSize(new Size(20, 20));
+    newDeptIcon.setPosition(-158, y + 28);
+    attachUiSprite(newDeptIcon, DEPT_ICON_KEYS[u.type]);
+    createLabel({ text: meta.name, fontSize: 14, bold: true, width: 188, align: 'left', parent: parent }).setPosition(-46, y + 28);
     createLabel({
       text: meta.desc,
       fontSize: 12,
@@ -4254,7 +4693,25 @@ export class AppView extends Component {
       parent: parent,
     }).setPosition(0, 316);
 
+    // §30.5 UI-07：标题下方 HR 横幅（ILL-S07 未交付，先用卡片底板 + CHR-HR01 回退）
+    const layout = this.shellLayout();
+    const talentBannerH = layout.viewportHeight < 720 ? 72 : 88;
+    const shift = talentBannerH + 12;
+    const banner = new Node('TalentBanner');
+    banner.parent = parent;
+    banner.addComponent(UITransform).setContentSize(new Size(343, talentBannerH));
+    banner.setPosition(0, 300 - talentBannerH / 2);
+    // §30.5 UI-07：ILL-S07 人才区空镜 + CHR-HR01 独立立绘（装饰不占触区）
+    attachSceneBanner(banner, {
+      sceneKey: 'ui_v2/scenes/ill_s07',
+      charKey: 'ui_v2/characters/chr_hr01',
+      focus: [0.5, 0.52],
+      charHeightRatio: 0.94,
+      charXRatio: 0.85,
+    });
+
     // 部门筛选：最多 6 个部门 + 全部（每行 4 个，热区 44）
+    const filterGridTop = 286 - shift;
     ov.filters.forEach((f, i) => {
       const label = f.deptType === null ? '全部' : this.deptLabel(f.deptType).replace('部', '');
       createButton({
@@ -4272,7 +4729,7 @@ export class AppView extends Component {
           audioManager.uiSelect();
           this.render();
         },
-      }).setPosition(-126 + (i % 4) * 84, 286 - Math.floor(i / 4) * 48);
+      }).setPosition(-126 + (i % 4) * 84, filterGridTop - Math.floor(i / 4) * 48);
     });
 
     const cardHeight = 108;
@@ -4281,7 +4738,7 @@ export class AppView extends Component {
     // used between controls. The filter grid is authored at y=286 in 48-unit
     // row steps and each button has a 44-unit hit target.
     const filterRows = Math.ceil(ov.filters.length / 4);
-    const filterBottom = 286 - Math.max(0, filterRows - 1) * 48 - 22;
+    const filterBottom = filterGridTop - Math.max(0, filterRows - 1) * 48 - 22;
     const listTop = filterBottom - 8 - cardHeight / 2;
     if (ov.rows.length === 0) {
       createLabel({
@@ -4294,19 +4751,22 @@ export class AppView extends Component {
     }
 
     // 复用卡片池：只渲染可视窗口内约 12 张卡，滚动时更新内容与位置
-    const cards: Array<{ node: Node; name: Node; meta: Node; pay: Node; state: Node; index: number }> = [];
+    const cards: Array<{ node: Node; name: Node; meta: Node; pay: Node; state: Node; avatar: AvatarSlot; index: number }> = [];
     for (let i = 0; i < 12; i += 1) {
       const card = createRect({ width: 343, height: cardHeight, color: Color.WHITE, radius: 8, parent });
       card.active = false;
-      const name = createLabel({ text: '', fontSize: 15, bold: true, width: 210, align: 'left', parent: card });
-      name.setPosition(-55, 32);
-      const meta = createLabel({ text: '', fontSize: 12, color: THEME.textWeak, width: 210, align: 'left', parent: card });
-      meta.setPosition(-55, 12);
-      const pay = createLabel({ text: '', fontSize: 12, color: THEME.primary, width: 210, align: 'left', parent: card });
-      pay.setPosition(-55, -8);
-      const state = createLabel({ text: '', fontSize: 12, color: THEME.textWeak, width: 210, align: 'left', parent: card });
-      state.setPosition(-55, -30);
-      const entry = { node: card, name, meta, pay, state, index: -1 };
+      // §30.4 头像身份：avatarId 有登记键时显示真实头像，否则中性首字回退
+      const avatar = createAvatarSlot(card, 44);
+      avatar.root.setPosition(-143, 14);
+      const name = createLabel({ text: '', fontSize: 15, bold: true, width: 180, align: 'left', parent: card });
+      name.setPosition(-26, 32);
+      const meta = createLabel({ text: '', fontSize: 12, color: THEME.textWeak, width: 180, align: 'left', parent: card });
+      meta.setPosition(-26, 12);
+      const pay = createLabel({ text: '', fontSize: 12, color: THEME.primary, width: 180, align: 'left', parent: card });
+      pay.setPosition(-26, -8);
+      const state = createLabel({ text: '', fontSize: 12, color: THEME.textWeak, width: 180, align: 'left', parent: card });
+      state.setPosition(-26, -30);
+      const entry = { node: card, name, meta, pay, state, avatar, index: -1 };
       cards.push(entry);
       createButton({
         text: '详情',
@@ -4358,6 +4818,7 @@ export class AppView extends Component {
       card.node.active = !!row;
       if (!row) continue;
       card.node.setPosition(0, pool.listTop - index * pool.step + shell.shift);
+      setAvatarImage(card.avatar, row.avatarId, row.name);
       card.name.getComponent(Label)!.string = `${row.name}（${this.deptLabel(row.deptType).replace('部', '')}）`;
       card.meta.getComponent(Label)!.string = `能力 ${row.skill}｜潜力 ${row.potential}｜协作 ${row.teamwork}`;
       card.pay.getComponent(Label)!.string = `月薪 ${moneyText(row.salaryMonthlyYuan)}｜入职 ${row.tenureMonths} 个月`;
@@ -4394,6 +4855,10 @@ export class AppView extends Component {
     if (handle.closed) return;
 
     const body = handle.body;
+    // UI-10：员工详情的真实头像与专属场景图（与列表同 avatarId，不重抽随机）
+    const headerAvatar = createAvatarSlot(body, 64, 'EmployeeDetailAvatar');
+    setAvatarImage(headerAvatar, emp.avatarId, emp.name);
+    this.appendDialogScene(body, 'ui_v2/scenes/ill_s10', 76, 292);
     const asOfLabel = createLabel({
       text: this.detailAsOfText(s),
       fontSize: 11,
@@ -4766,6 +5231,8 @@ export class AppView extends Component {
     if (pv.cashAfterYuan < 0) {
       handle.setError('现金不足以支付补偿，请先回笼资金后再裁员。');
     }
+    // UI-18：STA-05 裁员状态贴纸（纯装饰，不改变确认按钮与金额文案）
+    this.appendDialogIcon(handle.body, 'ui_v2/status/sta_05', 44);
   }
 
   private openHireForDept(deptId: string): void {
@@ -4779,21 +5246,31 @@ export class AppView extends Component {
     const storedCouponId = s.adRewards?.couponIds[0];
     const couponId = isAdCouponAvailable(s, storedCouponId, Date.now(), this.adRewardOwnerScope()) ? storedCouponId : undefined;
     const overlay = this.modalOverlay();
-    createRect({ width: 340, height: 470, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
-    createLabel({ text: '招聘候选人', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 206);
-    createLabel({ text: '招聘费=1个月月薪（HR已生效可折扣），次月到岗', fontSize: 10, color: THEME.textWeak, width: 300, parent: overlay }).setPosition(0, 186);
+    createRect({ width: 340, height: 540, color: Color.WHITE, radius: 12, parent: overlay }).setPosition(0, 0);
+    createLabel({ text: '招聘候选人', fontSize: 18, bold: true, parent: overlay }).setPosition(0, 241);
+    createLabel({ text: '招聘费=1个月月薪（HR已生效可折扣），次月到岗', fontSize: 10, color: THEME.textWeak, width: 300, parent: overlay }).setPosition(0, 221);
+    // §30.5 UI-16：ILL-S15 面试室空镜 + CHR-HR01 独立立绘（装饰不占触区）
+    const hrStrip = new Node('HireBanner');
+    hrStrip.parent = overlay;
+    hrStrip.addComponent(UITransform).setContentSize(new Size(308, 56));
+    hrStrip.setPosition(0, 184);
+    attachSceneBanner(hrStrip, { sceneKey: 'ui_v2/scenes/ill_s15', charKey: 'ui_v2/characters/chr_hr01', focus: [0.5, 0.52], charHeightRatio: 0.94, charXRatio: 0.85 });
 
     offer.candidates.forEach((c, idx) => {
-      const cardY = 150 - idx * 108;
+      const cardY = 108 - idx * 108;
       // R26：费用与可负担性一律取领域层 preview（含 HR 折扣），UI 不猜公式
       const pv = this.facade.previewHire({ offerId: offer.offerId, candidateId: c.candidateId, departmentId: deptId, ...(couponId ? { couponId } : {}) });
       const feeText = pv.ok ? moneyText(pv.payload.feeYuan) : moneyText(c.salaryMonthlyYuan);
       const affordable = pv.ok ? pv.payload.affordable : s.company!.cashYuan >= c.salaryMonthlyYuan;
       createRect({ width: 308, height: 98, color: THEME.bg, radius: 8, parent: overlay }).setPosition(0, cardY);
+      // §30.4 头像身份：avatarId 有登记键时显示真实头像，否则中性首字回退
+      const avatar = createAvatarSlot(overlay, 40, `HireAvatar${idx}`);
+      avatar.root.setPosition(-126, cardY + 14);
+      setAvatarImage(avatar, c.avatarId, c.name);
       const arch = c.archetype === 'A' ? '即战力' : c.archetype === 'B' ? '潜力股' : '经济型';
-      createLabel({ text: `${c.name}（${arch}）`, fontSize: 14, bold: true, width: 180, align: 'left', parent: overlay }).setPosition(-56, cardY + 32);
-      createLabel({ text: `能力 ${c.skill} 潜力 ${c.potential} 协作 ${c.teamwork}`, fontSize: 11, color: THEME.textWeak, width: 200, align: 'left', parent: overlay }).setPosition(-46, cardY + 12);
-      createLabel({ text: `月薪 ${moneyText(c.salaryMonthlyYuan)}｜招聘费 ${feeText}${couponId ? '（券）' : ''}`, fontSize: 11, color: THEME.primary, width: 200, align: 'left', parent: overlay }).setPosition(-46, cardY - 8);
+      createLabel({ text: `${c.name}（${arch}）`, fontSize: 14, bold: true, width: 160, align: 'left', parent: overlay }).setPosition(-24, cardY + 32);
+      createLabel({ text: `能力 ${c.skill} 潜力 ${c.potential} 协作 ${c.teamwork}`, fontSize: 11, color: THEME.textWeak, width: 180, align: 'left', parent: overlay }).setPosition(-14, cardY + 12);
+      createLabel({ text: `月薪 ${moneyText(c.salaryMonthlyYuan)}｜招聘费 ${feeText}${couponId ? '（券）' : ''}`, fontSize: 11, color: THEME.primary, width: 180, align: 'left', parent: overlay }).setPosition(-14, cardY - 8);
       createButton({
         text: '录用',
         width: 60,
@@ -4806,6 +5283,10 @@ export class AppView extends Component {
           this.openHireConfirm(c.candidateId, deptId, { initial: false, offer, ...(couponId ? { couponId } : {}) });
         },
       }).setPosition(124, cardY);
+      // §30.5 UI-16：现金不足必须可解释，而不是只把按钮置灰。
+      if (!affordable) {
+        createLabel({ text: '现金不足', fontSize: 11, color: THEME.danger, width: 60, parent: overlay }).setPosition(124, cardY - 33);
+      }
     });
 
     createButton({
@@ -4820,7 +5301,7 @@ export class AppView extends Component {
         overlay.destroy();
         void this.refreshHire(deptId);
       },
-    }).setPosition(-60, -206);
+    }).setPosition(-60, -236);
     if (this.adCoordinator && (this.adCoordinator.canStart() || this.adCoordinator.hasPendingGrant())
       && !couponId && this.facade.canRequestRewardedAd()) {
       createButton({
@@ -4846,7 +5327,7 @@ export class AppView extends Component {
             this.renderHireDialog(live, deptId);
           });
         },
-      }).setPosition(0, -158);
+      }).setPosition(0, -186);
     }
     createButton({
       text: '关闭',
@@ -4857,7 +5338,7 @@ export class AppView extends Component {
       textColor: THEME.text,
       parent: overlay,
       onClick: () => overlay.destroy(),
-    }).setPosition(60, -206);
+    }).setPosition(60, -236);
   }
 
   private async refreshHire(deptId: string): Promise<void> {
@@ -4875,6 +5356,29 @@ export class AppView extends Component {
 
   private renderRankTab(parent: Node): void {
     createLabel({ text: '排行榜', fontSize: 20, bold: true, color: THEME.text, width: 200, align: 'left', parent }).setPosition(-71, 352);
+    // §30.5 UI-08：RANK-03 小奖杯作题头装饰（装饰不占触区）
+    const titleBadge = new Node('RankTitleBadge');
+    titleBadge.parent = parent;
+    titleBadge.addComponent(UITransform).setContentSize(new Size(20, 20));
+    titleBadge.setPosition(-98, 352);
+    attachUiSprite(titleBadge, RANK_TROPHY_KEY);
+
+    // §31.2 D1-QA-01：常规视高用 56–72 荣誉条，短屏只保留题头奖杯并释放横幅占位。
+    // 阈值沿用 720 逻辑可视高；两档共用同一数据和点击逻辑，仅高度预算不同。
+    const rankLayout = this.shellLayout();
+    const rankCompact = rankLayout.viewportHeight < 720;
+    const RANK_BANNER_H = 64;
+    let rankTopY = 310;
+    if (!rankCompact) {
+      const bannerTop = 330;
+      const rankBanner = new Node('RankBanner');
+      rankBanner.parent = parent;
+      rankBanner.addComponent(UITransform).setContentSize(new Size(343, RANK_BANNER_H));
+      rankBanner.setPosition(0, bannerTop - RANK_BANNER_H / 2);
+      attachSceneBanner(rankBanner, { sceneKey: 'ui_v2/scenes/ill_s08', focus: [0.5, 0.52] });
+      // 横幅底边与切榜热区顶边保留 8 单位净距
+      rankTopY = bannerTop - RANK_BANNER_H - 8 - 22;
+    }
 
     const boardId = this.rankMode === 'assets' ? this.leaderboardConfig?.assetsBoardId : this.leaderboardConfig?.yearsBoardId;
     const realBoardReady = Boolean(this.leaderboardConfig?.enabled && this.leaderboardConsent);
@@ -4902,7 +5406,7 @@ export class AppView extends Component {
         audioManager.uiSelect();
         this.render();
       },
-    }).setPosition(assetsItem.x, 310);
+    }).setPosition(assetsItem.x, rankTopY);
     createButton({
       text: '年限榜',
       width: yearsItem.width,
@@ -4918,10 +5422,10 @@ export class AppView extends Component {
         audioManager.uiSelect();
         this.render();
       },
-    }).setPosition(yearsItem.x, 310);
+    }).setPosition(yearsItem.x, rankTopY);
 
     // 真实榜已启用时单独提供入口；未启用时只保留标题标签，不再重复长说明。
-    let cursor = 310 - 22;
+    let cursor = rankTopY - 22;
     if (realBoardReady) {
       const entryY = cursor - 12 - 22;
       createButton({ text: '打开 TapTap 公开榜', width: 168, height: 44, visualHeight: 32, fontSize: 12, color: THEME.chip,
@@ -4930,6 +5434,12 @@ export class AppView extends Component {
           if (!boardId) { this.toast('真实榜单缺少后台榜 ID'); return; }
           void new TapLeaderboardProvider().open(boardId).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用（需后台白名单/登录态）'); });
         } }).setPosition(0, entryY);
+      // UI-24：真实榜入口图标 RANK-04（装饰不占触区，不改按钮热区）
+      const rankEntryIcon = new Node('RankEntryIcon');
+      rankEntryIcon.parent = parent;
+      rankEntryIcon.addComponent(UITransform).setContentSize(new Size(22, 22));
+      rankEntryIcon.setPosition(-100, entryY);
+      attachUiSprite(rankEntryIcon, 'ui_v2/rank/rank_04');
       cursor = entryY - 22;
     }
 
@@ -4943,15 +5453,23 @@ export class AppView extends Component {
     const SUMMARY_H = 72;
     const summaryCenter = cursor - 12 - SUMMARY_H / 2;
     createRect({ width: 343, height: SUMMARY_H, color: Color.WHITE, radius: 12, parent }).setPosition(0, summaryCenter);
+    // §30.5 UI-08：RANK-02 本人排名标记（蓝白罗盘徽章，装饰不占触区）
+    if (player) {
+      const selfBadge = new Node('RankSelfBadge');
+      selfBadge.parent = parent;
+      selfBadge.addComponent(UITransform).setContentSize(new Size(22, 22));
+      selfBadge.setPosition(-156, summaryCenter + 14);
+      attachUiSprite(selfBadge, 'ui_v2/rank/rank_02');
+    }
     createLabel({
       text: player ? `我方 第 ${playerRank}/${rows.length} 名` : '尚未创建公司',
       fontSize: 15,
       bold: true,
       color: player ? THEME.primary : THEME.textWeak,
-      width: 208,
+      width: 196,
       align: 'left',
       parent,
-    }).setPosition(-48, summaryCenter + 14);
+    }).setPosition(-40, summaryCenter + 14);
     createLabel({
       text: player
         ? `总资产 ${moneyText(player.assetsYuan)}｜经营 ${player.yearsOperated} 年`
@@ -5008,10 +5526,30 @@ export class AppView extends Component {
           createLabel({ text: `企业：${row.name}`, fontSize: 14, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `总资产：${moneyText(row.assetsYuan)}（现金 + 未折旧业务资产）`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
           createLabel({ text: `经营年限：${row.yearsOperated} 年`, fontSize: 13, color: THEME.text, width: 276, parent: dialog.body });
+          // UI-24：排行口径只读说明（RANK-01/02 共用；不改变名次与按钮）
+          createLabel({
+            text: row.isPlayer
+              ? '口径：总资产为现金 + 未折旧业务资产；年限以已完成年度结算为准。\n本地模拟榜不上传平台；真实榜需在设置中开启授权后提交。'
+              : '口径：该行为本地模拟企业，用于离线比较，不代表真实在线排名。\n真实榜需平台登录与授权，且只在开关开启时显示。',
+            fontSize: 11,
+            color: THEME.textWeak,
+            width: 276,
+            lineHeight: 18,
+            parent: dialog.body,
+          });
           createButton({ text: '关闭', width: 108, height: 44, visualHeight: 40, parent: dialog.footer, onClick: () => dialog.close() }).setPosition(0, 0);
         },
       });
       rowButton.setPosition(0, y);
+      // §30.5 UI-08：前三名贴 RANK-01 金银铜子帧作底，动态名次仍由原生 Label 渲染
+      const medal = rankMedalFor(i + 1);
+      if (medal) {
+        const medalNode = new Node('RankMedal');
+        medalNode.parent = rowButton;
+        medalNode.addComponent(UITransform).setContentSize(new Size(30, 30));
+        medalNode.setPosition(-146.5, 0);
+        attachRankMedal(medalNode, medal);
+      }
       createLabel({ text: `${i + 1}`, fontSize: 14, bold: true, width: 26, color: i < 3 ? THEME.warning : THEME.textWeak, parent: rowButton }).setPosition(-146.5, 0);
       const nameNode = createLabel({
         // §29.12：CLAMP 不产生省略号，长公司名会像被切断；先按列宽截断再渲染。
@@ -5083,7 +5621,7 @@ export class AppView extends Component {
         text: label,
         width: 80,
         height: 56,
-        fontSize: 13,
+        fontSize: 12,
         color: new Color(0, 0, 0, 0),
         textColor: active ? THEME.primary : THEME.textWeak,
         parent: footer,
@@ -5095,6 +5633,21 @@ export class AppView extends Component {
         },
       });
       btn.setPosition(x, layout.bottomInset / 2);
+      // §30.3/§30.5 底部 Tab：文字统一下沉到同一基线；四个 Tab 各接两态图标（选中/未选中同轮廓异色）
+      const labelNode = btn.getChildByName('ButtonLabel');
+      if (labelNode) labelNode.setPosition(0, -13);
+      const TAB_ICON_KEYS: Record<TabId, [string, string]> = {
+        COMPANY: ['ui/navigation/Nav_Company', 'ui/navigation/Nav_Company_Inactive'],
+        DEPARTMENT: ['ui/navigation/Nav_Department', 'ui/navigation/Nav_Department_Inactive'],
+        TALENT: ['ui/navigation/Nav_Talent', 'ui/navigation/Nav_Talent_Inactive'],
+        RANK: ['ui/navigation/Nav_Leaderboard', 'ui/navigation/Nav_Leaderboard_Inactive'],
+      };
+      const icon = new Node('TabIcon');
+      icon.parent = btn;
+      icon.addComponent(UITransform).setContentSize(new Size(22, 22));
+      icon.setPosition(0, 9);
+      const iconPair = TAB_ICON_KEYS[id];
+      attachUiSprite(icon, active ? iconPair[0] : iconPair[1]);
       buttons.push(btn);
     });
     return { root: footer, bg, buttons };
@@ -5115,6 +5668,44 @@ export class AppView extends Component {
     });
     const body = handle.body;
     const innerWidth = 336 - 40;
+    // UI-20：扩产页独立图标 ICO-K12 + 与公司页同刻度的需求/产能条（只读，不改预览金额）
+    const investHead = new Node('InvestHead');
+    investHead.parent = body;
+    investHead.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
+    const investIcon = new Node('InvestIcon');
+    investIcon.parent = investHead;
+    investIcon.addComponent(UITransform).setContentSize(new Size(40, 40));
+    investIcon.setPosition(-innerWidth / 2 + 22, 0);
+    attachUiSprite(investIcon, 'ui_v2/business/ico_k12');
+    const overview = this.facade.getCompanyOverview();
+    if (overview) {
+      const scaleMax = Math.max(overview.monthlyCapacityYuan, overview.monthlyPotentialOrderYuan, 1);
+      const barW = 120;
+      const bars: Array<[string, number, Color]> = [
+        ['产能', overview.monthlyCapacityYuan, THEME.primary],
+        ['需求', overview.monthlyPotentialOrderYuan, THEME.secondary],
+      ];
+      bars.forEach(([name, value, color], index) => {
+        const barY = 12 - index * 20;
+        createLabel({ text: name, fontSize: 10, color: THEME.textWeak, width: 28, align: 'left', parent: investHead })
+          .setPosition(6, barY);
+        const track = new Node('InvestBar');
+        track.parent = investHead;
+        track.addComponent(UITransform).setContentSize(new Size(barW, 8));
+        track.setPosition(24 + barW / 2, barY);
+        const tg = track.addComponent(Graphics);
+        tg.fillColor = THEME.divider;
+        tg.roundRect(-barW / 2, -4, barW, 8, 3);
+        tg.fill();
+        const fill = new Node('InvestBarFill');
+        fill.parent = track;
+        fill.addComponent(UITransform).setContentSize(new Size(barW, 8));
+        const fg = fill.addComponent(Graphics);
+        fg.fillColor = color;
+        fg.roundRect(-barW / 2, -4, Math.max(2, Math.round((barW * value) / scaleMax)), 8, 3);
+        fg.fill();
+      });
+    }
     createLabel({
       text: `可用现金 ${moneyText(s.company?.cashYuan ?? 0)}`,
       fontSize: 13,
@@ -5285,6 +5876,17 @@ export class AppView extends Component {
     const body = handle.body;
     const innerWidth = 276;
 
+    // §30.5 UI-09：正文顶部装饰条（ILL-S09 桌面场景小图 + ICO-K07 账本；随正文滚动，不占触区）
+    const decoStrip = new Node('AnnualDeco');
+    decoStrip.parent = body;
+    decoStrip.addComponent(UITransform).setContentSize(new Size(innerWidth, 48));
+    attachSceneBanner(decoStrip, { sceneKey: 'ui_v2/scenes/ill_s09', focus: [0.5, 0.52], radius: 6 });
+    const ledgerIcon = new Node('LedgerIcon');
+    ledgerIcon.parent = decoStrip;
+    ledgerIcon.addComponent(UITransform).setContentSize(new Size(20, 20));
+    ledgerIcon.setPosition(innerWidth / 2 - 18, 0);
+    attachUiSprite(ledgerIcon, 'ui_v2/business/ico_k07');
+
     if (report) {
       const index = years.indexOf(report.year);
       // §29.5：年份只出现在标题；左右各一个独立按钮槽位，不再用中间文字桥接导致重叠。
@@ -5444,6 +6046,41 @@ export class AppView extends Component {
       });
     }
 
+    // EX-08：本年已发生事件（只读，取 state.annualEvents 真实记录，不做预测）
+    const yearEvents = (s.annualEvents ?? []).filter((e) => e.year === report.year && e.happened);
+    if (yearEvents.length > 0) {
+      createLabel({
+        text: '本年已发生事件（只读）',
+        fontSize: 12,
+        bold: true,
+        color: THEME.text,
+        width: innerWidth,
+        parent: body,
+      });
+      for (const event of yearEvents) {
+        if (!event.type) continue;
+        const meta = ANNUAL_EVENT_META[event.type];
+        const eventRow = new Node('AnnualEventRow');
+        eventRow.parent = body;
+        eventRow.addComponent(UITransform).setContentSize(new Size(innerWidth, 40));
+        const eventIcon = new Node('AnnualEventIcon');
+        eventIcon.parent = eventRow;
+        eventIcon.addComponent(UITransform).setContentSize(new Size(24, 24));
+        eventIcon.setPosition(-innerWidth / 2 + 12, 0);
+        attachUiSprite(eventIcon, meta.iconKey);
+        const effect = event.effectBps !== 0 ? `影响 ${percentText(Math.abs(event.effectBps))}` : '';
+        const amount = event.amountYuan !== 0 ? moneyText(Math.abs(event.amountYuan)) : '';
+        createLabel({
+          text: `${meta.label}｜第 ${event.month} 月${effect ? `｜${effect}` : ''}${amount ? `｜${amount}` : ''}`,
+          fontSize: 12,
+          color: event.amountYuan < 0 || event.effectBps < 0 ? THEME.danger : THEME.text,
+          width: innerWidth - 38,
+          align: 'left',
+          parent: eventRow,
+        }).setPosition(20, 0);
+      }
+    }
+
     createButton({
       text: '关闭',
       width: 108,
@@ -5474,6 +6111,23 @@ export class AppView extends Component {
     const body = handle.body;
     const innerWidth = 330 - 56;
     const audio = audioManager.getSettings();
+
+    // UI-12：设置页独立图标（ICO-K09）+ 一句话说明
+    const settingsHead = new Node('SettingsHead');
+    settingsHead.parent = body;
+    settingsHead.addComponent(UITransform).setContentSize(new Size(innerWidth, 52));
+    const settingsIcon = new Node('SettingsIcon');
+    settingsIcon.parent = settingsHead;
+    settingsIcon.addComponent(UITransform).setContentSize(new Size(40, 40));
+    settingsIcon.setPosition(-innerWidth / 2 + 22, 0);
+    attachUiSprite(settingsIcon, 'ui_v2/business/ico_k09');
+    createLabel({
+      text: '声音、榜单、云备份与合规',
+      fontSize: 13,
+      width: innerWidth - 60,
+      align: 'left',
+      parent: settingsHead,
+    }).setPosition(28, 0);
 
     const section = (text: string): void => {
       createLabel({
@@ -5601,6 +6255,9 @@ export class AppView extends Component {
     });
 
     section('云备份');
+    // EX-02：云备份专属场景 + 按真实账号绑定状态显示 STA-09/STA-10
+    this.appendDialogScene(body, 'ui_v2/scenes/ill_s20', 64, innerWidth);
+    this.appendDialogIcon(body, this.cloudProfileBound ? 'ui_v2/status/sta_10' : 'ui_v2/status/sta_09', 32);
     createLabel({
       text: `${this.cloudStatusText}\n云备份仅用于玩家自己的跨设备恢复，不提供运营后台查询。`,
       fontSize: 12,
@@ -5610,6 +6267,21 @@ export class AppView extends Component {
       align: 'left',
       parent: body,
     });
+    // EX-04：删除云档当前不提供授权接口，明确显示不可用而不是静默隐藏
+    const deleteRow = row();
+    const deleteIcon = new Node('DeleteUnavailableIcon');
+    deleteIcon.parent = deleteRow;
+    deleteIcon.addComponent(UITransform).setContentSize(new Size(22, 22));
+    deleteIcon.setPosition(-innerWidth / 2 + 11, 0);
+    attachUiSprite(deleteIcon, 'ui_v2/status/sta_12');
+    createLabel({
+      text: '删除云档：暂不提供（平台无已授权的删除接口）',
+      fontSize: 12,
+      color: THEME.textWeak,
+      width: innerWidth - 34,
+      align: 'left',
+      parent: deleteRow,
+    }).setPosition(16, 0);
     const cloudRow = row();
     const cloudItems = layoutActionRow(innerWidth, 2, BUTTON_BASELINE.gap);
     const cloudIds: Array<[string, () => void]> = [
@@ -5715,6 +6387,11 @@ export class AppView extends Component {
       desiredBodyHeight: 300,
       session: { semanticKey: `tutorial:${this.contextEpoch}`, kind: 'notice', owner: this.dialogOwner() },
     });
+    // UI-32：回看指引时保留引导角色形象（与新手气泡同一 CHR-GUIDE01）
+    const guideNode = new Node('TutorialGuideFigure');
+    guideNode.parent = handle.body;
+    guideNode.addComponent(UITransform).setContentSize(new Size(56, 56));
+    attachUiSprite(guideNode, 'ui_v2/characters/chr_guide01');
     createLabel({
       text:
         '公司页：实时现金/收入/利润、时间倍速、扩产与年报。\n' +
@@ -5797,6 +6474,11 @@ export class AppView extends Component {
     });
     if (!handle.closed && this.state().runId !== preview.oldRunId) {
       handle.blockSubmit('本局已切换，当前关闭预览已失效。');
+    }
+    // UI-13：关闭公司确认使用 ILL-S12 场景 + STA-03 状态贴纸
+    if (!handle.closed) {
+      this.appendDialogScene(handle.body, 'ui_v2/scenes/ill_s12', 64, 268);
+      this.appendDialogIcon(handle.body, 'ui_v2/status/sta_03', 40);
     }
   }
 

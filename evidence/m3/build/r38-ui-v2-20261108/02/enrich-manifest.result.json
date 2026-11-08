@@ -1,0 +1,17 @@
+{
+  "script": "D:\\Workspace\\TapTap\\我是CEO\\tools\\enrich-manifest.cjs",
+  "args": [
+    "D:\\Workspace\\TapTap\\我是CEO",
+    "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02",
+    "r38-ui-v2-20261108",
+    "02",
+    "diagnostic",
+    "36"
+  ],
+  "startedAt": "2026-11-08T16:49:39.601Z",
+  "finishedAt": "2026-11-08T16:49:40.313Z",
+  "exitCode": 0,
+  "spawnError": null,
+  "stdoutPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02\\enrich-manifest.log",
+  "stderrPath": "D:\\Workspace\\TapTap\\我是CEO\\evidence\\m3\\build\\r38-ui-v2-20261108\\02\\enrich-manifest.err.log"
+}
