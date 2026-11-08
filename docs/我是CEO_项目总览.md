@@ -6915,13 +6915,14 @@ attempt 01 已删除（指纹过期），attempt 02 为唯一当前包。
 
 清理后 D1/D2 `verify_delivery.py` 均 PASS，输入指纹未变（仍为 `afbc40e6…`），保留唯一包。
 
-#### 31.11.6 GitHub 交付
+#### 31.11.6 GitHub 交付（已完成）
 
 - 仓库：`vinkinyyx/i-am-ceo`，origin `https://github.com/vinkinyyx/i-am-ceo.git`
-- 交付分支：`codex/ui-v2-delivery`
-- 草稿 Release tag：`r38-ui-v2-20261108`
-- 附件：`game.zip`（SHA-256 与本地一致）
-- 状态：见本轮最终汇报
+- 交付分支：`codex/ui-v2-delivery`，commit `a59a8289d7495ac3df4695e307c64787c865c7d4`
+- 远端验证：`git ls-remote` 远端 SHA 与本地一致（PASS）
+- 草稿 Release tag：`r38-ui-v2-20261108`，title「我是CEO UI V2 诊断包 r38」
+- 附件：`game.zip`，远端下载 SHA-256 = `af151bb578b7cb0ae29b3116908cf3577df0efb416b66ffd24307719d9105c50`，与本地一致（PASS）
+- Release 链接：https://github.com/vinkinyyx/i-am-ceo/releases/tag/untagged-18d13b2dd155c3fc7c7a
 
 #### 31.11.7 已知阻塞与后续
 
