@@ -5,7 +5,7 @@ const path = require('path');
 const { CanvasDriver } = require('./canvas-driver.cjs');
 
 const CHROME = process.env.CHROME_EXE || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const SEED = 'evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json';
+const SEED = 'tests/fixtures/browser/seed-staffed.json';
 
 function sortValue(value) {
   if (Array.isArray(value)) return value.map(sortValue);
@@ -495,7 +495,7 @@ async function runShortScreen(url, outDir) {
 
 async function main() {
   const url = process.argv[2] || 'http://127.0.0.1:8153/';
-  const outDir = process.argv[3] || 'evidence/ui-v2-d2-d4';
+  const outDir = process.argv[3] || 'build/logs/browser/ui-v2-d2-d4';
   fs.mkdirSync(outDir, { recursive: true });
 
   const full = await runFullPath(url, outDir);

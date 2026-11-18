@@ -1,5 +1,5 @@
 import type {
-  ITapPlatform,
+  IGamePlatform,
   IStorageBackend,
   LoginResult,
   NetworkState,
@@ -7,7 +7,7 @@ import type {
   PlatformHttpResponse,
   Unsubscribe,
   WindowInfo,
-} from '../../assets/core/platform/ITapPlatform';
+} from '../../assets/core/platform/IGamePlatform';
 import { MemoryStorage } from './MemoryStorage';
 
 /**
@@ -15,7 +15,7 @@ import { MemoryStorage } from './MemoryStorage';
  * 关键纪律：本类及其引用严禁被打进正式 TapTap 包生产入口；
  * 真实包使用 TapMiniGamePlatform。
  */
-export class EditorMockPlatform implements ITapPlatform {
+export class EditorMockPlatform implements IGamePlatform {
   private readonly storage: IStorageBackend;
   private readonly showListeners = new Set<() => void>();
   private readonly hideListeners = new Set<() => void>();

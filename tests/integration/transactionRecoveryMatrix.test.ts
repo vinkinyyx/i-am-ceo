@@ -5,7 +5,7 @@ import { createFreshRunState, createInitialState } from '@core/domain/gameStateF
 import { GameError } from '@core/domain/errors';
 import { SAVE_KEYS } from '@core/persistence/SaveTypes';
 import { ScriptedStorage, ScriptedTapRuntime } from '../helpers/faults';
-import { TapPlatform } from '@core/platform/TapPlatform';
+import { TapPlatform } from '@platforms/taptap/TapPlatform';
 
 class RecoveryGateStorage extends ScriptedStorage {
   readonly operations: string[] = [];

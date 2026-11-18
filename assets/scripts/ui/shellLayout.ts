@@ -1,4 +1,4 @@
-import type { WindowInfo } from '../../core/platform/ITapPlatform';
+import type { WindowInfo } from '../../core/platform/IGamePlatform';
 
 /**
  * 页面壳布局计算（R24：固定头尾 + 滚动主体 + 真实安全区锚定）。纯 TS、无引擎依赖，可单测。

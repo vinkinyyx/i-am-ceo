@@ -1,4 +1,4 @@
-import type { ITapPlatform } from '../../core/platform/ITapPlatform';
+import type { IGamePlatform } from '../../core/platform/IGamePlatform';
 import {
   computeSafeAreaTransform,
   type SafeAreaTransform,
@@ -10,7 +10,7 @@ export { computeSafeAreaTransform };
 /**
  * 从平台取窗口信息并计算安全区变换；任何异常回落恒等变换（不阻断启动）。
  */
-export function resolveSafeAreaTransform(platform: ITapPlatform): SafeAreaTransform {
+export function resolveSafeAreaTransform(platform: IGamePlatform): SafeAreaTransform {
   try {
     return computeSafeAreaTransform(platform.getWindowInfo());
   } catch {

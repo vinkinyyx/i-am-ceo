@@ -1,4 +1,4 @@
-import type { IStorageBackend } from './ITapPlatform';
+import type { IStorageBackend } from './IGamePlatform';
 
 /**
  * 隐私政策同意记录（A23 / 合规清单 §1）。

@@ -1,13 +1,13 @@
 import { Game, game, screen, sys, view } from 'cc';
 import type {
-  ITapPlatform,
+  IGamePlatform,
   LoginResult,
   NetworkState,
   PlatformHttpRequest,
   PlatformHttpResponse,
   Unsubscribe,
   WindowInfo,
-} from '../../core/platform/ITapPlatform';
+} from '../../core/platform/IGamePlatform';
 import { GameError, GameErrorCode } from '../../core/domain/errors';
 import { CocosStorageAdapter } from './CocosStorageAdapter';
 
@@ -17,7 +17,7 @@ import { CocosStorageAdapter } from './CocosStorageAdapter';
  * 真实 TapTap 构建（M0-10）将提供调用 tap.* 的 TapMiniGamePlatform，
  * 届时由构建/引导层选择，本类不直接依赖 tap 全局对象。
  */
-export class CocosPlatform implements ITapPlatform {
+export class CocosPlatform implements IGamePlatform {
   private readonly storageBackend: CocosStorageAdapter;
 
   constructor() {

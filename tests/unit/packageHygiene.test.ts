@@ -48,13 +48,13 @@ describe('B16 生产包平台卫生', () => {
   });
 
   it('TapPlatform 不引用 EditorMock / MemoryStorage', () => {
-    const src = read('assets/core/platform/TapPlatform.ts');
+    const src = read('assets/platforms/taptap/TapPlatform.ts');
     expect(src).not.toMatch(/EditorMockPlatform/);
     expect(src).not.toMatch(/MemoryStorage/);
   });
 
   it('TapPlatform 只通过 globalThis.tap 访问运行时，不直接用 window/document/localStorage', () => {
-    const src = read('assets/core/platform/TapPlatform.ts');
+    const src = read('assets/platforms/taptap/TapPlatform.ts');
     // 允许出现在注释/字符串中对 localStorage 的禁止说明？生产实现里不应有实际引用
     const codeLines = src
       .split('\n')
@@ -83,7 +83,7 @@ describe('B16 生产包平台卫生', () => {
   });
 
   it('TapPlatform / AuthService 中无硬编码 secret/token 字面量（仅错误码/键名）', () => {
-    for (const f of ['assets/core/platform/TapPlatform.ts', 'assets/core/platform/AuthService.ts']) {
+    for (const f of ['assets/platforms/taptap/TapPlatform.ts', 'assets/platforms/taptap/AuthService.ts']) {
       const src = read(f);
       expect(src, f).not.toMatch(/secret\s*[:=]\s*['"][A-Za-z0-9]{8,}['"]/i);
       expect(src, f).not.toMatch(/(server_)?token\s*[:=]\s*['"][A-Za-z0-9]{12,}['"]/i);
@@ -91,7 +91,7 @@ describe('B16 生产包平台卫生', () => {
   });
 
   it('运行时配置样例不含真实密钥（占位为空/示例域名）', () => {
-    const src = read('assets/resources/config/runtime.config.json');
+    const src = read('assets/resources/platforms/taptap/runtime.config.example.json');
     const cfg = JSON.parse(src) as { authEndpoint: string; privacyPolicyUrl: string };
     expect(cfg.authEndpoint).toBe('');
     expect(cfg.privacyPolicyUrl).toBe('');

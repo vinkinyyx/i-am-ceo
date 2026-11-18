@@ -1,23 +1,16 @@
-// 启动画面 + 启动兼容补丁（每次构建后可重复执行，幂等）。
-// 1) 各平台覆盖logo/slogan与独立无字启动艺术层
-// 2) 小游戏首屏替换为整张品牌图 + 真实进度条（tools/splash/first-screen.js）
-// 3) game.js / check-version.js 启动兼容（真机 Android 卡首屏的防御）
-// 4) web-mobile 注入整图覆盖层
-// 用法：node tools/patch-splash.cjs
-const fs = require('fs');
-const path = require('path');
+// Apply the shared startup artwork to the local Cocos Web preview.
+const fs = require('node:fs');
+const path = require('node:path');
 
-const root = path.resolve(__dirname, '..');
-if (process.argv.includes('--help')) {
-  console.log('Usage: node tools/patch-splash.cjs [buildRoot]  # buildRoot contains web-mobile/wechatgame/TapBuild; default: <project>/build');
-  process.exit(0);
+const buildRoot = process.argv[2] ? path.resolve(process.argv[2]) : path.resolve(__dirname, '../build');
+const webDir = path.join(buildRoot, 'web-mobile');
+if (!fs.existsSync(path.join(webDir, 'index.html'))) {
+  throw new Error('Web preview index.html is missing: ' + webDir);
 }
-const buildRoot = process.argv[2] ? path.resolve(process.argv[2]) : path.join(root, 'build');
 const srcDir = path.join(__dirname, 'splash');
 const LOGO = path.join(srcDir, 'logo.png');
 const SLOGAN = path.join(srcDir, 'slogan.png');
 const SPLASH_ART = path.join(srcDir, 'splash-art.png');
-const FIRST_SCREEN_TPL = path.join(srcDir, 'first-screen.js');
 
 // 与 tools/splash/splash.html 的卡片背景一致，避免启动层留白出现色差
 const BG = { x: 11 / 255, y: 21 / 255, z: 38 / 255, w: 1 };
@@ -54,102 +47,6 @@ function patchWebSettings(file) {
   return { file, base64Chars: base64.length };
 }
 
-/** 小游戏首屏：无字 splash-art.png 背景 + 独立真实进度条。 */
-function installFirstScreen(dir) {
-  const dst = path.join(dir, 'first-screen.js');
-  if (!fs.existsSync(path.dirname(dst))) return null;
-  if (!fs.existsSync(FIRST_SCREEN_TPL)) return null;
-  fs.copyFileSync(FIRST_SCREEN_TPL, dst);
-  return { file: dst, bytes: fs.statSync(dst).size };
-}
-
-/**
- * game.js 启动兼容：
- * - 无 fetch 时不再抛错（抛出会直接卡在首屏）；
- * - Android 分支的 GameGlobal.requestAnimationFrame 缺失时退回全局 raf / setTimeout
- *   （华为、vivo 上若容器未挂 GameGlobal.raf，__initApp 永不执行 → 永远停在加载页）；
- * - canvas 全局缺失时不做尺寸调整；
- * - 启动链失败时结束首屏，避免永久卡图。
- */
-function patchGameJs(dir) {
-  const file = path.join(dir, 'game.js');
-  if (!fs.existsSync(file)) return null;
-  let src = fs.readFileSync(file, 'utf8');
-  const before = src;
-
-  src = src.replace(
-    /if \(!GameGlobal\.oldFetch\) \{\s*throw new Error\('fetch is not defined'\);\s*\}/,
-    "if (!GameGlobal.oldFetch) {\n    console.warn('[compat] fetch is not defined');\n}",
-  );
-
-  src = src.replace(/if \(canvas\)\s*\{/, "if (typeof canvas !== 'undefined' && canvas) {");
-
-  src = src.replace(
-    /var sysInfo = wx\.getSystemInfoSync\(\);\s*if \(sysInfo\.platform\.toLocaleLowerCase\(\) === 'android'\) \{\s*GameGlobal\.requestAnimationFrame\s*\(__initApp\);\s*\} else \{\s*__initApp\(\);\s*\}/,
-    [
-      'var sysInfo = wx.getSystemInfoSync();',
-      '(function () {',
-      "  var platform = sysInfo && sysInfo.platform ? String(sysInfo.platform).toLowerCase() : '';",
-      '  var raf = null;',
-      '  try { raf = GameGlobal && GameGlobal.requestAnimationFrame; } catch (e) {}',
-      "  if (!raf && typeof requestAnimationFrame === 'function') raf = requestAnimationFrame;",
-      "  if (platform === 'android') {",
-      '    if (raf) raf(__initApp); else setTimeout(__initApp, 16);',
-      '  } else {',
-      '    __initApp();',
-      '  }',
-      '})();',
-    ].join('\n'),
-  );
-
-  // 两套构建产物写法：Tap 转换后（function 形式）与 Cocos 原生（箭头函数形式）
-  src = src.replace(
-    /\[\"catch\"\]\(function \(err\) \{\s*console\.error\(err\);\s*\}\);/,
-    [
-      '["catch"](function (err) {',
-      '    console.error(err);',
-      '    try { firstScreen.end(); } catch (e) {}',
-      '  });',
-    ].join('\n'),
-  );
-  src = src.replace(
-    /\}\)\.catch\(\(err\) => \{\s*console\.error\(err\);\s*\}\);/,
-    [
-      '}).catch((err) => {',
-      '    console.error(err);',
-      '    try { firstScreen.end(); } catch (e) {}',
-      '});',
-    ].join('\n'),
-  );
-
-  if (src !== before) fs.writeFileSync(file, src, 'utf8');
-  return { file, changed: src !== before };
-}
-
-/** check-version.js：getAccountInfoSync 缺失/可选链不兼容时的防御。 */
-function patchCheckVersion(dir) {
-  const file = path.join(dir, 'check-version.js');
-  if (!fs.existsSync(file)) return null;
-  let src = fs.readFileSync(file, 'utf8');
-  const before = src;
-
-  src = src.replace(
-    /const miniProgram = wx\.getAccountInfoSync\(\)\.miniProgram;/,
-    [
-      'let __accountInfo = null;',
-      'try { __accountInfo = wx.getAccountInfoSync ? wx.getAccountInfoSync() : null; } catch (e) { __accountInfo = null; }',
-      'const miniProgram = (__accountInfo && __accountInfo.miniProgram) || {};',
-    ].join('\n'),
-  );
-  src = src.replace(
-    /exports\.isDevelop = miniProgram\?\.envVersion === "develop";/,
-    'exports.isDevelop = !!(miniProgram && miniProgram.envVersion === "develop");',
-  );
-
-  if (src !== before) fs.writeFileSync(file, src, 'utf8');
-  return { file, changed: src !== before };
-}
-
 /** web-mobile：注入整图覆盖层（构建产物 index.html 每次会被重建，故每次补丁）。 */
 function patchWebIndex(dir) {
   const file = path.join(dir, 'index.html');
@@ -181,45 +78,8 @@ function patchWebIndex(dir) {
   return { file, changed: true };
 }
 
-const targets = [
-  { name: 'web-mobile', dir: path.join(buildRoot, 'web-mobile') },
-  { name: 'wechatgame', dir: path.join(buildRoot, 'wechatgame') },
-  { name: 'tap', dir: path.join(buildRoot, 'TapBuild', 'game') },
-];
-
-const report = {
-  copied: [],
-  firstScreen: [],
-  gameJs: [],
-  checkVersion: [],
-  webSettings: null,
-  webIndex: null,
-  missing: [],
-};
-
-for (const t of targets) {
-  if (copyAssets(t.dir)) report.copied.push(t.name);
-  else report.missing.push(t.name);
-  if (t.name !== 'web-mobile') {
-    const fs1 = installFirstScreen(t.dir);
-    if (fs1) report.firstScreen.push(fs1);
-    const gj = patchGameJs(t.dir);
-    if (gj) report.gameJs.push(gj);
-    const cv = patchCheckVersion(t.dir);
-    if (cv) report.checkVersion.push(cv);
-  }
-}
-
-const webSettings = path.join(buildRoot, 'web-mobile', 'src', 'settings.json');
-report.webSettings = patchWebSettings(webSettings);
-const webIndex = patchWebIndex(path.join(buildRoot, 'web-mobile'));
-if (webIndex) report.webIndex = webIndex;
-
-// build-templates 让后续构建自动带上自有启动图
-for (const name of ['web-mobile', 'wechatgame']) {
-  const dir = path.join(root, 'build-templates', name);
-  fs.mkdirSync(dir, { recursive: true });
-  copyAssets(dir);
-}
-
-console.log(JSON.stringify(report, null, 2));
+copyAssets(webDir);
+console.log(JSON.stringify({
+  webSettings: patchWebSettings(path.join(webDir, 'src', 'settings.json')),
+  webIndex: patchWebIndex(webDir),
+}, null, 2));

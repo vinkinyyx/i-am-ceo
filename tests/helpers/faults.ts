@@ -7,13 +7,13 @@ import { SAVE_KEYS, type ResetTombstone, type SaveEnvelope, type SavePointer } f
 import { SaveRepository } from '@core/persistence/SaveRepository';
 import { encodeEnvelope } from '@core/persistence/SaveCodec';
 import type { GameState } from '@core/domain/types';
-import type { IStorageBackend } from '@core/platform/ITapPlatform';
+import type { IStorageBackend } from '@core/platform/IGamePlatform';
 import type {
   TapRuntime,
   TapSuccessFailCallback,
   TapCallbackResult,
   TapWindowInfoResult,
-} from '@core/platform/TapPlatform';
+} from '@platforms/taptap/TapPlatform';
 
 // ---------------------------------------------------------------- 受控调度
 export type Scheduler = {

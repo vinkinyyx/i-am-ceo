@@ -2,10 +2,10 @@
  * R17：登录态校验（checkSession guard + 失败/拒绝路径）。
  */
 import { describe, it, expect } from 'vitest';
-import { AuthService, SESSION_STORAGE_KEY } from '@core/platform/AuthService';
+import { AuthService, SESSION_STORAGE_KEY } from '@platforms/taptap/AuthService';
 import { GameError, GameErrorCode } from '@core/domain/errors';
 import { ScriptedTapRuntime } from '../helpers/faults';
-import { TapPlatform } from '@core/platform/TapPlatform';
+import { TapPlatform } from '@platforms/taptap/TapPlatform';
 
 function tapPlatform(tap: ScriptedTapRuntime): TapPlatform {
   return new TapPlatform(tap, { opTimeoutMs: 50, loginCallbackTimeoutMs: 50 });

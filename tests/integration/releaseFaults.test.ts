@@ -6,7 +6,7 @@
  * 不使用固定 sleep：hang 用 Promise.race + 受控标记判定。
  */
 import { describe, it, expect } from 'vitest';
-import { TapPlatform } from '@core/platform/TapPlatform';
+import { TapPlatform } from '@platforms/taptap/TapPlatform';
 import { GameStore } from '@core/application/GameStore';
 import { GameError, GameErrorCode } from '@core/domain/errors';
 import { crc32String } from '@core/persistence/crc32';

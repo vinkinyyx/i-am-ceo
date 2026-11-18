@@ -13,6 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@core': fileURLToPath(new URL('./assets/core', import.meta.url)),
+      '@platforms': fileURLToPath(new URL('./assets/platforms', import.meta.url)),
     },
   },
 });

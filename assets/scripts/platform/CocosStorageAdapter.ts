@@ -1,5 +1,5 @@
 import { sys } from 'cc';
-import type { IStorageBackend } from '../../core/platform/ITapPlatform';
+import type { IStorageBackend } from '../../core/platform/IGamePlatform';
 
 /**
  * Cocos 运行时存储后端。

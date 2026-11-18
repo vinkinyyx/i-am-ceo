@@ -8,9 +8,9 @@ import { createRequire } from 'node:module';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..', '..');
 const require = createRequire(import.meta.url);
-const { createApp } = require(path.join(root, 'services', 'tap-auth', 'handler.cjs'));
-const session = require(path.join(root, 'services', 'tap-auth', 'session.cjs'));
-const exchangeModule = require(path.join(root, 'services', 'tap-auth', 'exchange.cjs'));
+const { createApp } = require(path.join(root, 'platforms', 'taptap', 'services', 'tap-auth', 'handler.cjs'));
+const session = require(path.join(root, 'platforms', 'taptap', 'services', 'tap-auth', 'session.cjs'));
+const exchangeModule = require(path.join(root, 'platforms', 'taptap', 'services', 'tap-auth', 'exchange.cjs'));
 
 const EXCHANGE_PATH = '/v1/auth/taptap/exchange';
 const OPENID = 'openid-abc-XYZ-sensitive-value';
@@ -403,7 +403,7 @@ describe('health / 路由', () => {
 
   it('要求模块时不启动本地监听', () => {
     // 本文件顶部已 require handler.cjs；若 require 时监听端口，后续用例会冲突/进程挂起。
-    const handlerSource = fs.readFileSync(path.join(root, 'services', 'tap-auth', 'handler.cjs'), 'utf8');
+    const handlerSource = fs.readFileSync(path.join(root, 'platforms', 'taptap', 'services', 'tap-auth', 'handler.cjs'), 'utf8');
     expect(handlerSource).toContain('require.main === module');
   });
 });

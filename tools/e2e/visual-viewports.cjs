@@ -95,7 +95,7 @@ async function main() {
     process.exitCode = 2;
     return;
   }
-  const seedPath = path.resolve(args.seed || path.join(root, 'evidence/m3/TASK-M3-09-R30/attempt-06/seed-size-100.json'));
+  const seedPath = path.resolve(args.seed || path.join(root, 'tests/fixtures/browser/seed-size-100.json'));
   if (!fs.existsSync(seedPath)) throw new Error(`seed-missing:${seedPath}`);
   const seed = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
   fs.mkdirSync(outDir, { recursive: true });

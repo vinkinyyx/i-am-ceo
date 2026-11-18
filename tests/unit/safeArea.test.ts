@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeSafeAreaTransform } from '@core/platform/safeArea';
-import type { WindowInfo } from '@core/platform/ITapPlatform';
+import type { WindowInfo } from '@core/platform/IGamePlatform';
 
 describe('安全区变换 computeSafeAreaTransform（A21）', () => {
   it('无 safeArea 时恒等变换', () => {

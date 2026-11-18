@@ -1,13 +1,17 @@
-import type { ITapPlatform } from '../../core/platform/ITapPlatform';
-import { resolveTapRuntime, TapPlatform } from '../../core/platform/TapPlatform';
+import type { MiniGameAdapter, PlatformBinding } from '../../core/platform/PlatformServices';
+import { createTapServices } from '../../platforms/taptap/services';
+import { resolveTapRuntime, TapPlatform } from '../../platforms/taptap/TapPlatform';
 import { decidePlatform } from '../../core/platform/platformSelection';
 import { GameError, GameErrorCode } from '../../core/domain/errors';
 import { CocosPlatform } from './CocosPlatform';
-import { readBuildProfile } from './buildProfile';
+import { readBuildProfile, type MiniGameTarget } from '../../core/platform/buildProfile';
+import { douyinAdapter } from '../../platforms/douyin/adapter';
+import { wechatAdapter } from '../../platforms/wechat/adapter';
+
+const futureAdapters: readonly MiniGameAdapter[] = [douyinAdapter, wechatAdapter];
 
 export type PlatformSelection =
-  | { kind: 'taptap'; platform: ITapPlatform }
-  | { kind: 'editor'; platform: ITapPlatform }
+  | ({ kind: MiniGameTarget | 'editor' } & PlatformBinding)
   | { kind: 'unavailable'; reason: string };
 
 /**
@@ -21,7 +25,12 @@ export type PlatformSelection =
  */
 export function selectPlatform(): PlatformSelection {
   const profile = readBuildProfile();
-  const tap = resolveTapRuntime();
+  const adapter = futureAdapters.find(({ target }) => target === profile.kind);
+  if (adapter) {
+    const binding = adapter.create?.();
+    if (binding) return { kind: adapter.target, ...binding };
+  }
+  const tap = profile.kind === 'taptap' || profile.kind === 'editor' ? resolveTapRuntime() : null;
   const decision = decidePlatform({
     buildKind: profile.kind,
     hasTapRuntime: tap !== null,
@@ -31,17 +40,17 @@ export function selectPlatform(): PlatformSelection {
     return { kind: 'unavailable', reason: decision.reason ?? 'platform-unavailable' };
   }
   if (decision.kind === 'taptap' && tap) {
-    return { kind: 'taptap', platform: new TapPlatform(tap) };
+    return { kind: 'taptap', platform: new TapPlatform(tap), services: createTapServices(globalThis) };
   }
-  return { kind: 'editor', platform: new CocosPlatform() };
+  return { kind: 'editor', platform: new CocosPlatform(), services: createTapServices(null) };
 }
 
-export function createPlatform(): ITapPlatform {
+export function createPlatform(): PlatformBinding {
   const selected = selectPlatform();
   if (selected.kind === 'unavailable') {
     throw new GameError(GameErrorCode.PLATFORM_UNAVAILABLE, { reason: selected.reason });
   }
-  return selected.platform;
+  return selected;
 }
 
 /** 编辑器显式联调开关（全局），默认 false。 */

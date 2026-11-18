@@ -1,4 +1,4 @@
-import type { IStorageBackend } from '../platform/ITapPlatform';
+import type { IStorageBackend } from '../platform/IGamePlatform';
 import { GameError, GameErrorCode } from '../domain/errors';
 import type { GameState } from '../domain/types';
 import { canonicalStringify } from './canonical';

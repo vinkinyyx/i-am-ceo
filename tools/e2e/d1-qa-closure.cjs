@@ -26,7 +26,7 @@ function checksum(env) {
 
 /** 造带 6 员工（覆盖已登记/未知/空 avatarId）与含现金桥年报的存档 */
 function buildFixture() {
-  const seed = JSON.parse(fs.readFileSync('evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json', 'utf8'));
+  const seed = JSON.parse(fs.readFileSync('tests/fixtures/browser/seed-staffed.json', 'utf8'));
   const pointer = JSON.parse(seed['ceo/save/active']);
   const slot = pointer.slot;
   const env = JSON.parse(seed[`ceo/save/${slot}`]);
@@ -121,7 +121,7 @@ async function rankGeometry(page) {
 
 (async () => {
   const url = process.argv[2] || 'http://127.0.0.1:8153/';
-  const outDir = process.argv[3] || 'evidence/ui-v2-d1-qa-02';
+  const outDir = process.argv[3] || 'build/logs/browser/ui-v2-d1-qa-02';
   fs.mkdirSync(outDir, { recursive: true });
   const { fixture, names, avatarIds } = buildFixture();
   const checks = [];
@@ -225,8 +225,8 @@ async function rankGeometry(page) {
   await d1.clickLabel('人才');
   await d1.page.waitForTimeout(1600);
   const uuids = {
-    ...JSON.parse(fs.readFileSync('design/CEO_UI_V2_ArtSamples_v1/tools/import_uuids.json', 'utf8')),
-    ...JSON.parse(fs.readFileSync('design/CEO_UI_V2_D1_ArtHandoff_v1/tools/import_uuids.json', 'utf8')),
+    ...JSON.parse(fs.readFileSync('materials/design/CEO_UI_V2_ArtSamples_v1/tools/import_uuids.json', 'utf8')),
+    ...JSON.parse(fs.readFileSync('materials/design/CEO_UI_V2_D1_ArtHandoff_v1/tools/import_uuids.json', 'utf8')),
   };
   const KEY = {
     avatar_01: 'ui/avatars/EmployeeAvatar_01_Male_ShortHair_Color1',

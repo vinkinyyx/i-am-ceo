@@ -1,7 +1,7 @@
 {
   "name": "im-ceo",
   "version": "0.1.0",
-  "description": "《我是CEO》第一阶段 MVP - TapTap 普通小游戏（Cocos Creator 3.8.8 + TypeScript）",
+  "description": "《我是CEO》公共经营游戏与小游戏平台适配（Cocos Creator 3.8.8 + TypeScript）",
   "creator": {
     "version": "3.8.8"
   },
@@ -11,19 +11,20 @@
     "typecheck": "tsc -p tsconfig.core.json --noEmit",
     "typecheck:ui": "tsc -p tsconfig.ui.json --noEmit",
     "check": "npm run typecheck && npm run typecheck:ui && npm run lint && npm run test",
-    "lint": "eslint \"assets/core/**/*.ts\" \"assets/scripts/**/*.ts\" \"tests/**/*.ts\"",
+    "lint": "eslint \"assets/core/**/*.ts\" \"assets/scripts/**/*.ts\" \"assets/platforms/**/*.ts\" \"tests/**/*.ts\"",
     "test:unit": "vitest run --dir tests/unit",
     "test:integration": "vitest run --dir tests/integration",
     "test:golden": "vitest run --dir tests/golden",
     "test": "vitest run",
     "web-build": "powershell -ExecutionPolicy Bypass -File tools/build-web.ps1",
-    "tap-build": "powershell -ExecutionPolicy Bypass -File tools/build-tap.ps1",
-    "release-build": "powershell -ExecutionPolicy Bypass -File tools/build-tap-v2.ps1",
+    "tap-build": "powershell -ExecutionPolicy Bypass -File platforms/taptap/tools/build-tap.ps1",
+    "release-build": "powershell -ExecutionPolicy Bypass -File platforms/taptap/tools/build-tap-v2.ps1",
     "static-server": "node tools/static-server.cjs build/web-mobile 8123"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "eslint": "^9.17.0",
+    "playwright-core": "1.64.1",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "vitest": "^2.1.8"

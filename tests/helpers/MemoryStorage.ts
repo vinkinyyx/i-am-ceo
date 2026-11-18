@@ -1,4 +1,4 @@
-import type { IStorageBackend } from '../../assets/core/platform/ITapPlatform';
+import type { IStorageBackend } from '../../assets/core/platform/IGamePlatform';
 import { cloneJsonValue } from '../../assets/core/persistence/cloneGameState';
 
 /**

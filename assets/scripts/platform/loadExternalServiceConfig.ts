@@ -11,10 +11,10 @@ function loadOptional(path: string): Promise<unknown> {
   }).promise;
 }
 
-export async function loadCloudConfig() {
-  try { return parseCloudConfig(await loadOptional('config/cloud.config')); } catch { return { ...CLOUD_DISABLED }; }
+export async function loadCloudConfig(configRoot: string) {
+  try { return parseCloudConfig(await loadOptional(configRoot + '/cloud.config')); } catch { return { ...CLOUD_DISABLED }; }
 }
 
-export async function loadLeaderboardConfig() {
-  try { return parseLeaderboardConfig(await loadOptional('config/leaderboards.config')); } catch { return { ...LEADERBOARDS_DISABLED }; }
+export async function loadLeaderboardConfig(configRoot: string) {
+  try { return parseLeaderboardConfig(await loadOptional(configRoot + '/leaderboards.config')); } catch { return { ...LEADERBOARDS_DISABLED }; }
 }

@@ -30,7 +30,7 @@ type ValidateInput = {
   ads: Record<string, unknown>;
   leaderboards: Record<string, unknown>;
 };
-const { validateReleaseConfig } = nodeRequire(path.resolve(ROOT, 'tools/validate-release-config.cjs')) as {
+const { validateReleaseConfig } = nodeRequire(path.resolve(ROOT, 'platforms/taptap/tools/validate-release-config.cjs')) as {
   validateReleaseConfig(input: ValidateInput): ValidateResult;
 };
 
@@ -81,10 +81,10 @@ function fields(result: ValidateResult): string[] {
 
 describe('DEV-04 发行配置组合校验器：正例', () => {
   it('diagnostic：仓库当前提交态（三能力关闭、endpoint/隐私URL空）通过', () => {
-    const read = (name: string) => JSON.parse(fs.readFileSync(path.resolve(ROOT, `assets/resources/config/${name}`), 'utf8')) as Record<string, unknown>;
+    const read = (name: string) => JSON.parse(fs.readFileSync(path.resolve(ROOT, `assets/resources/platforms/taptap/${name}`), 'utf8')) as Record<string, unknown>;
     const result = validateReleaseConfig({
       purpose: 'diagnostic',
-      runtime: read('runtime.config.json'),
+      runtime: read('runtime.config.example.json'),
       cloud: read('cloud.config.json'),
       ads: read('ads.config.json'),
       leaderboards: read('leaderboards.config.json'),

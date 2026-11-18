@@ -1,4 +1,4 @@
-import type { SafeArea, WindowInfo } from './ITapPlatform';
+import type { SafeArea, WindowInfo } from './IGamePlatform';
 
 /**
  * 安全区适配计算（设计文档 08 / A21）。纯 TS、无引擎依赖，可单测。

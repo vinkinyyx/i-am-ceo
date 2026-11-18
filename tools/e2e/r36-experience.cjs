@@ -69,9 +69,9 @@ function findLabelOverlaps(labels) {
 }
 
 (async () => {
-  const outDir = process.argv[3] || 'evidence/acceptance-r36-experience-20261107/attempt-01';
+  const outDir = process.argv[3] || 'build/logs/browser/acceptance-r36-experience-20261107/attempt-01';
   fs.mkdirSync(outDir, { recursive: true });
-  const seed = JSON.parse(fs.readFileSync('evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json', 'utf8'));
+  const seed = JSON.parse(fs.readFileSync('tests/fixtures/browser/seed-staffed.json', 'utf8'));
   const pointer = JSON.parse(seed['ceo/save/active']);
   const slot = pointer.slot;
   const env = JSON.parse(seed[`ceo/save/${slot}`]);

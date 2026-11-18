@@ -6,7 +6,7 @@ import {
   type TapRuntime,
   type TapSuccessFailCallback,
   type TapWindowInfoResult,
-} from '@core/platform/TapPlatform';
+} from '@platforms/taptap/TapPlatform';
 
 /**
  * 注入式假 tap 全局对象：模拟 TapTap 小游戏运行时。

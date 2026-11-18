@@ -110,7 +110,7 @@ describe('R20 patch-release.cjs', () => {
     makeFakeTapGame(tapDir);
     const logo = path.join(root, 'tools', 'splash', 'logo.png');
     fs.copyFileSync(logo, path.join(tapDir, 'logo.89978.png'));
-    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-logo', '1.0.0']);
+    const r = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-logo', '1.0.0']);
     expect(r.code).toBe(0);
     expect(fs.existsSync(path.join(tapDir, 'logo.png'))).toBe(true);
     expect(fs.existsSync(path.join(tapDir, 'logo.89978.png'))).toBe(false);
@@ -123,7 +123,7 @@ describe('R20 patch-release.cjs', () => {
     makeFakeTapGame(tapDir);
     fs.copyFileSync(path.join(root, 'tools', 'splash', 'logo.png'), path.join(tapDir, 'logo.89978.png'));
     fs.writeFileSync(path.join(tapDir, 'settings.json'), JSON.stringify({ splashLogo: 'logo.89978.png' }));
-    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-logo-ref', '1.0.0']);
+    const r = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-logo-ref', '1.0.0']);
     expect(r.code).toBe(0);
     expect(fs.existsSync(path.join(tapDir, 'logo.png'))).toBe(true);
     expect(fs.existsSync(path.join(tapDir, 'logo.89978.png'))).toBe(true);
@@ -135,7 +135,7 @@ describe('R20 patch-release.cjs', () => {
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
     fs.copyFileSync(path.join(root, 'tools', 'splash', 'splash.jpg'), path.join(tapDir, 'splash.d49ca.jpg'));
-    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
+    const r = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
     expect(r.code).toBe(0);
     expect(r.stdout).toContain('PATCH_OK');
     const gameJs = fs.readFileSync(path.join(tapDir, 'game.js'), 'utf8');
@@ -154,9 +154,9 @@ describe('R20 patch-release.cjs', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-pipe-'));
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
-    runCjs('tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
+    runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
     const once = fs.readFileSync(path.join(tapDir, 'game.js'), 'utf8');
-    const r2 = runCjs('tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
+    const r2 = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
     expect(r2.code).toBe(0);
     const twice = fs.readFileSync(path.join(tapDir, 'game.js'), 'utf8');
     expect(twice).toBe(once);
@@ -168,7 +168,7 @@ describe('R20 patch-release.cjs', () => {
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
     fs.writeFileSync(path.join(tapDir, 'game.js'), '// totally different\n');
-    const r = runCjs('tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
+    const r = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-test', '1.0.0']);
     expect(r.code).not.toBe(0);
     expect(r.stdout).toMatch(/PATCH_FAIL/);
   });
@@ -177,8 +177,8 @@ describe('R20 patch-release.cjs', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-pipe-'));
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-one', '1.0.0']).code).toBe(0);
-    const mismatch = runCjs('tools/patch-release.cjs', [tapDir, 'r-two', '1.0.0']);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-one', '1.0.0']).code).toBe(0);
+    const mismatch = runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-two', '1.0.0']);
     expect(mismatch.code).not.toBe(0);
     expect(mismatch.stdout).toContain('PATCH_FAIL');
   });
@@ -189,11 +189,11 @@ describe('R20 repack + R21 verify', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-zip-'));
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-zip', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-zip', '1.0.0']).code).toBe(0);
     const zip1 = path.join(tmp, 'a', 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip1]).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip1]).code).toBe(0);
     const outDir = path.join(tmp, 'out');
-    const verify = runCjs('tools/verify-package.cjs', [zip1, 'r-zip', '1.0.0', outDir]);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip1, 'r-zip', '1.0.0', outDir]);
     expect(verify.stdout).toContain('VERIFY_OK');
     const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'manifest.json'), 'utf8'));
     expect(manifest.sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -204,7 +204,7 @@ describe('R20 repack + R21 verify', () => {
     expect(zipEntries.every((e) => !e.entryName.includes('\\'))).toBe(true);
     expect(zipEntries.some((e) => e.entryName === 'splash-art.png')).toBe(true);
     expect(zipEntries.some((e) => e.entryName === 'splash.jpg')).toBe(false);
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip1]).code).not.toBe(0);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip1]).code).not.toBe(0);
 
     const corrupt = Buffer.from(fs.readFileSync(zip1));
     let localOffset = 0;
@@ -228,11 +228,11 @@ describe('R20 repack + R21 verify', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-zip-baked-splash-'));
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-baked', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-baked', '1.0.0']).code).toBe(0);
     fs.copyFileSync(path.join(root, 'tools', 'splash', 'splash.jpg'), path.join(tapDir, 'splash.d49ca.jpg'));
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const verify = runCjs('tools/verify-package.cjs', [zip, 'r-baked', '1.0.0', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-baked', '1.0.0', path.join(tmp, 'out')]);
     expect(verify.code).not.toBe(0);
     expect(verify.stdout).toContain('baked-progress splash artwork');
   });
@@ -250,11 +250,11 @@ describe('R20 repack + R21 verify', () => {
         "System[\"import\"]('./application.a4e34.js');",
       ),
     );
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-hashed', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-hashed', '1.0.0']).code).toBe(0);
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
     const outDir = path.join(tmp, 'out');
-    const verify = runCjs('tools/verify-package.cjs', [zip, 'r-hashed', '1.0.0', outDir]);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-hashed', '1.0.0', outDir]);
     expect(verify.code).toBe(0);
     const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'manifest.json'), 'utf8'));
     expect(manifest.applicationEntry).toBe('application.a4e34.js');
@@ -272,10 +272,10 @@ describe('R20 repack + R21 verify', () => {
     const ads = JSON.parse(fs.readFileSync(adsPath, 'utf8'));
     ads[5][0][2].policyVersion = 1;
     fs.writeFileSync(adsPath, JSON.stringify(ads));
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-policy-mismatch', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-policy-mismatch', '1.0.0']).code).toBe(0);
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const verify = runCjs('tools/verify-package.cjs', [zip, 'r-policy-mismatch', '1.0.0', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-policy-mismatch', '1.0.0', path.join(tmp, 'out')]);
     expect(verify.code).not.toBe(0);
     expect(verify.stdout).toContain('policyVersion differs from packaged privacy policy');
   });
@@ -288,10 +288,10 @@ describe('R20 repack + R21 verify', () => {
     const ads = JSON.parse(fs.readFileSync(adsPath, 'utf8'));
     ads[5][0][2] = { ...ads[5][0][2], enabled: true, environment: 'test', privacyReviewed: true };
     fs.writeFileSync(adsPath, JSON.stringify(ads));
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-empty-ad-id', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-empty-ad-id', '1.0.0']).code).toBe(0);
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const verify = runCjs('tools/verify-package.cjs', [zip, 'r-empty-ad-id', '1.0.0', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-empty-ad-id', '1.0.0', path.join(tmp, 'out')]);
     expect(verify.code).not.toBe(0);
     expect(verify.stdout).toContain('enabled ads require a non-empty real adUnitId');
   });
@@ -302,10 +302,10 @@ describe('R20 repack + R21 verify', () => {
     makeFakeTapGame(tapDir);
     fs.mkdirSync(path.join(tapDir, 'assets', 'main'), { recursive: true });
     fs.writeFileSync(path.join(tapDir, 'assets', 'main', 'index.hash.js'), 'class EditorMockPlatform {}');
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-mock-module', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-mock-module', '1.0.0']).code).toBe(0);
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const verify = runCjs('tools/verify-package.cjs', [zip, 'r-mock-module', '1.0.0', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const verify = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-mock-module', '1.0.0', path.join(tmp, 'out')]);
     expect(verify.code).not.toBe(0);
     expect(verify.stdout).toContain('EditorMockPlatform in package');
   });
@@ -315,8 +315,8 @@ describe('R20 repack + R21 verify', () => {
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const r = runCjs('tools/verify-package.cjs', [zip, 'r-bad', '9.9.9', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const r = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-bad', '9.9.9', path.join(tmp, 'out')]);
     expect(r.code).not.toBe(0);
     expect(r.stdout).toMatch(/VERIFY_FAIL/);
   });
@@ -325,11 +325,11 @@ describe('R20 repack + R21 verify', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ceo-zip-hook-'));
     const tapDir = path.join(tmp, 'game');
     makeFakeTapGame(tapDir);
-    expect(runCjs('tools/patch-release.cjs', [tapDir, 'r-hook', '1.0.0']).code).toBe(0);
+    expect(runCjs('platforms/taptap/tools/patch-release.cjs', [tapDir, 'r-hook', '1.0.0']).code).toBe(0);
     fs.appendFileSync(path.join(tapDir, 'application.js'), '\nwindow.__CEO_TEST_WRITE__ = true;');
     const zip = path.join(tmp, 'game.zip');
-    expect(runCjs('tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
-    const check = runCjs('tools/verify-package.cjs', [zip, 'r-hook', '1.0.0', path.join(tmp, 'out')]);
+    expect(runCjs('platforms/taptap/tools/repack-release.cjs', [tapDir, zip]).code).toBe(0);
+    const check = runCjs('platforms/taptap/tools/verify-package.cjs', [zip, 'r-hook', '1.0.0', path.join(tmp, 'out')]);
     expect(check.code).not.toBe(0);
     expect(check.stdout).toMatch(/development test hook/);
   });

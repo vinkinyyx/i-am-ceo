@@ -41,7 +41,7 @@ export interface IPlayerIdentityProvider {
  * 不读取昵称、设备号、登录 code 或 sessionToken 作为身份。
  */
 export interface AuthSessionSnapshot {
-  kind: 'taptap' | 'mock';
+  kind: 'taptap' | 'douyin' | 'wechat' | 'mock';
   expiresAtMs: number;
   profile?: {
     profileId: string;

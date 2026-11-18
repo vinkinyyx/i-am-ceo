@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
 
-const seed = JSON.parse(fs.readFileSync('evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json', 'utf8'));
-const outDir = process.argv[3] || 'evidence/m3/TASK-M3-09-R34/attempt-01';
+const seed = JSON.parse(fs.readFileSync('tests/fixtures/browser/seed-staffed.json', 'utf8'));
+const outDir = process.argv[3] || 'build/logs/browser/m3/TASK-M3-09-R34/attempt-01';
 const CHROME = process.env.CHROME_EXE || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 (async () => {

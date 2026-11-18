@@ -16,7 +16,7 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['assets/core/**/*.ts', 'tests/**/*.ts', 'tools/**/*.ts'],
+    files: ['assets/core/**/*.ts', 'assets/platforms/**/*.ts', 'tests/**/*.ts', 'tools/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'off',

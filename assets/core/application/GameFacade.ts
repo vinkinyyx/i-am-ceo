@@ -1,7 +1,7 @@
 import { GameError, GameErrorCode, errorMessage } from '../domain/errors';
 import type { CommandResult } from '../domain/result';
 import { ok, fail } from '../domain/result';
-import type { IStorageBackend, ITapPlatform } from '../platform/ITapPlatform';
+import type { IStorageBackend, IGamePlatform, PlatformKind } from '../platform/IGamePlatform';
 import { GameStore } from './GameStore';
 import { createCompany, type CreateCompanyInput } from './CompanyService';
 import { getOffer, refreshOffer } from './OfferService';
@@ -102,7 +102,7 @@ export class GameFacade {
     this.clock.afterMonthSettle = (s) => refreshRisk(s, this.cfg) !== 'DISTRESS';
   }
 
-  static async bootstrap(platform: ITapPlatform, cfg: EconomyConfig): Promise<GameFacade> {
+  static async bootstrap(platform: IGamePlatform, cfg: EconomyConfig): Promise<GameFacade> {
     const loaded = await GameStore.load(platform);
     const store = loaded ?? new GameStore(platform, createInitialState(Date.now()));
     return new GameFacade(platform, store, cfg);
@@ -132,7 +132,7 @@ export class GameFacade {
 
   /** 测试/首启直接注入存储。 */
   static async fromStorage(
-    storage: IStorageBackend & ITapPlatform,
+    storage: IStorageBackend & IGamePlatform,
     cfg: EconomyConfig,
   ): Promise<GameFacade> {
     return GameFacade.bootstrap(storage, cfg);
@@ -401,8 +401,8 @@ export class GameFacade {
     }
   }
 
-  getEnvironment(): 'EDITOR' | 'TAPTAP' {
-    return (this.platform as ITapPlatform).getEnvironment();
+  getEnvironment(): PlatformKind {
+    return (this.platform as IGamePlatform).getEnvironment();
   }
 
   // ---------------------------------------------------------------- M1 经营

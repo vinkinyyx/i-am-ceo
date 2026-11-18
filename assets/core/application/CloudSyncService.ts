@@ -2,7 +2,7 @@ import type { GameFacade } from './GameFacade';
 import type { CloudArchiveRef, CloudCheckpointV1, CloudOperationResult, CloudRuntimeConfig } from '../persistence/CloudSaveTypes';
 import { decodeCloudCheckpoint } from '../persistence/CloudSaveCodec';
 import type { ICloudSaveProvider } from '../platform/ICloudSaveProvider';
-import type { IStorageBackend } from '../platform/ITapPlatform';
+import type { IStorageBackend } from '../platform/IGamePlatform';
 
 const LEGACY_INTENT_KEY = 'ceo/cloud/pending-create/v1';
 

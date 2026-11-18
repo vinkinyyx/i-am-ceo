@@ -1,7 +1,7 @@
 /**
  * R26：招聘预览与收费确认（领域层：真实费用、取消零变更、offer 失效）。
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GameFacade } from '@core/application/GameFacade';
 import { registerConfig } from '@core/config/configLoader';
 import type { EconomyConfig } from '@core/config/EconomyConfig';
@@ -42,6 +42,8 @@ beforeEach(async () => {
   facade = await facadeFor(runningCompany(9001));
   runId = facade.getState().runId;
 });
+
+afterEach(() => vi.useRealTimers());
 
 describe('R26 previewHire', () => {
   it('T02 预览显示真实招聘费=1 月工资、现金前后余额，且不改状态', () => {
@@ -126,6 +128,7 @@ describe('R26 previewHire', () => {
 
   it('广告券仅免一次招聘费、保留月薪并同事务消费，且运营期下月生效', async () => {
     const now = new Date(2026, 10, 3, 12).getTime();
+    vi.setSystemTime(now);
     const state = runningCompany(9003);
     expect(beginAdSession(state, 'reward-session', now)).toBe(true);
     expect(grantAdCoupon(state, 'reward-session', now)).toBe(true);

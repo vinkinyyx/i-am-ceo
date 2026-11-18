@@ -1,7 +1,7 @@
 /**
  * 运行时平台配置（仅本地、不入库）。
  *
- * code2Session 最小服务端地址通过 resources/config/runtime.config.json 注入，
+ * code2Session 最小服务端地址通过 runtime.config.json 注入，
  * 该文件含部署环境信息，按项目纪律不提交 git（见 .gitignore）。
  * 文件缺失时 endpoint 为空：真机登录会明确报“服务端未配置”，不会伪造登录；
  * 编辑器/预览始终走 mock，不受影响。

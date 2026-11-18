@@ -4,16 +4,16 @@ import {
   AuthService,
   SESSION_STORAGE_KEY,
   type AuthSession,
-} from '@core/platform/AuthService';
+} from '@platforms/taptap/AuthService';
 import type {
-  ITapPlatform,
+  IGamePlatform,
   PlatformHttpRequest,
   PlatformHttpResponse,
-} from '@core/platform/ITapPlatform';
+} from '@core/platform/IGamePlatform';
 import { EditorMockPlatform } from '../helpers/EditorMockPlatform';
 
 /** 可控假真机平台（TAPTAP 环境）。 */
-class FakeTapPlatform implements ITapPlatform {
+class FakeTapPlatform implements IGamePlatform {
   loginMode: 'ok' | 'fail' | 'empty' = 'ok';
   code = 'code-xyz';
   http: (req: PlatformHttpRequest) => PlatformHttpResponse | Promise<PlatformHttpResponse> = () => ({

@@ -37,8 +37,8 @@ import {
 import { loadEconomyConfig } from '../platform/loadConfig';
 import { loadRuntimeConfig } from '../platform/loadRuntimeConfig';
 import { getRuntimeConfig } from '../platform/runtimeConfig';
-import { AuthService } from '../../core/platform/AuthService';
-import type { IdentityRefreshReason } from '../../core/platform/AuthService';
+import type { IPlatformAuth, IdentityRefreshReason } from '../../core/platform/IPlatformAuth';
+import type { PlatformBinding, PlatformServices } from '../../core/platform/PlatformServices';
 import { acceptPrivacy, hasAcceptedPrivacy } from '../../core/platform/privacyConsent';
 import { PRIVACY_POLICY_TEXT } from '../../core/platform/privacyPolicyText';
 import { GameError } from '../../core/domain/errors';
@@ -75,7 +75,6 @@ import { THEME, DESIGN_WIDTH, DESIGN_HEIGHT } from './theme';
 import { TEXT_TOKENS } from './textTokens';
 import { audioManager } from '../audio/AudioManager';
 import { loadAdsConfig } from '../ads/loadAdsConfig';
-import { TapRewardedAdProvider } from '../../core/platform/TapRewardedAdProvider';
 import { isAdCouponAvailable } from '../../core/application/AdRewardService';
 import { AdRewardCoordinator } from '../ads/AdRewardCoordinator';
 import { loadCloudConfig, loadLeaderboardConfig } from '../platform/loadExternalServiceConfig';
@@ -86,8 +85,7 @@ import { compareCloudHeads, type CloudHeadRelation } from '../../core/applicatio
 import { LeaderboardSyncService } from '../../core/application/LeaderboardSyncService';
 import { PlayerIdentityState, SessionPlayerIdentityProvider } from '../../core/platform/PlayerIdentity';
 import type { PlayerIdentityResult } from '../../core/platform/PlayerIdentity';
-import { TapCloudSaveProvider } from '../../core/platform/TapCloudSaveProvider';
-import { TapLeaderboardProvider } from '../../core/platform/TapLeaderboardProvider';
+import type { ICloudSaveProvider } from '../../core/platform/ICloudSaveProvider';
 import type { CloudArchiveRef, CloudCheckpointV1 } from '../../core/persistence/CloudSaveTypes';
 
 type TabId = 'COMPANY' | 'DEPARTMENT' | 'TALENT' | 'RANK';
@@ -200,8 +198,9 @@ function nextCommandId(prefix: string): string {
  */
 export class AppView extends Component {
   private facade!: GameFacade;
-  private platform: ReturnType<typeof createPlatform> | null = null;
-  private auth: AuthService | null = null;
+  private platform: PlatformBinding['platform'] | null = null;
+  private platformServices: PlatformServices | null = null;
+  private auth: IPlatformAuth | null = null;
   private authed = false;
   /** B2：登录单飞，避免隐私同意后的并行初始化触发两次 tap.login/换票。 */
   private loginInFlight: Promise<void> | null = null;
@@ -232,7 +231,7 @@ export class AppView extends Component {
   private cloudConfig: CloudRuntimeConfig | null = null;
   private cloudStatusText = '云备份尚未检查';
   private cloudSync: CloudSyncService | null = null;
-  private cloudProvider: TapCloudSaveProvider | null = null;
+  private cloudProvider: ICloudSaveProvider | null = null;
   /** A24-05：可信身份状态；只有 verified 的 profileId 才能绑定云档。 */
   private identity: PlayerIdentityState | null = null;
   private leaderboardSync: LeaderboardSyncService | null = null;
@@ -361,13 +360,14 @@ export class AppView extends Component {
     profiler.hideStats();
     audioManager.loadSettings();
     boot.begin('engine');
-    const platform = createPlatform();
+    const { platform, services } = createPlatform();
     this.platform = platform;
+    this.platformServices = services;
     boot.end('engine');
     boot.begin('config');
-    const [cfg] = await Promise.all([loadEconomyConfig(), loadRuntimeConfig()]);
+    const [cfg] = await Promise.all([loadEconomyConfig(), loadRuntimeConfig(services.configRoot)]);
     boot.end('config');
-    this.auth = new AuthService(platform, { endpoint: getRuntimeConfig().authEndpoint });
+    this.auth = services.createAuth(platform, getRuntimeConfig().authEndpoint);
     boot.begin('save');
     // R13：显式装载结果——unavailable/corrupt 时不创建可写 facade、不开启时钟
     const loadResult = await GameFacade.bootstrapWithStatus(platform, cfg);
@@ -525,9 +525,12 @@ export class AppView extends Component {
   /** R13：闸门重试只重新执行一次启动尝试（不叠加 bootstrap/时钟）。 */
   private async restartBootAfterSaveGate(): Promise<void> {
     try {
-      const platform = this.platform ?? createPlatform();
+      const { platform, services } = this.platform && this.platformServices
+        ? { platform: this.platform, services: this.platformServices }
+        : createPlatform();
       this.platform = platform;
-      const [cfg] = await Promise.all([loadEconomyConfig(), loadRuntimeConfig()]);
+      this.platformServices = services;
+      const [cfg] = await Promise.all([loadEconomyConfig(), loadRuntimeConfig(services.configRoot)]);
       const loadResult = await GameFacade.bootstrapWithStatus(platform, cfg);
       if (loadResult.kind === 'unavailable' || loadResult.kind === 'corrupt') {
         const code = loadResult.kind === 'unavailable' ? 'SAVE_UNAVAILABLE' : 'SAVE_CORRUPT';
@@ -816,9 +819,10 @@ export class AppView extends Component {
   private persistenceRecoveryOverlay: Node | null = null;
 
   private async setupAdsAfterConsent(): Promise<void> {
-    if (!this.facade || !this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
-    const config = await loadAdsConfig();
-    const provider = new TapRewardedAdProvider(config.enabled, config.rewardedAdUnitId);
+    const services = this.platformServices;
+    if (!services || !this.facade || !this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
+    const config = await loadAdsConfig(services.configRoot);
+    const provider = services.createRewardedAds(config.enabled, config.rewardedAdUnitId);
     this.adCoordinator = new AdRewardCoordinator(provider, this.facade, () => {
       const authEpoch = this.authEpoch;
       const contextEpoch = this.contextEpoch;
@@ -838,12 +842,13 @@ export class AppView extends Component {
   }
 
   private async setupLeaderboardAfterConsent(): Promise<void> {
-    if (!this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
-    this.leaderboardConfig = await loadLeaderboardConfig();
+    const services = this.platformServices;
+    if (!services || !this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
+    this.leaderboardConfig = await loadLeaderboardConfig(services.configRoot);
     const consent = await this.platform.get<boolean>('ceo/leaderboard/consent/v1').catch(() => false) === true;
     if (consent !== this.leaderboardConsent) this.leaderboardConsentEpoch += 1;
     this.leaderboardConsent = consent;
-    this.leaderboardSync ??= new LeaderboardSyncService(new TapLeaderboardProvider(), this.leaderboardConfig);
+    this.leaderboardSync ??= new LeaderboardSyncService(services.createLeaderboard(), this.leaderboardConfig);
   }
 
   /**
@@ -923,7 +928,8 @@ export class AppView extends Component {
     const auth = this.auth;
     const identity = this.identity;
     const config = this.cloudConfig;
-    if (!auth || !identity || !config) return;
+    const services = this.platformServices;
+    if (!services || !auth || !identity || !config) return;
     this.identityVerification = 'verifying';
     const environment = config.environment === 'production' ? 'production' : 'test';
     const flight = (async () => {
@@ -946,7 +952,7 @@ export class AppView extends Component {
           if (applied.kind === 'verified' || applied.kind === 'changed') {
             if (identity.currentEpoch !== previousEpoch && this.platform) {
               // 确认换号/首绑：云服务改绑新 profile；旧云列表与归属已在切换回调内清空。
-              this.cloudProvider = new TapCloudSaveProvider();
+              this.cloudProvider = services.createCloudSave();
               this.cloudSync = new CloudSyncService(this.cloudProvider, this.platform, config,
                 config.appId, environment, identity.profileId);
               if (applied.kind === 'changed') {
@@ -983,8 +989,9 @@ export class AppView extends Component {
   }
 
   private async setupCloudAfterConsent(): Promise<void> {
-    if (!this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
-    this.cloudConfig = await loadCloudConfig();
+    const services = this.platformServices;
+    if (!services || !this.platform || !(await hasAcceptedPrivacy(this.platform))) return;
+    this.cloudConfig = await loadCloudConfig(services.configRoot);
     const environment = this.cloudConfig.environment === 'production' ? 'production' : 'test';
     // A24-05：身份只来自可信来源；开发者 OAuth / 昵称 / 设备号 / 随机每设备 ID 都不是账号。
     if (!this.identity || this.identity.appId !== this.cloudConfig.appId
@@ -1005,7 +1012,7 @@ export class AppView extends Component {
     // DEV-02：启动身份基于缓存会话，不等于平台当前账号；敏感操作前由统一身份门强制刷新。
     this.identityVerification = 'unverified';
     this.lastBackupAuthEpoch = this.authEpoch;
-    this.cloudProvider = new TapCloudSaveProvider();
+    this.cloudProvider = services.createCloudSave();
     this.cloudSync = new CloudSyncService(this.cloudProvider, this.platform, this.cloudConfig,
       this.cloudConfig.appId, environment, this.identity.profileId);
     const status = await this.cloudSync.status();
@@ -5432,7 +5439,7 @@ export class AppView extends Component {
         textColor: THEME.primary, parent,
         onClick: () => {
           if (!boardId) { this.toast('真实榜单缺少后台榜 ID'); return; }
-          void new TapLeaderboardProvider().open(boardId).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用（需后台白名单/登录态）'); });
+          void this.platformServices?.createLeaderboard().open(boardId).then((r) => { if (r.kind !== 'ok') this.toast('TapTap榜单暂不可用（需后台白名单/登录态）'); });
         } }).setPosition(0, entryY);
       // UI-24：真实榜入口图标 RANK-04（装饰不占触区，不改按钮热区）
       const rankEntryIcon = new Node('RankEntryIcon');

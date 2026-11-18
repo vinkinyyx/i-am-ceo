@@ -30,9 +30,14 @@ node_modules/
 .idea/
 
 #//////////////////////////
-# 敏感/本地运行配置（永不入库，见 docs/08 与 server/README）
+# 敏感/本地运行配置（永不入库，见各平台文档）
 #//////////////////////////
-assets/resources/config/runtime.config.json
-server/.env
+/assets/resources/platforms/*/runtime.config.json
+/platforms/*/server/.env
 .env
 .env.*
+
+# 本地编辑器和测试生成文件
+/.screenshots/
+/extensions/taptap-minigame-tools/logs/
+__pycache__/

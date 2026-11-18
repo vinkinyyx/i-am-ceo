@@ -2,6 +2,7 @@
  * R16：正式包平台选择与能力边界。
  */
 import { describe, it, expect } from 'vitest';
+import { readBuildProfile } from '@core/platform/buildProfile';
 import { decidePlatform } from '@core/platform/platformSelection';
 
 describe('R16-T01 发布构建缺 tap 能力→unavailable，不降级', () => {
@@ -31,5 +32,20 @@ describe('R16-T02/T03 编辑器/预览仍可用 CocosPlatform；可选能力不�
     expect(
       decidePlatform({ buildKind: 'editor', hasTapRuntime: true, explicitTapDebug: true }),
     ).toEqual({ kind: 'taptap' });
+  });
+});
+
+describe('平台构建标识', () => {
+  it.each(['wechat', 'douyin', 'unknown'])('目标 %s 保留自己的标识并拒绝降级到 TapTap 或编辑器', (kind) => {
+    const profile = readBuildProfile({ kind });
+    expect(profile.kind).toBe(kind);
+    expect(decidePlatform({ buildKind: profile.kind, hasTapRuntime: true, explicitTapDebug: true })).toEqual({
+      kind: 'unavailable',
+      reason: 'platform-adapter-unavailable:' + kind,
+    });
+  });
+
+  it('有构建标识但格式错误时拒绝按编辑器启动', () => {
+    expect(readBuildProfile({}).kind).toBe('invalid-build-profile');
   });
 });

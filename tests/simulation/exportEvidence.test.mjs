@@ -7,7 +7,7 @@ describe.skipIf(process.env.CEO_EXPORT_SIMULATION_EVIDENCE !== '1')('R40 evidenc
   it('writes all 900 actual run rows and summary', () => {
     const { rows, csv } = runHundredSeedBatch();
     const summary = summarize(rows);
-    const output = path.resolve('evidence/m3/TASK-M3-09-R40/attempt-01');
+    const output = path.resolve('build/logs/simulation/r40');
     fs.mkdirSync(output, { recursive: true });
     fs.writeFileSync(path.join(output, 'simulation-900.csv'), `${csv}\n`, 'utf8');
     fs.writeFileSync(path.join(output, 'simulation-900.json'), JSON.stringify({ generatedAt: new Date().toISOString(), configHashAlgorithm: 'FNV-1a 64-bit over UTF-8 economy.v1.json bytes', summary, rows }, null, 2), 'utf8');

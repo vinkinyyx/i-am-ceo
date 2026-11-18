@@ -20,10 +20,11 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@core/*": ["assets/core/*"]
+      "@core/*": ["assets/core/*"],
+      "@platforms/*": ["assets/platforms/*"]
     },
     "types": []
   },
-  "include": ["assets/core/**/*.ts", "tests/**/*.ts", "tools/**/*.ts"],
+  "include": ["assets/core/**/*.ts", "assets/platforms/**/*.ts", "tests/**/*.ts", "tools/**/*.ts"],
   "exclude": ["node_modules", "library", "temp", "build", "NewProject"]
 }

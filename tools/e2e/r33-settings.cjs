@@ -2,8 +2,8 @@ const fs = require('fs');
 const { CanvasDriver } = require('./canvas-driver.cjs');
 
 (async () => {
-  const outDir = process.argv[3] || 'evidence/m3/TASK-M3-09-R33/attempt-01';
-  const seed = JSON.parse(fs.readFileSync('evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json', 'utf8'));
+  const outDir = process.argv[3] || 'build/logs/browser/m3/TASK-M3-09-R33/attempt-01';
+  const seed = JSON.parse(fs.readFileSync('tests/fixtures/browser/seed-staffed.json', 'utf8'));
   const driver = await CanvasDriver.launch({ url: process.argv[2] || 'http://127.0.0.1:8153/', viewport: { width: 375, height: 812 }, outDir, executablePath: process.env.CHROME_EXE || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' });
   const original = await driver.loadFixture(seed).then(() => driver.readCommittedSave());
   await driver.page.waitForTimeout(500);

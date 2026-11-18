@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseAdsConfig } from '../../assets/scripts/ads/adConfig';
-import { TapRewardedAdProvider } from '@core/platform/TapRewardedAdProvider';
+import { TapRewardedAdProvider } from '@platforms/taptap/TapRewardedAdProvider';
 
 describe('optional rewarded ad provider', () => {
   it('defaults missing, malformed, and no-unit configuration to disabled', () => {

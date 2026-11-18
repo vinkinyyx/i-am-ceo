@@ -36,8 +36,8 @@ function seal(envelope) {
 }
 function makeStressFixture() {
   const root = path.resolve(__dirname, '../..');
-  const large = JSON.parse(fs.readFileSync(path.join(root, 'evidence/m3/TASK-M3-09-R30/attempt-06/seed-size-100.json'), 'utf8'));
-  const staffed = JSON.parse(fs.readFileSync(path.join(root, 'evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json'), 'utf8'));
+  const large = JSON.parse(fs.readFileSync(path.join(root, 'tests/fixtures/browser/seed-size-100.json'), 'utf8'));
+  const staffed = JSON.parse(fs.readFileSync(path.join(root, 'tests/fixtures/browser/seed-staffed.json'), 'utf8'));
   const pointer = JSON.parse(large['ceo/save/active']);
   const envelope = JSON.parse(large[`ceo/save/${pointer.slot}`]);
   const staffedPointer = JSON.parse(staffed['ceo/save/active']);

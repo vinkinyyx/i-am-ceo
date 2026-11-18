@@ -1,7 +1,7 @@
 import type { GameState } from '../domain/types';
 import { GameError, GameErrorCode } from '../domain/errors';
 import { SaveRepository } from '../persistence/SaveRepository';
-import type { IStorageBackend } from '../platform/ITapPlatform';
+import type { IStorageBackend } from '../platform/IGamePlatform';
 import { createInitialState } from '../domain/gameStateFactory';
 import { cloneGameState } from '../persistence/cloneGameState';
 

@@ -20,8 +20,8 @@ function checksum(env) {
 }
 
 (async () => {
-  const outDir = process.argv[3] || 'evidence/m3/TASK-M3-09-R31-R32/attempt-01';
-  const seedFile = 'evidence/m3/TASK-M3-09-R30/attempt-06/seed-staffed.json';
+  const outDir = process.argv[3] || 'build/logs/browser/m3/TASK-M3-09-R31-R32/attempt-01';
+  const seedFile = 'tests/fixtures/browser/seed-staffed.json';
   const seed = JSON.parse(fs.readFileSync(seedFile, 'utf8'));
   const pointer = JSON.parse(seed['ceo/save/active']);
   const slot = pointer.slot;

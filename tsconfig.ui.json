@@ -21,6 +21,7 @@
   "include": [
     "assets/scripts/**/*.ts",
     "assets/core/**/*.ts",
+    "assets/platforms/**/*.ts",
     "C:/ProgramData/cocos/editors/Creator/3.8.8/resources/resources/3d/engine/bin/.declarations/cc.d.ts",
     "temp/declarations/cc.env.d.ts",
     "temp/declarations/jsb.d.ts",
